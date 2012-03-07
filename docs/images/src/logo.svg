@@ -17,8 +17,8 @@
    inkscape:version="0.48.2 r9819"
    sodipodi:docname="logo.svg"
    inkscape:export-filename="C:\Users\Rob\workspace\freezedry_sourceforge\docs\images\logo.png"
-   inkscape:export-xdpi="90"
-   inkscape:export-ydpi="90">
+   inkscape:export-xdpi="135"
+   inkscape:export-ydpi="135">
   <defs
      id="defs4">
     <linearGradient
@@ -124,7 +124,7 @@
        sodipodi:cy="31.536232"
        sodipodi:rx="4.216074"
        sodipodi:ry="5.3823071"
-       d="m 36.796557,32.378389 a 4.216074,5.3823071 0 1 1 0.03972,-0.432933"
+       d="m 36.796557,32.378389 c -0.364331,2.935953 -2.52403,4.938967 -4.823824,4.473857 -2.299794,-0.465111 -3.868797,-3.222217 -3.504466,-6.158171 0.364331,-2.935953 2.52403,-4.938967 4.823824,-4.473857 2.169136,0.438686 3.71117,2.929667 3.544191,5.725238"
        transform="matrix(0.63616727,0.22966691,-0.20083819,0.72748399,12.61259,1008.6459)"
        sodipodi:start="0.15711318"
        sodipodi:end="6.35929"
