@@ -72,7 +72,7 @@ import org.xml.sax.SAXException;
  * (field) in a {@link InfoNode}. The {@link InfoNode} information is a complete set of information needed 
  * to persist and reconstruct the specified {@link Object}.<p>
  * 
- * The {@link PersistenceEngine} allows you to specify {@link NodeBuilder} that are responsible for converting
+ * The {@link PersistenceEngine} allows you to specify {@link NodeBuilder}s that are responsible for converting
  * an object into the semantic model, and a semantic model back into an object. By default, a set of node builders
  * are created and added to the {@link PersistenceEngine} at construction. However, through the 
  * {@link #addNodeBuilder(Class, NodeBuilder)} method, you can specify which node builder to use for which class.
