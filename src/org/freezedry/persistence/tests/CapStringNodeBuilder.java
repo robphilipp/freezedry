@@ -1,6 +1,8 @@
-package org.freezedry.persistence.builders;
+package org.freezedry.persistence.tests;
 
 import org.freezedry.persistence.PersistenceEngine;
+import org.freezedry.persistence.builders.NodeBuilder;
+import org.freezedry.persistence.builders.StringNodeBuilder;
 import org.freezedry.persistence.tree.InfoNode;
 
 public class CapStringNodeBuilder extends StringNodeBuilder {
