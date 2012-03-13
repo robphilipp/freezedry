@@ -117,7 +117,7 @@ public class CollectionNodeBuilder extends AbstractNodeBuilder {
 			message.append( "Field not found in containing class:" + Constants.NEW_LINE );
 			message.append( "  Containing class: " + containingClass.getName() + Constants.NEW_LINE );
 			message.append( "  Field name: " + fieldName + Constants.NEW_LINE );
-			LOGGER.warn( message.toString(), e );
+			LOGGER.info( message.toString(), e );
 		}
 		if( persistName == null || persistName.isEmpty() )
 		{
@@ -142,7 +142,7 @@ public class CollectionNodeBuilder extends AbstractNodeBuilder {
 			message.append( "Field not found in containing class:" + Constants.NEW_LINE );
 			message.append( "  Containing class: " + containingClass.getName() + Constants.NEW_LINE );
 			message.append( "  Field name: " + fieldName + Constants.NEW_LINE );
-			LOGGER.warn( message.toString(), e );
+			LOGGER.info( message.toString(), e );
 		}
 		
 		// run through the Collection elements, recursively calling createNode(...) to create
