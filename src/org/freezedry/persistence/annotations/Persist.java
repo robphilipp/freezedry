@@ -40,5 +40,7 @@ public @interface Persist {
 	Class< ? > instantiateAs() default Null.class;
 //	Class< ? >[] instantiateGenericsAs() default {};
 	
+	Class< ? > useNodeBuilder() default Null.class;
+	
 	public static class Null { } 
 }

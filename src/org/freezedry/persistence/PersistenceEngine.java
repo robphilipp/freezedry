@@ -142,7 +142,7 @@ public class PersistenceEngine {
 		builders.put( String.class, new StringNodeBuilder( this ) );
 		
 		// other leaf nodes
-		builders.put( Calendar.class, new DateNodeBuilder() );
+		builders.put( Calendar.class, new DateNodeBuilder( this ) );
 		
 		// collection info node builder (specific info node builder)
 		builders.put( Collection.class, new CollectionNodeBuilder( this ) );
@@ -178,6 +178,26 @@ public class PersistenceEngine {
 	public boolean containsNodeBuilder( final Class< ? > clazz )
 	{
 		return ( getNodeBuilder( clazz ) != null );
+	}
+	
+	/**
+	 * Returns true if the specified field name of the specified {@link Class} has a {@link NodeBuilder} annotation;
+	 * false otherwise. 
+	 * @param clazz The specified {@link Class}
+	 * @param fieldName The field name to check for a {@link NodeBuilder} annotation.
+	 * @return true if the specified field name of the specified {@link Class} has a {@link NodeBuilder} annotation;
+	 * false otherwise.
+	 */
+	public boolean containsAnnotatedNodeBuilder( final Class< ? > clazz, final String fieldName )
+	{
+		boolean contains = false;
+		try
+		{
+			contains = ReflectionUtils.hasNodeBuilderAnnotation( clazz, fieldName );
+		}
+		catch( IllegalArgumentException e ) {}	// swallow the exception
+		
+		return contains;
 	}
 
 	/**
@@ -249,6 +269,50 @@ public class PersistenceEngine {
 	public void setGeneralArrayNodeBuilder( final NodeBuilder builder )
 	{
 		this.genaralArrayNodeBuilder = builder;
+	}
+
+	/*
+	 * Searches through the existing node builders to see if they are of the specified {@link Class}.
+	 * If it doesn't find one, then it instantiates a new {@link NodeBuilder} and sets its {@link PersistenceEngine}
+	 * to this object.
+	 * @param nodeBuilderClass The {@link NodeBuilder} {@link Class} to be used for instantiating the object
+	 * @return a {@link NodeBuilder} object associated with the specified node builder {@link Class}
+	 */
+	private NodeBuilder getAnnotatedNodeBuilder( final Class< ? > clazz, final String fieldName )
+	{
+		// grab the node builder class from the field annotation
+		final Class< ? > nodeBuilderClass = ReflectionUtils.getNodeBuilderClass( clazz, fieldName );
+
+		// first we check to see if the node builder has already been constructed, in which case
+		// we use it.
+		NodeBuilder nodeBuilder = null;
+		for( Map.Entry< Class< ? >, NodeBuilder > entry : nodeBuilders.entrySet() )
+		{
+			if( entry.getValue().getClass().equals( nodeBuilderClass ) )
+			{
+				nodeBuilder = entry.getValue();
+				break;
+			}
+		}
+		
+		// if the node builder is still null at this point, then we need to instantiate one.
+		if( nodeBuilder == null )
+		{
+			try
+			{
+				nodeBuilder = (NodeBuilder)nodeBuilderClass.newInstance();
+				nodeBuilder.setPersistenceEngine( this );
+			}
+			catch( InstantiationException | IllegalAccessException e )
+			{
+				final StringBuffer message = new StringBuffer();
+				message.append( "Unable to instantiate the NodeBuilder class." + Constants.NEW_LINE );
+				message.append( "  NodeBuilder Class: " + nodeBuilderClass.getName() );
+				LOGGER.error( message.toString() );
+				throw new IllegalStateException( message.toString(), e );
+			}
+		}
+		return nodeBuilder;
 	}
 	
 	/**
@@ -332,6 +396,7 @@ public class PersistenceEngine {
 		final Class< ? > clazz = object.getClass();
 		
 		// construct the node. There are several cases to consider:
+		// 0. the field annotated with a specified node builder in mind
 		// 1. the object is intended to be a leaf node: create a leaf InfoNode object
 		//    with the appropriately populated values, and we're done.
 		// 2. the object is of a special type: use the appropriate node factory 
@@ -344,7 +409,26 @@ public class PersistenceEngine {
 		// the leaf node info node builders may need to be overridden. the third case is handled
 		// by the compound node
 		InfoNode node = null;
-		if( containsNodeBuilder( clazz ) )
+		if( containsAnnotatedNodeBuilder( containingClass, fieldName ) )
+		{
+			final NodeBuilder builder = getAnnotatedNodeBuilder( containingClass, fieldName );
+			try
+			{
+				node = builder.createInfoNode( containingClass, object, fieldName );
+			}
+			catch( ReflectiveOperationException e )
+			{
+				final StringBuffer message = new StringBuffer();
+				message.append( "Node Builder failed to create InfoNode:" + Constants.NEW_LINE );
+				message.append( "  Builder: " + builder.getClass().getName() + Constants.NEW_LINE );
+				message.append( "  Containing Class Name: " + containingClass.getName() + Constants.NEW_LINE );
+				message.append( "  Object: " + clazz.getName() + Constants.NEW_LINE );
+				message.append( "  Field Name: " + fieldName + Constants.NEW_LINE );
+				LOGGER.error( message.toString() );
+				throw new IllegalStateException( message.toString(), e );
+			}
+		}
+		else if( containsNodeBuilder( clazz ) )
 		{
 			final NodeBuilder builder = getNodeBuilder( clazz );
 			try
@@ -468,7 +552,6 @@ public class PersistenceEngine {
 				}
 			}
 
-			// TODO if a field for the fieldName doesn't exist, then search the annotations
 			// grab the class' field
 			try
 			{
@@ -501,7 +584,8 @@ public class PersistenceEngine {
 	
 				// create the object
 				final Class< ? > newClass = ReflectionUtils.getMostSpecificClass( field.getType(), node );
-				final Object newObject = createObject( newClass, node );
+				final Class< ? > containingClass = field.getDeclaringClass();
+				final Object newObject = createObject( containingClass, newClass, node );
 	
 				// set the field to be accessible (override the accessor)
 				field.setAccessible( true );
@@ -542,18 +626,43 @@ public class PersistenceEngine {
 	 * @param currentNode The {@link InfoNode} containing information about the object to be created
 	 * @return The newly minted object
 	 */
-	public Object createObject( final Class< ? > clazz, final InfoNode currentNode )
+	public Object createObject( final Class< ? > containingClass, final Class< ? > clazz, final InfoNode currentNode )
 	{
+		// grab the field name from the node
+		String fieldName = currentNode.getFieldName();
+		if( fieldName == null )
+		{
+			fieldName = currentNode.getPersistName();
+		}
+		
 		// find the node builder need to create the object. if there is
 		// no node builder, then instantiate the object and make a recursive call
 		// to the buildObject(...) method.
 		Object object = null;
-		if( containsNodeBuilder( clazz ) )
+		if( containsAnnotatedNodeBuilder( containingClass, fieldName ) )
+		{
+			final NodeBuilder builder = getAnnotatedNodeBuilder( containingClass, fieldName );
+			try
+			{
+				object = builder.createObject( containingClass, clazz, currentNode );
+			}
+			catch( ReflectiveOperationException e )
+			{
+				final StringBuffer message = new StringBuffer();
+				message.append( "Node Builder failed to create object from Class and InfoNode:" + Constants.NEW_LINE );
+				message.append( "  Class Name: " + clazz.getName() + Constants.NEW_LINE );
+				message.append( "  Builder: " + builder.getClass().getName() + Constants.NEW_LINE );
+				message.append( "  InfoNode: " + currentNode.toString() + Constants.NEW_LINE );
+				LOGGER.error( message.toString() );
+				throw new IllegalStateException( message.toString(), e );
+			}
+		}
+		else if( containsNodeBuilder( clazz ) )
 		{
 			final NodeBuilder builder = getNodeBuilder( clazz );
 			try
 			{
-				object = builder.createObject( clazz, currentNode );
+				object = builder.createObject( containingClass, clazz, currentNode );
 			}
 			catch( ReflectiveOperationException e )
 			{
@@ -570,7 +679,7 @@ public class PersistenceEngine {
 		{
 			try
 			{
-				object = genaralArrayNodeBuilder.createObject( clazz, currentNode );
+				object = genaralArrayNodeBuilder.createObject( containingClass, clazz, currentNode );
 			}
 			catch( ReflectiveOperationException e )
 			{

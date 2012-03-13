@@ -35,6 +35,7 @@ public class Person {
 	private String givenName;
 	
 //	@Persist( persistenceName = "LastName" )
+//	@Persist( useNodeBuilder = CapStringNodeBuilder.class )
 	private String familyName;
 	private int age;
 	

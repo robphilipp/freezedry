@@ -99,7 +99,7 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 			message.append( "Field not found in containing class:" + Constants.NEW_LINE );
 			message.append( "  Containing class: " + containingClass.getName() + Constants.NEW_LINE );
 			message.append( "  Field name: " + fieldName + Constants.NEW_LINE );
-			LOGGER.warn( message.toString(), e );
+			LOGGER.info( message.toString(), e );
 		}
 		if( persistName == null || persistName.isEmpty() )
 		{
@@ -139,7 +139,7 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 			message.append( "Field not found in containing class:" + Constants.NEW_LINE );
 			message.append( "  Containing class: " + containingClass.getName() + Constants.NEW_LINE );
 			message.append( "  Field name: " + fieldName + Constants.NEW_LINE );
-			LOGGER.warn( message.toString(), e );
+			LOGGER.info( message.toString(), e );
 		}
 		
 		// run through the Map entries, recursively calling createNode(...) to create
@@ -167,7 +167,7 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 	 * @see org.freezedry.persistence.builders.infonodes.NodeBuilder#createObject(java.lang.Class, org.freezedry.persistence.tree.nodes.InfoNode)
 	 */
 	@Override
-	public Object createObject( final Class< ? > clazz, final InfoNode node ) throws ReflectiveOperationException
+	public Object createObject( final Class< ? > containingClass, final Class< ? > clazz, final InfoNode node ) throws ReflectiveOperationException
 	{
 		// creates the map...
 		final Map< ? super Object, ? super Object > map = createMap( clazz );
@@ -238,14 +238,14 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 			if( PersistMap.KEY_PERSIST_NAME.equals( firstNode.getPersistName() ) &&
 				PersistMap.VALUE_PERSIST_NAME.equals( secondNode.getPersistName() )	)
 			{
-				key = buildObject( keyClass, keyTypes, firstNode, node );
-				value = buildObject( valueClass, valueTypes, secondNode, node );
+				key = buildObject( containingClass, keyClass, keyTypes, firstNode, node );
+				value = buildObject( containingClass, valueClass, valueTypes, secondNode, node );
 			}
 			else if( PersistMap.KEY_PERSIST_NAME.equals( secondNode.getPersistName() ) &&
 					 PersistMap.VALUE_PERSIST_NAME.equals( firstNode.getPersistName() ) )
 			{
-				key = buildObject( keyClass, keyTypes, secondNode, node );
-				value = buildObject( valueClass, valueTypes, firstNode, node );
+				key = buildObject( containingClass, keyClass, keyTypes, secondNode, node );
+				value = buildObject( containingClass, valueClass, valueTypes, firstNode, node );
 			}
 			
 			// add the new objects to the map

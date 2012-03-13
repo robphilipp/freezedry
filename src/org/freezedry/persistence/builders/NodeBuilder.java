@@ -55,7 +55,7 @@ public interface NodeBuilder extends Copyable< NodeBuilder > {
 	 * @param node The information about the object to create
 	 * @return
 	 */
-	Object createObject( final Class< ? > clazz, final InfoNode node ) throws ReflectiveOperationException;
+	Object createObject( final Class< ? > containingClass, final Class< ? > clazz, final InfoNode node ) throws ReflectiveOperationException;
 	
 	/**
 	 * Sets the {@link PersistenceEngine} with which this {@link NodeBuilder} must work. Recall, that the

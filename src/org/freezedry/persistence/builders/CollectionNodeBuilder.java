@@ -117,7 +117,7 @@ public class CollectionNodeBuilder extends AbstractNodeBuilder {
 			message.append( "Field not found in containing class:" + Constants.NEW_LINE );
 			message.append( "  Containing class: " + containingClass.getName() + Constants.NEW_LINE );
 			message.append( "  Field name: " + fieldName + Constants.NEW_LINE );
-			LOGGER.warn( message.toString(), e );
+			LOGGER.info( message.toString(), e );
 		}
 		if( persistName == null || persistName.isEmpty() )
 		{
@@ -142,7 +142,7 @@ public class CollectionNodeBuilder extends AbstractNodeBuilder {
 			message.append( "Field not found in containing class:" + Constants.NEW_LINE );
 			message.append( "  Containing class: " + containingClass.getName() + Constants.NEW_LINE );
 			message.append( "  Field name: " + fieldName + Constants.NEW_LINE );
-			LOGGER.warn( message.toString(), e );
+			LOGGER.info( message.toString(), e );
 		}
 		
 		// run through the Collection elements, recursively calling createNode(...) to create
@@ -169,7 +169,7 @@ public class CollectionNodeBuilder extends AbstractNodeBuilder {
 	 * @see org.freezedry.persistence.builders.infonodes.NodeBuilder#createObject(java.lang.Class, org.freezedry.persistence.tree.nodes.InfoNode)
 	 */
 	@Override
-	public Object createObject( final Class< ? > clazz, final InfoNode node ) throws ReflectiveOperationException
+	public Object createObject( final Class< ? > containingClass, final Class< ? > clazz, final InfoNode node ) throws ReflectiveOperationException
 	{
 		// creates the collection...
 		final Collection< ? super Object > collection = createCollection( clazz );
@@ -208,7 +208,7 @@ public class CollectionNodeBuilder extends AbstractNodeBuilder {
 		// and add them to the newly created collection.
 		for( InfoNode element : node.getChildren() ) 
 		{
-			final Object object = buildObject( elementClass, elementTypes, element, node );
+			final Object object = buildObject( containingClass, elementClass, elementTypes, element, node );
 			collection.add( object );
 		}
 		

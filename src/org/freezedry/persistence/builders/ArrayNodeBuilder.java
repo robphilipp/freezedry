@@ -180,7 +180,7 @@ public class ArrayNodeBuilder extends AbstractNodeBuilder {
 	 * @see org.freezedry.persistence.builders.infonodes.NodeBuilder#createObject(java.lang.Class, org.freezedry.persistence.tree.nodes.InfoNode)
 	 */
 	@Override
-	public Object createObject( final Class< ? > clazz, final InfoNode node ) throws ReflectiveOperationException
+	public Object createObject( final Class< ? > containingClass, final Class< ? > clazz, final InfoNode node ) throws ReflectiveOperationException
 	{
 		// TODO figure out the generics in arrays...i.e. is Person< Location >[] legal?
 //		// grab the generic type parameters from the info node, and make sure there is only one
@@ -222,7 +222,7 @@ public class ArrayNodeBuilder extends AbstractNodeBuilder {
 		for( InfoNode element : node.getChildren() ) 
 		{
 			// set the value into the array
-			final Object object = buildObject( clazz.getComponentType(), null, element, node );
+			final Object object = buildObject( containingClass, clazz.getComponentType(), null, element, node );
 			Array.set( collection, index, object );
 			
 			// increment the index counter

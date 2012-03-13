@@ -27,6 +27,7 @@ import java.util.concurrent.RunnableScheduledFuture;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.freezedry.persistence.annotations.Persist;
+import org.freezedry.persistence.builders.NodeBuilder;
 import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.tests.Fconcrete;
 import org.freezedry.persistence.utils.tests.circle.A;
@@ -401,7 +402,81 @@ public class ReflectionUtils {
 		}
 		return rootClass;
 	}
+	
+	/**
+	 * Retrieves the {@link NodeBuilder} {@link Class} associated with the field name of the specified
+	 * {@link Class}. If the field name isn't part of the specified class, then returns an exception.
+	 * Returns {@link Persist.Null} if no {@link NodeBuilder} {@link Class} was specified in the annotation.
+	 * @param clazz The specified {@link Class} that contains the specified field name
+	 * @param fieldName The name of the field for which to return the {@link NodeBuilder} {@link Class}.
+	 * @return The {@link NodeBuilder} {@link Class} associated with the annotation, or {@link Persist.Null} if no
+	 * {@link NodeBuilder} {@link Class} was specified in the annotation.
+	 */
+	public static Class< ? > getNodeBuilderClass( final Class< ? > clazz, final String fieldName )
+	{
+		Class< ? > nodeBuilderClass = null; 
+		try
+		{
+			// try for the field, if it isn't there it'll throw an exception.
+			nodeBuilderClass = getNodeBuilderClass( clazz.getDeclaredField( fieldName ) );
+		}
+		catch( ReflectiveOperationException e )
+		{
+			final StringBuffer message = new StringBuffer();
+			message.append( "The specified class does not have a field with the specified name." );
+			message.append( "  Specified Class: " + clazz + Constants.NEW_LINE );
+			message.append( "  Specified Field Name: " + fieldName );
+			LOGGER.error( message.toString() );
+			throw new IllegalArgumentException( message.toString(), e );
+		}
+		return nodeBuilderClass;
+	}
 
+	/**
+	/**
+	 * Retrieves the {@link NodeBuilder} {@link Class} associated with the field name of the specified
+	 * {@link Class}. If the field name isn't part of the specified class, then returns an exception.
+	 * Returns {@link Persist.Null} if no {@link NodeBuilder} {@link Class} was specified in the annotation.
+	 * @param field The field for which to retrieve the associated {@link NodeBuilder}.
+	 * @return The {@link NodeBuilder} {@link Class} associated with the annotation, or {@link Persist.Null} if no
+	 * {@link NodeBuilder} {@link Class} was specified in the annotation.
+	 */
+	public static Class< ? > getNodeBuilderClass( final Field field )
+	{
+		// see if the field has a @Persist( instantiateAs = XXXX.class ) annotation
+		final Persist annotation = field.getAnnotation( Persist.class );
+		Class< ? > nodeBuilderClass = null; 
+		if( annotation != null )
+		{
+			nodeBuilderClass = annotation.useNodeBuilder();
+		}
+		return nodeBuilderClass;
+	}
+	
+	/**
+	 * Returns true if the specified field name of the specified {@link Class} has a {@link NodeBuilder} annotation;
+	 * false otherwise. 
+	 * @param clazz The specified {@link Class}
+	 * @param fieldName The field name to check for a {@link NodeBuilder} annotation.
+	 * @return true if the specified field name of the specified {@link Class} has a {@link NodeBuilder} annotation;
+	 * false otherwise.
+	 */
+	public static boolean hasNodeBuilderAnnotation( final Class< ? > clazz, final String fieldName )
+	{
+		boolean hasAnnotation = false;
+		try
+		{
+			// try to get the field or skip over the next line to catch the no such field exception
+			final Field field = clazz.getDeclaredField( fieldName );
+			
+			// has the field, but does it have the annotation
+			final Class< ? > builderClass = getNodeBuilderClass( field );
+			hasAnnotation = ( builderClass != Persist.Null.class ) && ( builderClass != null );
+		}
+		catch( NoSuchFieldException e ) {}
+		return hasAnnotation;
+	}
+	
 	public static void main( String[] args )
 	{
 		DOMConfigurator.configure( "log4j.xml" );
