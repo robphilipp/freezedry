@@ -52,7 +52,7 @@ public class BooleanNodeBuilder extends AbstractLeafNodeBuilder {
 	 * @see org.freezedry.persistence.builders.infonodes.NodeBuilder#createObject(java.lang.Class, org.freezedry.persistence.tree.nodes.InfoNode)
 	 */
 	@Override
-	public Boolean createObject( final Class< ? > clazz, final InfoNode node )
+	public Boolean createObject( final Class< ? > containingClass, final Class< ? > clazz, final InfoNode node )
 	{
 		final Object valueString = node.getValue();
 		return Boolean.parseBoolean( valueString.toString() );

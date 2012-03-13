@@ -552,7 +552,6 @@ public class PersistenceEngine {
 				}
 			}
 
-			// TODO if a field for the fieldName doesn't exist, then search the annotations
 			// grab the class' field
 			try
 			{
@@ -585,7 +584,8 @@ public class PersistenceEngine {
 	
 				// create the object
 				final Class< ? > newClass = ReflectionUtils.getMostSpecificClass( field.getType(), node );
-				final Object newObject = createObject( newClass, node );
+				final Class< ? > containingClass = field.getDeclaringClass();
+				final Object newObject = createObject( containingClass, newClass, node );
 	
 				// set the field to be accessible (override the accessor)
 				field.setAccessible( true );
@@ -626,18 +626,43 @@ public class PersistenceEngine {
 	 * @param currentNode The {@link InfoNode} containing information about the object to be created
 	 * @return The newly minted object
 	 */
-	public Object createObject( final Class< ? > clazz, final InfoNode currentNode )
+	public Object createObject( final Class< ? > containingClass, final Class< ? > clazz, final InfoNode currentNode )
 	{
+		// grab the field name from the node
+		String fieldName = currentNode.getFieldName();
+		if( fieldName == null )
+		{
+			fieldName = currentNode.getPersistName();
+		}
+		
 		// find the node builder need to create the object. if there is
 		// no node builder, then instantiate the object and make a recursive call
 		// to the buildObject(...) method.
 		Object object = null;
-		if( containsNodeBuilder( clazz ) )
+		if( containsAnnotatedNodeBuilder( containingClass, fieldName ) )
+		{
+			final NodeBuilder builder = getAnnotatedNodeBuilder( containingClass, fieldName );
+			try
+			{
+				object = builder.createObject( containingClass, clazz, currentNode );
+			}
+			catch( ReflectiveOperationException e )
+			{
+				final StringBuffer message = new StringBuffer();
+				message.append( "Node Builder failed to create object from Class and InfoNode:" + Constants.NEW_LINE );
+				message.append( "  Class Name: " + clazz.getName() + Constants.NEW_LINE );
+				message.append( "  Builder: " + builder.getClass().getName() + Constants.NEW_LINE );
+				message.append( "  InfoNode: " + currentNode.toString() + Constants.NEW_LINE );
+				LOGGER.error( message.toString() );
+				throw new IllegalStateException( message.toString(), e );
+			}
+		}
+		else if( containsNodeBuilder( clazz ) )
 		{
 			final NodeBuilder builder = getNodeBuilder( clazz );
 			try
 			{
-				object = builder.createObject( clazz, currentNode );
+				object = builder.createObject( containingClass, clazz, currentNode );
 			}
 			catch( ReflectiveOperationException e )
 			{
@@ -654,7 +679,7 @@ public class PersistenceEngine {
 		{
 			try
 			{
-				object = genaralArrayNodeBuilder.createObject( clazz, currentNode );
+				object = genaralArrayNodeBuilder.createObject( containingClass, clazz, currentNode );
 			}
 			catch( ReflectiveOperationException e )
 			{

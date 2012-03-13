@@ -230,7 +230,8 @@ public abstract class AbstractNodeBuilder implements NodeBuilder {
 	 * @return The newly created object
 	 * @throws ReflectiveOperationException
 	 */
-	protected Object buildObject( final Class< ? > clazz, 
+	protected Object buildObject( final Class< ? > containingClass,
+								  final Class< ? > clazz, 
 								  final List< Type > types, 
 								  final InfoNode node, 
 								  final InfoNode parentNode ) throws ReflectiveOperationException
@@ -244,7 +245,7 @@ public abstract class AbstractNodeBuilder implements NodeBuilder {
 		updateNode( node, types, parentNode );
 		
 		// create the new object
-		final Object key = getPersistenceEngine().createObject( specificClazz, node );
+		final Object key = getPersistenceEngine().createObject( containingClass, specificClazz, node );
 		
 		return key;
 	}

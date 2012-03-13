@@ -169,7 +169,7 @@ public class CollectionNodeBuilder extends AbstractNodeBuilder {
 	 * @see org.freezedry.persistence.builders.infonodes.NodeBuilder#createObject(java.lang.Class, org.freezedry.persistence.tree.nodes.InfoNode)
 	 */
 	@Override
-	public Object createObject( final Class< ? > clazz, final InfoNode node ) throws ReflectiveOperationException
+	public Object createObject( final Class< ? > containingClass, final Class< ? > clazz, final InfoNode node ) throws ReflectiveOperationException
 	{
 		// creates the collection...
 		final Collection< ? super Object > collection = createCollection( clazz );
@@ -208,7 +208,7 @@ public class CollectionNodeBuilder extends AbstractNodeBuilder {
 		// and add them to the newly created collection.
 		for( InfoNode element : node.getChildren() ) 
 		{
-			final Object object = buildObject( elementClass, elementTypes, element, node );
+			final Object object = buildObject( containingClass, elementClass, elementTypes, element, node );
 			collection.add( object );
 		}
 		
