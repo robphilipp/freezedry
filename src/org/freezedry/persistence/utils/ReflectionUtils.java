@@ -353,6 +353,31 @@ public class ReflectionUtils {
 	}
 	
 	/**
+	 * Returns the name of the {@link Field} which is annotated with the specified persistence name, or null if
+	 * no {@link Field} has the annotation.
+	 * @param clazz The {@link Class} potentially containing the field with the specified persistence name
+	 * @param persistName The persistence name to find
+	 * @return the name of the {@link Field} which is annotated with the specified persistence name, or null if
+	 * no {@link Field} has the annotation. 
+	 */
+	public static String getFieldNameForPersistenceName( final Class< ? > clazz, final String persistName )
+	{
+		final List< Field > fields = Arrays.asList( clazz.getDeclaredFields() );
+		String fieldName = null;
+		for( final Field field : fields )
+		{
+			// grab the persistence name if the annotation @Persist( persistName = "xxxx" ) is specified
+			if( persistName.equals( getPersistenceName( field ) ) )
+			{
+				fieldName = field.getName();
+				break;
+			}
+		}
+		
+		return fieldName;
+	}
+	
+	/**
 	 * Returns the {@link Class} of the {@link InfoNode} object. If the specified {@link Class} is a subtype of the
 	 * {@link Class} in the {@link InfoNode}, then it uses the specified {@link Class}. And vice versa.
 	 * If the specified {@link Class} is not a subtype of the {@link Class} found in the {@link InfoNode}, then

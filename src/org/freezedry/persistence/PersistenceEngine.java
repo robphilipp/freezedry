@@ -632,7 +632,12 @@ public class PersistenceEngine {
 		String fieldName = currentNode.getFieldName();
 		if( fieldName == null )
 		{
-			fieldName = currentNode.getPersistName();
+			final String persistName = currentNode.getPersistName();
+			fieldName = ReflectionUtils.getFieldNameForPersistenceName( containingClass, persistName );
+			if( fieldName == null )
+			{
+				fieldName = persistName;
+			}
 		}
 		
 		// find the node builder need to create the object. if there is
