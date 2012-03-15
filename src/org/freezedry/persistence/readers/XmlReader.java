@@ -19,6 +19,7 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -83,7 +84,8 @@ public class XmlReader implements Reader {
 	 * @see org.freezedry.persistence.readers.Reader#read(java.lang.Class, java.io.InputStream)
 	 */
 	@Override
-	public InfoNode read( final Class< ? > clazz, final InputStream input )
+//	public InfoNode read( final Class< ? > clazz, final InputStream input )
+	public InfoNode read( final Class< ? > clazz, final java.io.Reader input )
 	{
 		// load the xml file into a DOM document node
 		final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -96,7 +98,8 @@ public class XmlReader implements Reader {
 			// parse the input stream into a DOM tree and remove the empty text nodes
 			// that may have been in the XML due to formatting (we have to do this unless
 			// we use a validating builder, for which we need an XML schema).
-			document = builder.parse( input );
+			final ReaderInputStream inputStream = new ReaderInputStream( input );
+			document = builder.parse( inputStream );
 			if( isRemoveEmptyTextNodes )
 			{
 				document = DomUtils.removeFormattingTextNodes( document );
@@ -333,7 +336,8 @@ public class XmlReader implements Reader {
 		
 		final XmlReader reader = new XmlReader();
 //		reader.setRemoveEmptyTextNodes( false );
-		final InputStream input = new BufferedInputStream( new FileInputStream( "person.xml" ) );
+		final InputStream inputStream = new BufferedInputStream( new FileInputStream( "person.xml" ) );
+		final java.io.Reader input = new InputStreamReader( inputStream );
 		final InfoNode infoNode = reader.read( Division.class, input );
 		System.out.println( infoNode.simpleTreeToString() );
 		

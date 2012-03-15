@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -806,7 +807,8 @@ public class PersistenceEngine {
 			// read in XML
 			final XmlReader reader = new XmlReader();
 	//		reader.setRemoveEmptyTextNodes( false );
-			final InputStream input = new BufferedInputStream( new FileInputStream( "person.xml" ) );
+			final InputStream inputStream = new BufferedInputStream( new FileInputStream( "person.xml" ) );
+			final java.io.Reader input = new InputStreamReader( inputStream );
 			final InfoNode infoNode = reader.read( Division.class, input );
 			System.out.println( infoNode.treeToString() );
 			
@@ -814,7 +816,8 @@ public class PersistenceEngine {
 			System.out.println( redivision );
 
 			// read in JSON 
-			final InputStream jsonInput = new BufferedInputStream( new FileInputStream( "person.json" ) );
+			final InputStream jsonInputStream = new BufferedInputStream( new FileInputStream( "person.json" ) );
+			final java.io.Reader jsonInput = new InputStreamReader( jsonInputStream );
 			final JsonReader jsonReader = new JsonReader();
 			final InfoNode jsonInfoNode = jsonReader.read( Division.class, jsonInput );
 			System.out.println( jsonInfoNode.simpleTreeToString() );

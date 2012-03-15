@@ -19,6 +19,7 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -81,7 +82,8 @@ public class JsonReader implements Reader {
 	 * @see org.freezedry.persistence.readers.Reader#read(java.lang.Class, java.io.InputStream)
 	 */
 	@Override
-	public InfoNode read( final Class< ? > clazz, final InputStream input )
+//	public InfoNode read( final Class< ? > clazz, final InputStream input )
+	public InfoNode read( final Class< ? > clazz, final java.io.Reader input )
 	{
 		// load the json string from the input stream into a json object
 		final JSONObject jsonObject = createRootJsonObject( clazz, input );
@@ -254,7 +256,8 @@ public class JsonReader implements Reader {
 	 * @param input The {@link InputStream} from which to read the JSON source
 	 * @return A string representation of the JSON source
 	 */
-	private static JSONObject createRootJsonObject( final Class< ? > clazz, final InputStream input )
+//	private static JSONObject createRootJsonObject( final Class< ? > clazz, final InputStream input )
+	private static JSONObject createRootJsonObject( final Class< ? > clazz, final java.io.Reader input )
 	{
 		// parse the source json string into a json object
 		String source = null;
@@ -346,7 +349,8 @@ public class JsonReader implements Reader {
 	{
 		DOMConfigurator.configure( "log4j.xml" );
 		
-		final InputStream input = new BufferedInputStream( new FileInputStream( "person.json" ) );
+		final InputStream inputStream = new BufferedInputStream( new FileInputStream( "person.json" ) );
+		final java.io.Reader input = new InputStreamReader( inputStream );
 		final JsonReader reader = new JsonReader();
 		final InfoNode infoNode = reader.read( Division.class, input );
 		System.out.println( infoNode.simpleTreeToString() );

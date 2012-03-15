@@ -32,7 +32,7 @@ public interface Writer {
 	 * output stream. The implementing class determines the format with which the semantic model is written.
 	 * There should also be an equivalent {@link Reader} that can read the output into the semantic model.
 	 * @param rootNode The root {@link InfoNode} representing the semantic model of the object to be written.
-	 * @param output The {@link PrintWriter} output stream to which to write the semantic model.
+	 * @param output The {@link java.io.Writer} output stream to which to write the semantic model.
 	 */
 	void write( final InfoNode rootNode, final java.io.Writer output );
 }

@@ -34,5 +34,5 @@ public interface Reader {
 	 * @param input The input stream from which to read the persisted object.
 	 * @return The root {@link InfoNode} representing the semantic model.
 	 */
-	InfoNode read( final Class< ? > clazz, final InputStream input );
+	InfoNode read( final Class< ? > clazz, final java.io.Reader input );
 }
