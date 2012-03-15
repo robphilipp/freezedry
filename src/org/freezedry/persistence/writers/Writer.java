@@ -34,5 +34,5 @@ public interface Writer {
 	 * @param rootNode The root {@link InfoNode} representing the semantic model of the object to be written.
 	 * @param output The {@link PrintWriter} output stream to which to write the semantic model.
 	 */
-	void write( final InfoNode rootNode, final PrintWriter output );
+	void write( final InfoNode rootNode, final java.io.Writer output );
 }

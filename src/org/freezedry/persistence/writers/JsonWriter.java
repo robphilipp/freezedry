@@ -46,7 +46,7 @@ public class JsonWriter implements Writer {
 	 * @see org.freezedry.persistence.writers.Writer#write(org.freezedry.persistence.tree.InfoNode, java.io.PrintWriter)
 	 */
 	@Override
-	public void write( final InfoNode rootNode, final PrintWriter output )
+	public void write( final InfoNode rootNode, final java.io.Writer output )
 	{
 		Pair< String, JSONObject > keyValue = null;
 		try

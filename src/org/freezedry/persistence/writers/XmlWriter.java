@@ -84,7 +84,7 @@ public class XmlWriter implements Writer {
 	 * @param rootNode The root {@link InfoNode} of the semantic model
 	 * @throws ParserConfigurationException
 	 */
-	public void write( final InfoNode rootNode, final PrintWriter output )
+	public void write( final InfoNode rootNode, final java.io.Writer output )
 	{
 		final Document document = buildDom( rootNode );
 		if( LOGGER.isInfoEnabled() )
