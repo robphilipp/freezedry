@@ -18,6 +18,7 @@ package org.freezedry.persistence.writers;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -46,7 +47,7 @@ import org.w3c.dom.Node;
  * 
  * @author Robert Philipp
  */
-public class XmlWriter implements Writer {
+public class XmlWriter implements PersistenceWriter {
 	
 	private static final Logger LOGGER = Logger.getLogger( XmlWriter.class );
 	
@@ -84,7 +85,7 @@ public class XmlWriter implements Writer {
 	 * @param rootNode The root {@link InfoNode} of the semantic model
 	 * @throws ParserConfigurationException
 	 */
-	public void write( final InfoNode rootNode, final java.io.Writer output )
+	public void write( final InfoNode rootNode, final Writer output )
 	{
 		final Document document = buildDom( rootNode );
 		if( LOGGER.isInfoEnabled() )

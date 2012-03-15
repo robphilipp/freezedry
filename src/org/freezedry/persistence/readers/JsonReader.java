@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -68,22 +69,21 @@ import org.json.JSONObject;
  *    false
  *    null
  * </pre> 
- * @see Reader
+ * @see PersistenceReader
  * @see XmlReader
  * 
  * @author rob
  */
-public class JsonReader implements Reader {
+public class JsonReader implements PersistenceReader {
 
 	private static final Logger LOGGER = Logger.getLogger( JsonReader.class );
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.freezedry.persistence.readers.Reader#read(java.lang.Class, java.io.InputStream)
+	 * @see org.freezedry.persistence.readers.PersistenceReader#read(java.lang.Class, java.io.InputStream)
 	 */
 	@Override
-//	public InfoNode read( final Class< ? > clazz, final InputStream input )
-	public InfoNode read( final Class< ? > clazz, final java.io.Reader input )
+	public InfoNode read( final Class< ? > clazz, final Reader input )
 	{
 		// load the json string from the input stream into a json object
 		final JSONObject jsonObject = createRootJsonObject( clazz, input );
@@ -256,8 +256,7 @@ public class JsonReader implements Reader {
 	 * @param input The {@link InputStream} from which to read the JSON source
 	 * @return A string representation of the JSON source
 	 */
-//	private static JSONObject createRootJsonObject( final Class< ? > clazz, final InputStream input )
-	private static JSONObject createRootJsonObject( final Class< ? > clazz, final java.io.Reader input )
+	private static JSONObject createRootJsonObject( final Class< ? > clazz, final Reader input )
 	{
 		// parse the source json string into a json object
 		String source = null;
@@ -350,7 +349,7 @@ public class JsonReader implements Reader {
 		DOMConfigurator.configure( "log4j.xml" );
 		
 		final InputStream inputStream = new BufferedInputStream( new FileInputStream( "person.json" ) );
-		final java.io.Reader input = new InputStreamReader( inputStream );
+		final Reader input = new InputStreamReader( inputStream );
 		final JsonReader reader = new JsonReader();
 		final InfoNode infoNode = reader.read( Division.class, input );
 		System.out.println( infoNode.simpleTreeToString() );

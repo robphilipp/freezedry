@@ -16,6 +16,7 @@
 package org.freezedry.persistence.readers;
 
 import java.io.InputStream;
+import java.io.Reader;
 
 import org.freezedry.persistence.tree.InfoNode;
 
@@ -26,7 +27,7 @@ import org.freezedry.persistence.tree.InfoNode;
  * 
  * @author Robert Philipp
  */
-public interface Reader {
+public interface PersistenceReader {
 
 	/**
 	 * Reads the input stream into a semantic model represented by the return root {@link InfoNode}.
@@ -34,5 +35,5 @@ public interface Reader {
 	 * @param input The input stream from which to read the persisted object.
 	 * @return The root {@link InfoNode} representing the semantic model.
 	 */
-	InfoNode read( final Class< ? > clazz, final java.io.Reader input );
+	InfoNode read( final Class< ? > clazz, final Reader input );
 }

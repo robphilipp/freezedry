@@ -18,6 +18,7 @@ package org.freezedry.persistence.writers;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Writer;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
@@ -37,16 +38,16 @@ import org.json.JSONWriter;
  * 
  * @author Robert Philipp
  */
-public class JsonWriter implements Writer {
+public class JsonWriter implements PersistenceWriter {
 
 	private static final Logger LOGGER = Logger.getLogger( JsonWriter.class );
 	
 	/*
 	 * (non-Javadoc)
-	 * @see org.freezedry.persistence.writers.Writer#write(org.freezedry.persistence.tree.InfoNode, java.io.PrintWriter)
+	 * @see org.freezedry.persistence.writers.PersistenceWriter#write(org.freezedry.persistence.tree.InfoNode, java.io.PrintWriter)
 	 */
 	@Override
-	public void write( final InfoNode rootNode, final java.io.Writer output )
+	public void write( final InfoNode rootNode, final Writer output )
 	{
 		Pair< String, JSONObject > keyValue = null;
 		try

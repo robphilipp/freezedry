@@ -48,7 +48,7 @@ import java.io.PipedOutputStream;
 import java.io.Reader;
 
 /**
- * This class convert Reader to InputStream. It works by converting the
+ * This class convert PersistenceReader to InputStream. It works by converting the
  * characters to the encoding specified in constructor parameter.
  * 
  * @author Petr Hamernik, David Strupl

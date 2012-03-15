@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -47,7 +48,7 @@ import org.xml.sax.SAXException;
  * 
  * @author Robert Philipp
  */
-public class XmlReader implements Reader {
+public class XmlReader implements PersistenceReader {
 
 	private static final Logger LOGGER = Logger.getLogger( XmlReader.class );
 	
@@ -81,11 +82,10 @@ public class XmlReader implements Reader {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.freezedry.persistence.readers.Reader#read(java.lang.Class, java.io.InputStream)
+	 * @see org.freezedry.persistence.readers.PersistenceReader#read(java.lang.Class, java.io.InputStream)
 	 */
 	@Override
-//	public InfoNode read( final Class< ? > clazz, final InputStream input )
-	public InfoNode read( final Class< ? > clazz, final java.io.Reader input )
+	public InfoNode read( final Class< ? > clazz, final Reader input )
 	{
 		// load the xml file into a DOM document node
 		final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -337,7 +337,7 @@ public class XmlReader implements Reader {
 		final XmlReader reader = new XmlReader();
 //		reader.setRemoveEmptyTextNodes( false );
 		final InputStream inputStream = new BufferedInputStream( new FileInputStream( "person.xml" ) );
-		final java.io.Reader input = new InputStreamReader( inputStream );
+		final Reader input = new InputStreamReader( inputStream );
 		final InfoNode infoNode = reader.read( Division.class, input );
 		System.out.println( infoNode.simpleTreeToString() );
 		

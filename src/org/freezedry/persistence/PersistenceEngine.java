@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.io.Reader;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -54,7 +55,7 @@ import org.freezedry.persistence.builders.ShortNodeBuilder;
 import org.freezedry.persistence.builders.StringNodeBuilder;
 import org.freezedry.persistence.containers.orderedseries.IntegerOrderedSeries;
 import org.freezedry.persistence.readers.JsonReader;
-import org.freezedry.persistence.readers.Reader;
+import org.freezedry.persistence.readers.PersistenceReader;
 import org.freezedry.persistence.readers.XmlReader;
 import org.freezedry.persistence.tests.Division;
 import org.freezedry.persistence.tests.Person;
@@ -63,7 +64,7 @@ import org.freezedry.persistence.utils.Constants;
 import org.freezedry.persistence.utils.DateUtils;
 import org.freezedry.persistence.utils.ReflectionUtils;
 import org.freezedry.persistence.writers.JsonWriter;
-import org.freezedry.persistence.writers.Writer;
+import org.freezedry.persistence.writers.PersistenceWriter;
 import org.freezedry.persistence.writers.XmlWriter;
 import org.xml.sax.SAXException;
 
@@ -98,8 +99,8 @@ import org.xml.sax.SAXException;
  * 
  * @see InfoNode
  * @see NodeBuilder
- * @see Writer
- * @see Reader
+ * @see PersistenceWriter
+ * @see PersistenceReader
  * @see Persist
  * 
  * @author Robert Philipp
@@ -808,7 +809,7 @@ public class PersistenceEngine {
 			final XmlReader reader = new XmlReader();
 	//		reader.setRemoveEmptyTextNodes( false );
 			final InputStream inputStream = new BufferedInputStream( new FileInputStream( "person.xml" ) );
-			final java.io.Reader input = new InputStreamReader( inputStream );
+			final Reader input = new InputStreamReader( inputStream );
 			final InfoNode infoNode = reader.read( Division.class, input );
 			System.out.println( infoNode.treeToString() );
 			
@@ -817,7 +818,7 @@ public class PersistenceEngine {
 
 			// read in JSON 
 			final InputStream jsonInputStream = new BufferedInputStream( new FileInputStream( "person.json" ) );
-			final java.io.Reader jsonInput = new InputStreamReader( jsonInputStream );
+			final Reader jsonInput = new InputStreamReader( jsonInputStream );
 			final JsonReader jsonReader = new JsonReader();
 			final InfoNode jsonInfoNode = jsonReader.read( Division.class, jsonInput );
 			System.out.println( jsonInfoNode.simpleTreeToString() );
