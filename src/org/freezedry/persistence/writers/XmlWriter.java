@@ -94,13 +94,13 @@ public class XmlWriter implements PersistenceWriter {
 		}
 		
 		// use a Transformer to write the output xml
-		final TransformerFactory tFactory = TransformerFactory.newInstance();
+		final TransformerFactory factory = TransformerFactory.newInstance();
 		try
 		{
 			final DOMSource source = new DOMSource( document );
 			final StreamResult result = new StreamResult( output );
 			
-			final Transformer transformer = tFactory.newTransformer();
+			final Transformer transformer = factory.newTransformer();
 			transformer.transform( source, result );
 		}
 		catch( TransformerException e )

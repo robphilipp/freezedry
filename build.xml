@@ -35,7 +35,7 @@
 	<property name="log4j_config" value="log4j.xml" />
 	
 	<!-- 
-		jUnit
+		JSON
 	-->
 	<property name="json" value="json-20120228.jar" />
 		
@@ -108,11 +108,11 @@
 
 
 	<!-- 
-		Target: make_app_jar
+		Target: make_jar
 		
-		builds a single jar that contains all the dependent jar files 
+		builds a jar that contains only the FreezeDry classes 
 	-->
-	<target name="make_jar" depends="clean_dist, init, configure_logging" description="build the jar file for the application">
+	<target name="make_jar" depends="clean_dist, init, configure_logging" description="build the jar file containing only FreezeDry classes">
 		<echo>***** Building single jar file for ${app_name} *****</echo>
 		<echo>Base Directory: ${basedir}</echo>
 		<echo>Directory containing classes: ${build}</echo>
@@ -139,11 +139,11 @@
 	</target>
 
 	<!-- 
-		Target: make_app_jar
+		Target: make_combined_jar
 		
 		builds a single jar that contains all the dependent jar files 
 	-->
-	<target name="make_combined_jar" depends="clean_dist, init, configure_logging" description="build the jar file for the application">
+	<target name="make_combined_jar" depends="clean_dist, init, configure_logging" description="build a jar file that contains all the dependent code">
 		<echo>***** Building single jar file for ${app_name} *****</echo>
 		<echo>Base Directory: ${basedir}</echo>
 		<echo>Directory containing classes: ${build}</echo>
