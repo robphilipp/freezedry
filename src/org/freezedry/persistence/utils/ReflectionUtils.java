@@ -382,12 +382,12 @@ public class ReflectionUtils {
 	 * {@link Class} in the {@link InfoNode}, then it uses the specified {@link Class}. And vice versa.
 	 * If the specified {@link Class} is not a subtype of the {@link Class} found in the {@link InfoNode}, then
 	 * it returns the {@link Class} from the {@link InfoNode}. If the {@link Class} found in the {@link InfoNode}
-	 * is null, then returns the specifiec {@link Class}.
+	 * is null, then returns the specified {@link Class}.
 	 * @param clazz The specified {@link Class} to parse
 	 * @param node The {@link InfoNode}
 	 * @return The most specific {@link Class} when the specified {@link Class} is a subtype of the {@link Class}
 	 * found in the {@link InfoNode} object. Otherwise, returns the {@link Class} found in the {@link InfoNode} object.
-	 * If the {@link Class} found in the {@link InfoNode} is null, then returns the specifiec {@link Class}.
+	 * If the {@link Class} found in the {@link InfoNode} is null, then returns the specified {@link Class}.
 	 */
 	public static Class< ? > getMostSpecificClass( final Class< ? > clazz, final InfoNode node )
 	{
@@ -398,7 +398,7 @@ public class ReflectionUtils {
 			if( ReflectionUtils.calculateClassDistance( clazz, rootClass ) > 0  )
 			{
 				final StringBuffer message = new StringBuffer();
-				message.append( "The specified class derives from the class specified in the root node: using root node class." );
+				message.append( "The specified class derives from the class specified in the root node: using root node class."  + Constants.NEW_LINE);
 				message.append( "  Specified Class: " + clazz + Constants.NEW_LINE );
 				message.append( "  Root Node Class: " + rootClass + Constants.NEW_LINE );
 				LOGGER.info( message.toString() );
@@ -407,7 +407,7 @@ public class ReflectionUtils {
 			else if( ReflectionUtils.calculateClassDistance( rootClass, clazz ) > 0 )
 			{
 				final StringBuffer message = new StringBuffer();
-				message.append( "The class in the root node derives from the specified class: using specified class." );
+				message.append( "The class in the root node derives from the specified class: using specified class." + Constants.NEW_LINE );
 				message.append( "  Specified Class: " + clazz + Constants.NEW_LINE );
 				message.append( "  Root Node Class: " + rootClass + Constants.NEW_LINE );
 				LOGGER.info( message.toString() );
@@ -448,7 +448,7 @@ public class ReflectionUtils {
 		catch( ReflectiveOperationException e )
 		{
 			final StringBuffer message = new StringBuffer();
-			message.append( "The specified class does not have a field with the specified name." );
+			message.append( "The specified class does not have a field with the specified name."  + Constants.NEW_LINE);
 			message.append( "  Specified Class: " + clazz + Constants.NEW_LINE );
 			message.append( "  Specified Field Name: " + fieldName );
 			LOGGER.error( message.toString() );
