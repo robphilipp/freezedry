@@ -1,5 +1,7 @@
 package org.freezedry.persistence.renderers;
 
+import java.util.List;
+
 import org.freezedry.persistence.containers.Pair;
 import org.freezedry.persistence.copyable.Copyable;
 import org.freezedry.persistence.tree.InfoNode;
@@ -14,7 +16,6 @@ public interface PersistenceRenderer extends Copyable< PersistenceRenderer >{
 	 * 
 	 * @param infoNode
 	 * @param key
-	 * @return
 	 */
-	Pair< String, Object > createKeyValuePair( final InfoNode infoNode, final String key );
+	void buildKeyValuePair( final InfoNode infoNode, final String key, final List< Pair< String, Object > > keyValues );
 }

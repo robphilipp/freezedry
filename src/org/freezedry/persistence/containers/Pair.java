@@ -150,8 +150,8 @@ public class Pair< F, S > {
 	public String toString()
 	{
 		final StringBuffer asString = new StringBuffer( "[" );
-		asString.append( first.toString() ).append( ", " );
-		asString.append( second.toString() ).append( "]" );
+		asString.append( (first != null ? first.toString() : "[null]" ) ).append( ", " );
+		asString.append( (second != null ? second.toString() : "[null]" ) ).append( "]" );
 		return asString.toString();
 	}
 }
