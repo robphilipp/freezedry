@@ -6,25 +6,113 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.freezedry.persistence.PersistenceEngine;
+import org.freezedry.persistence.builders.NodeBuilder;
 import org.freezedry.persistence.containers.Pair;
+import org.freezedry.persistence.containers.orderedseries.IntegerOrderedSeries;
+import org.freezedry.persistence.renderers.ListRenderer;
+import org.freezedry.persistence.renderers.PersistenceRenderer;
 import org.freezedry.persistence.tests.Division;
 import org.freezedry.persistence.tests.Person;
 import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.DateUtils;
+import org.freezedry.persistence.utils.ReflectionUtils;
 import org.w3c.dom.Document;
 
 public class KeyValueWriter implements PersistenceWriter {
 
 //	private static final Logger LOGGER = Logger.getLogger( KeyValueWriter.class );
 	
+	private Map< Class< ? >, PersistenceRenderer > renderers;
+	
+	/**
+	 * 
+	 */
+	public KeyValueWriter()
+	{
+		renderers = createDefaultRenderers();
+	}
+	
+	/*
+	 * @return
+	 */
+	private static Map< Class< ? >, PersistenceRenderer > createDefaultRenderers()
+	{
+		final Map< Class< ? >, PersistenceRenderer > renderers = new HashMap<>();
+		renderers.put( List.class, new ListRenderer() );
+		
+		return renderers;
+	}
+	
+	/**
+	 * Finds the {@link PersistenceRenderer} associated with the class. If the specified class
+	 * doesn't have a renderer, then it searches for the closest parent class (inheritance)
+	 * and returns that. In this case, it adds an entry to the persistence renderer map for the
+	 * specified class associating it with the returned persistence renderer (performance speed-up for
+	 * subsequent calls).
+	 * @param clazz The class for which to find a persistence renderer
+	 * @return the {@link PersistenceRenderer} associated with the class
+	 */
+	public PersistenceRenderer getRenderer( final Class< ? > clazz )
+	{
+		// simplest case is that the info node builders map has an entry for the class
+		PersistenceRenderer renderer = renderers.get( clazz );
+		
+		// if the info node builder didn't have a direct entry, work our way up the inheritance
+		// hierarchy, and find the closed parent class, assigning it its associated info node builder
+		if( renderer == null )
+		{
+			// run through the available info node builders holding the distance (number of levels in the
+			// inheritance hierarchy) they are from the specified class
+			final IntegerOrderedSeries< Class< ? > > hierarchy = new IntegerOrderedSeries<>();
+			for( Map.Entry< Class< ? >, PersistenceRenderer > entry : renderers.entrySet() )
+			{
+				final Class< ? > targetClass = entry.getKey();
+				final int level = ReflectionUtils.calculateClassDistance( clazz, targetClass );
+				if( level > -1 )
+				{
+					hierarchy.add( level, targetClass );
+				}
+			}
+			
+			// if one or more parent classes were found, then take the first one,
+			// which is the closest one, grab its info node builder, and add an entry for the
+			// specified class to the associated info node builder for faster subsequent look-ups
+			if( !hierarchy.isEmpty() )
+			{
+				final Class< ? > closestParent = hierarchy.getFirstValue();
+				renderer = renderers.get( closestParent );
+				renderers.put( clazz, renderer.getCopy() );
+			}
+		}
+		return renderer;
+	}
+
+	/**
+	 * Finds the {@link PersistenceRenderer} associated with the class. If the specified class
+	 * doesn't have a renderer, then it searches for the closest parent class (inheritance)
+	 * and returns that. In this case, it adds an entry to the persistence renderer map for the
+	 * specified class associating it with the returned persistence renderer (performance speed-up for
+	 * subsequent calls).
+	 * @param clazz The class for which to find a persistence renderer
+	 * @return the true if a persistence renderer was found; false otherwise
+	 */
+	public boolean containsRenderer( final Class< ? > clazz )
+	{
+		return ( getRenderer( clazz ) != null );
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.writers.PersistenceWriter#write(org.freezedry.persistence.tree.InfoNode, java.io.Writer)
+	 */
 	@Override
 	public void write( final InfoNode rootNode, final Writer output )
 	{
@@ -52,13 +140,13 @@ public class KeyValueWriter implements PersistenceWriter {
 		return keyValuePairs;
 	}
 
-	/*
-	 * Recurses through the {@link InfoNode} tree and builds the DOM {@link Node} tree.
-	 * @param infoNode The {@link InfoNode} from which to build the domNode
-	 * @param domNode The DOM {@link Node} to which to add the new DOM {@link Node}s
-	 * @param document The root node of the DOM tree (which is a {@link Document})
+	/**
+	 * 
+	 * @param infoNode
+	 * @param key
+	 * @param keyValues
 	 */
-	private void buildKeyValuePairs( final InfoNode infoNode, final String key, final List< Pair< String, Object > > keyValues )
+	public void buildKeyValuePairs( final InfoNode infoNode, final String key, final List< Pair< String, Object > > keyValues )
 	{
 		final List< InfoNode > children = infoNode.getChildren();
 		for( InfoNode child : children )
@@ -66,7 +154,7 @@ public class KeyValueWriter implements PersistenceWriter {
 			// if the node represents a list, then let's use a list renderer? use similar design as used with the
 			// the node builders...
 			// create the new key value pair
-			final Pair< String, Object > newKeyValuePair = createKeyValuePair( child, key/*, keyValues*/ );
+			final Pair< String, Object > newKeyValuePair = createKeyValuePair( child, key );
 			final String newKey = newKeyValuePair.getFirst();
 			
 			// when the value is null, then the key-value pair is associated with a compound node,
@@ -86,11 +174,15 @@ public class KeyValueWriter implements PersistenceWriter {
 	 * 
 	 * @param infoNode
 	 * @param key
-	 * @param keyValues
 	 * @return
 	 */
-	private Pair< String, Object > createKeyValuePair( final InfoNode infoNode, final String key/*, final List< Pair< String, Object > > keyValues*/ )
+	private Pair< String, Object > createKeyValuePair( final InfoNode infoNode, final String key )
 	{
+		// grab the type information from the info node
+		final Class< ? > clazz = infoNode.getClazz();
+		
+		
+		
 		// create the new key based on the specified key and the persistence name
 		final String newKey = key + ":" + infoNode.getPersistName();
 
