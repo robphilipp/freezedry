@@ -1,4 +1,4 @@
-package org.freezedry.persistence.writers;
+package org.freezedry.persistence.writers.keyvalue;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -17,13 +17,14 @@ import org.apache.log4j.xml.DOMConfigurator;
 import org.freezedry.persistence.PersistenceEngine;
 import org.freezedry.persistence.containers.Pair;
 import org.freezedry.persistence.containers.orderedseries.IntegerOrderedSeries;
-import org.freezedry.persistence.renderers.CollectionRenderer;
-import org.freezedry.persistence.renderers.PersistenceRenderer;
 import org.freezedry.persistence.tests.Division;
 import org.freezedry.persistence.tests.Person;
 import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.DateUtils;
 import org.freezedry.persistence.utils.ReflectionUtils;
+import org.freezedry.persistence.writers.PersistenceWriter;
+import org.freezedry.persistence.writers.keyvalue.renderers.CollectionRenderer;
+import org.freezedry.persistence.writers.keyvalue.renderers.PersistenceRenderer;
 import org.w3c.dom.Document;
 
 public class KeyValueWriter implements PersistenceWriter {

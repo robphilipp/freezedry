@@ -1,8 +1,8 @@
-package org.freezedry.persistence.renderers;
+package org.freezedry.persistence.writers.keyvalue.renderers;
 
 import org.freezedry.persistence.utils.Require;
-import org.freezedry.persistence.writers.KeyValueWriter;
 import org.freezedry.persistence.writers.PersistenceWriter;
+import org.freezedry.persistence.writers.keyvalue.KeyValueWriter;
 
 public abstract class AbstractPersistenceRenderer implements PersistenceRenderer {
 
