@@ -6,8 +6,10 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +26,7 @@ import org.freezedry.persistence.utils.DateUtils;
 import org.freezedry.persistence.utils.ReflectionUtils;
 import org.freezedry.persistence.writers.PersistenceWriter;
 import org.freezedry.persistence.writers.keyvalue.renderers.CollectionRenderer;
+import org.freezedry.persistence.writers.keyvalue.renderers.MapRenderer;
 import org.freezedry.persistence.writers.keyvalue.renderers.PersistenceRenderer;
 import org.w3c.dom.Document;
 
@@ -50,6 +53,7 @@ public class KeyValueWriter implements PersistenceWriter {
 	{
 		final Map< Class< ? >, PersistenceRenderer > renderers = new HashMap<>();
 		renderers.put( Collection.class, new CollectionRenderer( this ) );
+		renderers.put( Map.class, new MapRenderer( this ) );
 		
 		return renderers;
 	}
@@ -257,10 +261,10 @@ public class KeyValueWriter implements PersistenceWriter {
 		division.addPerson( new Person( "Jones", "Janet", 13 ) );
 		division.addPerson( new Person( "Ghad", "Booda", 17 ) );
 		
-//		division.addMonth( "January", new HashSet<>( Arrays.asList( 1, 2, 3, 31 ) ) );
-//		division.addMonth( "February", new HashSet<>( Arrays.asList( 1, 2, 3, 28 ) ) );
-//		division.addMonth( "March", new HashSet<>( Arrays.asList( 1, 2, 3, 31 ) ) );
-//		division.addMonth( "April", new HashSet<>( Arrays.asList( 1, 2, 3, 30 ) ) );
+		division.addMonth( "January", new HashSet<>( Arrays.asList( 1, 2, 3, 31 ) ) );
+		division.addMonth( "February", new HashSet<>( Arrays.asList( 1, 2, 3, 28 ) ) );
+		division.addMonth( "March", new HashSet<>( Arrays.asList( 1, 2, 3, 31 ) ) );
+		division.addMonth( "April", new HashSet<>( Arrays.asList( 1, 2, 3, 30 ) ) );
 //		
 		division.setCarNames( new String[] { "civic", "tsx", "accord" } );
 		
