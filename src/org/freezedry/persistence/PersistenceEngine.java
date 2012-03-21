@@ -161,7 +161,7 @@ public class PersistenceEngine {
 	 * @param clazz The {@link Class} of the object to persist and, therefore, for which to generate a node
 	 * @param builder The {@link NodeBuilder} used to generate {@link InfoNode}s for the specified {@link Class}
 	 * @return The {@link NodeBuilder} that used to be associated with the specified {@link Class}; or null if
-	 * no {@link NodeBuilder} was previously associated with the speicified {@link Class}
+	 * no {@link NodeBuilder} was previously associated with the specified {@link Class}
 	 */
 	public NodeBuilder addNodeBuilder( final Class< ? > clazz, final NodeBuilder builder )
 	{
