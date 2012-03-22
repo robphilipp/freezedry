@@ -1,0 +1,93 @@
+package org.freezedry.persistence.writers.keyvalue.renderers;
+
+import java.text.DecimalFormat;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.freezedry.persistence.containers.Pair;
+import org.freezedry.persistence.tree.InfoNode;
+import org.freezedry.persistence.utils.Constants;
+import org.freezedry.persistence.writers.keyvalue.KeyValueWriter;
+
+/**
+ * 
+ * @author rob
+ */
+public class DoubleRenderer extends AbstractPersistenceRenderer {
+	
+	private static final Logger LOGGER = Logger.getLogger( DoubleRenderer.class );
+	
+	private DecimalFormat formatter = new DecimalFormat( "#0.000" );
+
+	/**
+	 * 
+	 * @param writer
+	 */
+	public DoubleRenderer( final KeyValueWriter writer )
+	{
+		super( writer );
+	}
+	
+	/**
+	 * 
+	 * @param writer
+	 * @param formatter
+	 */
+	public DoubleRenderer( final KeyValueWriter writer, final DecimalFormat formatter )
+	{
+		this( writer );
+		this.formatter = formatter;
+	}
+
+	/**
+	 * 
+	 * @param renderer
+	 */
+	public DoubleRenderer( final DoubleRenderer renderer )
+	{
+		super( renderer );
+		this.formatter = renderer.formatter;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.writers.keyvalue.renderers.PersistenceRenderer#buildKeyValuePair(org.freezedry.persistence.tree.InfoNode, java.lang.String, java.util.List)
+	 */
+	@Override
+	public void buildKeyValuePair( final InfoNode infoNode, final String key, final List< Pair< String, Object > > keyValues, final boolean isWithholdPersistName )
+	{
+		// ensure that the info node is a leaf
+		if( !infoNode.isLeafNode() )
+		{
+			final StringBuffer message = new StringBuffer();
+			message.append( "To render a key-value pair as an Integer, the info node must be a leaf node." + Constants.NEW_LINE );
+			message.append( "  Current Key:" + key + Constants.NEW_LINE );
+			message.append( "  InfoNode:" + Constants.NEW_LINE );
+			message.append( "    Persist Name: " + infoNode.getPersistName() + Constants.NEW_LINE );
+			message.append( "    Node Type: " + infoNode.getNodeType().name() + Constants.NEW_LINE );
+			message.append( "    Child Nodes: " + infoNode.getChildCount() + Constants.NEW_LINE );
+			message.append( "    Node Class Type: " + infoNode.getClazz().getName() + Constants.NEW_LINE );
+			LOGGER.error( message.toString() );
+			throw new IllegalArgumentException( message.toString() );
+		}
+		
+		String newKey = key;
+		if( !isWithholdPersistName && infoNode.getPersistName() != null && !infoNode.getPersistName().isEmpty() )
+		{
+			newKey += ":" + infoNode.getPersistName();
+		}
+		final Double value = (Double)infoNode.getValue();
+		keyValues.add( new Pair< String, Object >( newKey, formatter.format( value ) ) );
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.copyable.Copyable#getCopy()
+	 */
+	@Override
+	public DoubleRenderer getCopy()
+	{
+		return new DoubleRenderer( this );
+	}
+
+}

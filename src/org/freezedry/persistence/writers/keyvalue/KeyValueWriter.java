@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,8 +27,11 @@ import org.freezedry.persistence.utils.DateUtils;
 import org.freezedry.persistence.utils.ReflectionUtils;
 import org.freezedry.persistence.writers.PersistenceWriter;
 import org.freezedry.persistence.writers.keyvalue.renderers.CollectionRenderer;
+import org.freezedry.persistence.writers.keyvalue.renderers.DoubleRenderer;
+import org.freezedry.persistence.writers.keyvalue.renderers.IntegerRenderer;
 import org.freezedry.persistence.writers.keyvalue.renderers.MapRenderer;
 import org.freezedry.persistence.writers.keyvalue.renderers.PersistenceRenderer;
+import org.freezedry.persistence.writers.keyvalue.renderers.StringRenderer;
 import org.w3c.dom.Document;
 
 public class KeyValueWriter implements PersistenceWriter {
@@ -36,6 +40,7 @@ public class KeyValueWriter implements PersistenceWriter {
 	
 	private Map< Class< ? >, PersistenceRenderer > renderers;
 	private PersistenceRenderer arrayRenderer;
+	private boolean isShowFullKey = false;
 	
 	/**
 	 * 
@@ -54,8 +59,21 @@ public class KeyValueWriter implements PersistenceWriter {
 		final Map< Class< ? >, PersistenceRenderer > renderers = new HashMap<>();
 		renderers.put( Collection.class, new CollectionRenderer( this ) );
 		renderers.put( Map.class, new MapRenderer( this ) );
+		renderers.put( String.class, new StringRenderer( this ) );
+		renderers.put( Integer.class, new IntegerRenderer( this ) );
+		renderers.put( Double.class, new DoubleRenderer( this ) );
 		
 		return renderers;
+	}
+	
+	public void setShowFullKey( final boolean isShowFullKey )
+	{
+		this.isShowFullKey = isShowFullKey;
+	}
+	
+	public boolean isShowFullKey()
+	{
+		return isShowFullKey;
 	}
 	
 	/**
@@ -141,10 +159,11 @@ public class KeyValueWriter implements PersistenceWriter {
 		final List< Pair< String, Object > > keyValuePairs = new ArrayList<>();
 		
 		// create the first DOM node from the info-node and add it to the document
-		final Pair< String, Object > rootPair = createKeyValuePair( rootInfoNode, "", keyValuePairs );
+//		final Pair< String, Object > rootPair = createKeyValuePairs( rootInfoNode, "", keyValuePairs );
 		
 		// recursively build the DOM tree from the info-node tree
-		buildKeyValuePairs( rootInfoNode, rootPair.getFirst(), keyValuePairs );
+//		buildKeyValuePairs( rootInfoNode, rootPair.getFirst(), keyValuePairs );
+		buildKeyValuePairs( rootInfoNode, rootInfoNode.getPersistName(), keyValuePairs );
 		
 		// once complete, then return the document (root node of the DOM tree)
 		return keyValuePairs;
@@ -158,70 +177,93 @@ public class KeyValueWriter implements PersistenceWriter {
 	 */
 	public void buildKeyValuePairs( final InfoNode infoNode, final String key, final List< Pair< String, Object > > keyValues )
 	{
-		final Class< ? > clazz = infoNode.getClazz();
-		if( containsRenderer( clazz ) )
+		// run through the node's children, and for each one create and add the key-value pairs
+		// to the list of key-value pairs
+		for( InfoNode child : infoNode.getChildren() )
 		{
-//			final String newKey = ( key != null && !key.isEmpty() ? ( key + ":" ) : "" ) + infoNode.getPersistName();
-			getRenderer( clazz ).buildKeyValuePair( infoNode, key, keyValues );
-//			keyValues.add( keyValuePair );
-		}
-		else if( clazz.isArray() )
-		{
-//			final String newKey = ( key != null && !key.isEmpty() ? ( key + ":" ) : "" ) + infoNode.getPersistName();
-			arrayRenderer.buildKeyValuePair( infoNode, key, keyValues );
-		}
-		else
-		{
-			final List< InfoNode > children = infoNode.getChildren();
-			for( InfoNode child : children )
+			// if a child has been processed already, and marked processed, then we don't process
+			// it again. this can occur if the node is, for example, a collection or map, in which
+			// case the subnodes are processed outside of this loop, and this method may be called
+			// recursively, and we want to ensure that the node is only processed once.
+			if( !child.isProcessed() )
 			{
-				// if the node represents a list, then let's use a list renderer? use similar design as used with the
-				// the node builders...
-				// create the new key value pair
-				final Pair< String, Object > newKeyValuePair = createKeyValuePair( child, key, keyValues );
-				final String newKey = newKeyValuePair.getFirst();
+				// create the new key value pairs
+				createKeyValuePairs( child, key, keyValues, false );
 				
-				// when the value is null, then the key-value pair is associated with a compound node,
-				// meaning it doesn't have a plain value. in this case, we don't add the key to the map,
-				// but we do need to continue to aggregated the key
-				if( newKeyValuePair.getSecond() != null )
-				{
-					keyValues.add( new Pair< String, Object >( newKey, newKeyValuePair.getSecond() ) );
-				}
-				else
-				{
-					// recursive call back to this method to create any child nodes
-					buildKeyValuePairs( child, newKey, keyValues );
-				}
+				// mark the node as being processed
+				child.setIsProcessed( true );
 			}
 		}
 	}
 
+//	/**
+//	 * 
+//	 * @param infoNode
+//	 * @param key
+//	 * @param keyValues
+//	 */
+//	public void createKeyValuePairs( final InfoNode infoNode, final String key, final List< Pair< String, Object > > keyValues )
+//	{
+//		createKeyValuePairs( infoNode, key, keyValues, false );
+//	}
+	
 	/**
 	 * 
 	 * @param infoNode
 	 * @param key
-	 * @return
+	 * @param keyValues
+	 * @param isWithholdPersitName
 	 */
-	public Pair< String, Object > createKeyValuePair( final InfoNode infoNode, final String key, final List< Pair< String, Object > > keyValues )
+	public void createKeyValuePairs( final InfoNode infoNode, final String key, final List< Pair< String, Object > > keyValues, final boolean isWithholdPersitName )
 	{
-		// the return pair
-		Pair< String, Object > keyValuePair = null;
-		
-		// create the new key based on the specified key and the persistence name
-		final String newKey = ( key != null && !key.isEmpty() ? ( key + ":" ) : "" ) + infoNode.getPersistName();
-		keyValuePair = new Pair< String, Object >( newKey, null );
-		
-		// if the node is a leaf node, then it has a value, and we need to create a key-value pair
-		if( infoNode.isLeafNode() )
+		final boolean isHidePersistName = ( isShowFullKey ? false : isWithholdPersitName );
+		final Class< ? > clazz = infoNode.getClazz();
+		if( containsRenderer( clazz ) )
 		{
-			// create the key-value pair and return it
-			keyValuePair.setSecond( infoNode.getValue() );
+			getRenderer( clazz ).buildKeyValuePair( infoNode, key, keyValues, isHidePersistName );
 		}
-		
-		return keyValuePair;
+		else if( clazz.isArray() )
+		{
+			arrayRenderer.buildKeyValuePair( infoNode, key, keyValues, isHidePersistName );
+		}
+		else
+		{
+			// create the new key based on the specified key and the persistence name
+			final String newKey = createKey( infoNode, key, isHidePersistName );
+			final Pair< String, Object > keyValuePair = new Pair< String, Object >( newKey, null );
+			
+			// if the node is a leaf node, then it has a value, and we need to create a key-value pair
+			if( infoNode.isLeafNode() )
+			{
+				// create the key-value pair and return it
+				keyValuePair.setSecond( infoNode.getValue() );
+				keyValues.add( keyValuePair );
+			}
+			else
+			{
+				buildKeyValuePairs( infoNode, newKey, keyValues );
+			}
+		}
 	}
-
+	
+	private String createKey( final InfoNode infoNode, final String key, final boolean isWithholdPersitName )
+	{
+		final StringBuffer newKey = new StringBuffer();
+		if( key != null && !key.isEmpty() )
+		{
+			newKey.append( key );
+			if( !isWithholdPersitName )
+			{
+				newKey.append( ":" );
+			}
+		}
+		if( !isWithholdPersitName )
+		{
+			newKey.append( infoNode.getPersistName() );
+		}
+		return newKey.toString();
+	}
+	
 	/**
 	 * For testing
 	 * @param args
@@ -242,16 +284,16 @@ public class KeyValueWriter implements PersistenceWriter {
 		{
 			johnny.addMood( Math.sin( Math.PI / 4 * i ) );
 		}
-//		Map< String, String > group = new LinkedHashMap<>();
-//		group.put( "one", "ONE" );
-//		group.put( "two", "TWO" );
-//		group.put( "three", "THREE" );
-//		johnny.addGroup( "numbers", group );
-//
-//		group = new LinkedHashMap<>();
-//		group.put( "a", "AY" );
-//		group.put( "b", "BEE" );
-//		johnny.addGroup( "letters", group );
+		Map< String, String > group = new LinkedHashMap<>();
+		group.put( "one", "ONE" );
+		group.put( "two", "TWO" );
+		group.put( "three", "THREE" );
+		johnny.addGroup( "numbers", group );
+
+		group = new LinkedHashMap<>();
+		group.put( "a", "AY" );
+		group.put( "b", "BEE" );
+		johnny.addGroup( "letters", group );
 		
 		johnny.setBirthdate( DateUtils.createDateFromString( "1963-04-22", "yyyy-MM-dd" ) );
 		
@@ -265,7 +307,7 @@ public class KeyValueWriter implements PersistenceWriter {
 		division.addMonth( "February", new HashSet<>( Arrays.asList( 1, 2, 3, 28 ) ) );
 		division.addMonth( "March", new HashSet<>( Arrays.asList( 1, 2, 3, 31 ) ) );
 		division.addMonth( "April", new HashSet<>( Arrays.asList( 1, 2, 3, 30 ) ) );
-//		
+		
 		division.setCarNames( new String[] { "civic", "tsx", "accord" } );
 		
 		
@@ -276,6 +318,7 @@ public class KeyValueWriter implements PersistenceWriter {
 		try( final PrintWriter printWriter = new PrintWriter( new FileWriter( "person.txt" ) ) )
 		{
 			final KeyValueWriter writer = new KeyValueWriter();
+//			writer.setShowFullKey( true );
 			writer.write( rootNode, printWriter );
 		}
 		catch( IOException e )

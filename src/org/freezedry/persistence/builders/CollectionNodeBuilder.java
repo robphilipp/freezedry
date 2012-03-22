@@ -176,7 +176,7 @@ public class CollectionNodeBuilder extends AbstractNodeBuilder {
 
 		// grab the generic type parameters from the info node, and make sure there is only one
 		// (i.e. List< Double > should have java.lang.Double as the generic type)
-		// and pull out that type
+		// and pull out that type (this should have come from the previous recursion)
 		final List< Type > types = node.getGenericParameterTypes();
 		if( types.size() != 1 )
 		{

@@ -51,6 +51,8 @@ public class InfoNode {
 	private Map< String, Method > setFieldMap;
 	private Map< String, Method > getFieldMap;
 	
+	private boolean isProcessed = false;
+	
 	/**
 	 * Creates a root {@link InfoNode} with the specified persistence name and class type.
 	 * @param persistName The name with which to persist the hierarchy, which is typical the class name
@@ -287,6 +289,16 @@ public class InfoNode {
 	public final void addGenericParameterType( final Type type )
 	{
 		genericParameterTypes.add( type );
+	}
+	
+	public final void setIsProcessed( final boolean isProcessed )
+	{
+		this.isProcessed = isProcessed;
+	}
+	
+	public final boolean isProcessed()
+	{
+		return isProcessed;
 	}
 
 	/**

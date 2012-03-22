@@ -31,7 +31,7 @@ public abstract class AbstractPersistenceRenderer implements PersistenceRenderer
 	/**
 	 * @return The persistence writer associated with this renderer for use in recursion.
 	 */
-	protected KeyValueWriter getPeristPersistenceWriter()
+	protected KeyValueWriter getPersistenceWriter()
 	{
 		return writer;
 	}

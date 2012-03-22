@@ -72,11 +72,8 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 	 * @see org.freezedry.persistence.writers.keyvalue.renderers.PersistenceRenderer#buildKeyValuePair(org.freezedry.persistence.tree.InfoNode, java.lang.String, java.util.List)
 	 */
 	@Override
-	public void buildKeyValuePair( final InfoNode infoNode, final String key, final List< Pair< String, Object > > keyValues )
+	public void buildKeyValuePair( final InfoNode infoNode, final String key, final List< Pair< String, Object > > keyValues, final boolean isWithholdPersistName )
 	{
-		// the return pair
-		Pair< String, Object > keyValuePair = null;
-
 		// [Division:months{January}[0], 1]
 		// [Division:months{January}[1], 2]
 		// [Division:systems{ALM}, "Investments and Capital Markets Division"]
@@ -128,29 +125,26 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 				}
 				
 				// no we can continue to parse the nodes.
-				String newKey = null;
+				String newKey = createKey( key, infoNode ) + "{";
 				if( keyNode.isLeafNode() )
 				{
-					newKey = key + "{" + keyNode.getValue() + "}";
+					newKey += keyNode.getValue() + "}";
 				}
 				else
 				{
-					newKey = key + "{";
-					getPeristPersistenceWriter().buildKeyValuePairs( keyNode, newKey, keyValues );
+					newKey += "{";
+					getPersistenceWriter().buildKeyValuePairs( keyNode, newKey, keyValues );
 					newKey += "}";
 				}
 				
-				keyValuePair = new Pair< String, Object >( newKey, null );
-				if( valueNode.isLeafNode() )
-				{
-					// create the key-value pair and return it
-					keyValuePair.setSecond( valueNode.getValue() );
-					keyValues.add( keyValuePair );
-				}
-				else
-				{
-					getPeristPersistenceWriter().buildKeyValuePairs( valueNode, newKey, keyValues );
-				}
+				// create the key-value pair and return it. we know that we have value node, and that
+				// the persistence name of the value is "Value" or something else set by the user. we
+				// don't want to write that out, so we simply remove the value from the node.
+				valueNode.setPersistName( "" );
+				getPersistenceWriter().createKeyValuePairs( valueNode, newKey, keyValues, true );
+				
+				// mark the node as processed so that it doesn't get processed again
+				node.setIsProcessed( true );
 			}
 			else
 			{
@@ -162,6 +156,16 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 				throw new IllegalStateException( message.toString() );
 			}
 		}
+	}
+	
+	private String createKey( final String key, final InfoNode node )
+	{
+		String newKey = key;
+		if( node.getPersistName() != null && !node.getPersistName().isEmpty() )
+		{
+			newKey += ":" + node.getPersistName();
+		}
+		return newKey;
 	}
 
 	/*
