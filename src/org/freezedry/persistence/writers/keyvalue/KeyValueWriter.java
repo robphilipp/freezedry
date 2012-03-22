@@ -35,12 +35,36 @@ import org.w3c.dom.Document;
 public class KeyValueWriter implements PersistenceWriter {
 
 //	private static final Logger LOGGER = Logger.getLogger( KeyValueWriter.class );
-	public static final String SEPARATOR = ":";
+	private static final String SEPARATOR = ":";
 	
 	private Map< Class< ? >, PersistenceRenderer > renderers;
 	private PersistenceRenderer arrayRenderer;
 	private boolean isShowFullKey = false;
 	
+	private String separator;
+	
+	/**
+	 * 
+	 */
+	public KeyValueWriter( final Map< Class< ? >, PersistenceRenderer > renderers, 
+						   final PersistenceRenderer arrayRenderer,
+						   final String separator )
+	{
+		this.renderers = renderers;
+		this.arrayRenderer = arrayRenderer;
+		this.separator = separator;
+	}
+
+	/**
+	 * 
+	 */
+	public KeyValueWriter( final String separator )
+	{
+		renderers = createDefaultRenderers();
+		arrayRenderer = new CollectionRenderer( this );
+		this.separator = separator;
+	}
+
 	/**
 	 * 
 	 */
@@ -48,6 +72,7 @@ public class KeyValueWriter implements PersistenceWriter {
 	{
 		renderers = createDefaultRenderers();
 		arrayRenderer = new CollectionRenderer( this );
+		separator = SEPARATOR;
 	}
 	
 	/*
@@ -74,6 +99,16 @@ public class KeyValueWriter implements PersistenceWriter {
 		renderers.put( Boolean.TYPE, new LeafNodeRenderer( this ) );
 		
 		return renderers;
+	}
+	
+	public void setSeparator( final String separator )
+	{
+		this.separator = separator;
+	}
+	
+	public String getSeparator()
+	{
+		return separator;
 	}
 	
 	public void setShowFullKey( final boolean isShowFullKey )
@@ -264,7 +299,7 @@ public class KeyValueWriter implements PersistenceWriter {
 			newKey.append( key );
 			if( !isWithholdPersitName )
 			{
-				newKey.append( SEPARATOR );
+				newKey.append( separator );
 			}
 		}
 		if( !isWithholdPersitName )
@@ -329,6 +364,7 @@ public class KeyValueWriter implements PersistenceWriter {
 		{
 			final KeyValueWriter writer = new KeyValueWriter();
 //			writer.setShowFullKey( true );
+			writer.setSeparator( "." );
 			writer.write( rootNode, printWriter );
 		}
 		catch( IOException e )

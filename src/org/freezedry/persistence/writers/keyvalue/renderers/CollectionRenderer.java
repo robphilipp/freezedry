@@ -78,7 +78,7 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 		String newKey = key;
 		if( node.getPersistName() != null && !node.getPersistName().isEmpty() )
 		{
-			newKey += KeyValueWriter.SEPARATOR + node.getPersistName();
+			newKey += getPersistenceWriter().getSeparator() + node.getPersistName();
 		}
 		newKey += indexDecorator.decorate( index );
 		return newKey;

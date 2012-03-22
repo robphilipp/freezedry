@@ -184,7 +184,7 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 		String newKey = key;
 		if( node.getPersistName() != null && !node.getPersistName().isEmpty() )
 		{
-			newKey += KeyValueWriter.SEPARATOR + node.getPersistName();
+			newKey += getPersistenceWriter().getSeparator() + node.getPersistName();
 		}
 		return newKey;
 	}
