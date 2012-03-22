@@ -1,4 +1,4 @@
-package org.freezedry.persistence.writers.keyvalue.renderers.decorators;
+package org.freezedry.persistence.keyvalue.renderers.decorators;
 
 public class StringDecorator implements Decorator {
 
@@ -26,7 +26,7 @@ public class StringDecorator implements Decorator {
 	
 	/*
 	 * (non-Javadoc)
-	 * @see org.freezedry.persistence.writers.keyvalue.renderers.decorators.Decorator#decorate(java.lang.Object)
+	 * @see org.freezedry.persistence.keyvalue.renderers.decorators.Decorator#decorate(java.lang.Object)
 	 */
 	@Override
 	public String decorate( Object object )

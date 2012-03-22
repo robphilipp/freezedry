@@ -1,17 +1,17 @@
-package org.freezedry.persistence.writers.keyvalue.renderers;
+package org.freezedry.persistence.keyvalue.renderers;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import org.freezedry.persistence.keyvalue.renderers.decorators.BooleanDecorator;
+import org.freezedry.persistence.keyvalue.renderers.decorators.Decorator;
+import org.freezedry.persistence.keyvalue.renderers.decorators.DoubleDecorator;
+import org.freezedry.persistence.keyvalue.renderers.decorators.IntegerDecorator;
+import org.freezedry.persistence.keyvalue.renderers.decorators.StringDecorator;
 import org.freezedry.persistence.utils.ReflectionUtils;
 import org.freezedry.persistence.utils.Require;
+import org.freezedry.persistence.writers.KeyValueWriter;
 import org.freezedry.persistence.writers.PersistenceWriter;
-import org.freezedry.persistence.writers.keyvalue.KeyValueWriter;
-import org.freezedry.persistence.writers.keyvalue.renderers.decorators.BooleanDecorator;
-import org.freezedry.persistence.writers.keyvalue.renderers.decorators.Decorator;
-import org.freezedry.persistence.writers.keyvalue.renderers.decorators.DoubleDecorator;
-import org.freezedry.persistence.writers.keyvalue.renderers.decorators.IntegerDecorator;
-import org.freezedry.persistence.writers.keyvalue.renderers.decorators.StringDecorator;
 
 public abstract class AbstractPersistenceRenderer implements PersistenceRenderer {
 

@@ -1,4 +1,4 @@
-package org.freezedry.persistence.writers.keyvalue.renderers.decorators;
+package org.freezedry.persistence.keyvalue.renderers.decorators;
 
 import java.text.DecimalFormat;
 
@@ -25,7 +25,7 @@ public class DoubleDecorator implements Decorator {
 	
 	/*
 	 * (non-Javadoc)
-	 * @see org.freezedry.persistence.writers.keyvalue.renderers.decorators.Decorator#decorate(java.lang.Object)
+	 * @see org.freezedry.persistence.keyvalue.renderers.decorators.Decorator#decorate(java.lang.Object)
 	 */
 	@Override
 	public String decorate( Object object )

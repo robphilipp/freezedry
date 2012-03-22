@@ -1,4 +1,4 @@
-package org.freezedry.persistence.writers.keyvalue.renderers.decorators;
+package org.freezedry.persistence.keyvalue.renderers.decorators;
 
 import org.freezedry.persistence.copyable.Copyable;
 

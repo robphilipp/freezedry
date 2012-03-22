@@ -1,11 +1,11 @@
-package org.freezedry.persistence.writers.keyvalue.renderers;
+package org.freezedry.persistence.keyvalue.renderers;
 
 import java.util.List;
 
 import org.freezedry.persistence.containers.Pair;
+import org.freezedry.persistence.keyvalue.renderers.decorators.StringDecorator;
 import org.freezedry.persistence.tree.InfoNode;
-import org.freezedry.persistence.writers.keyvalue.KeyValueWriter;
-import org.freezedry.persistence.writers.keyvalue.renderers.decorators.StringDecorator;
+import org.freezedry.persistence.writers.KeyValueWriter;
 
 public class CollectionRenderer extends AbstractPersistenceRenderer {
 	

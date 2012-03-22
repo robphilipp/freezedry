@@ -1,14 +1,14 @@
-package org.freezedry.persistence.writers.keyvalue.renderers;
+package org.freezedry.persistence.keyvalue.renderers;
 
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.freezedry.persistence.containers.Pair;
+import org.freezedry.persistence.keyvalue.renderers.decorators.Decorator;
 import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.Constants;
-import org.freezedry.persistence.writers.keyvalue.KeyValueWriter;
-import org.freezedry.persistence.writers.keyvalue.renderers.decorators.Decorator;
+import org.freezedry.persistence.writers.KeyValueWriter;
 
 public class LeafNodeRenderer extends AbstractPersistenceRenderer {
 	
@@ -31,7 +31,7 @@ public class LeafNodeRenderer extends AbstractPersistenceRenderer {
 	
 	/*
 	 * (non-Javadoc)
-	 * @see org.freezedry.persistence.writers.keyvalue.renderers.PersistenceRenderer#buildKeyValuePair(org.freezedry.persistence.tree.InfoNode, java.lang.String, java.util.List)
+	 * @see org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer#buildKeyValuePair(org.freezedry.persistence.tree.InfoNode, java.lang.String, java.util.List)
 	 */
 	@Override
 	public void buildKeyValuePair( final InfoNode infoNode, final String key, final List< Pair< String, Object > > keyValues, final boolean isWithholdPersistName )

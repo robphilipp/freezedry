@@ -1,4 +1,4 @@
-package org.freezedry.persistence.writers.keyvalue.renderers;
+package org.freezedry.persistence.keyvalue.renderers;
 
 import java.util.List;
 
