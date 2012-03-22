@@ -90,9 +90,8 @@ public class LeafNodeRenderer extends AbstractPersistenceRenderer {
 		String newKey = key;
 		if( !isWithholdPersistName && infoNode.getPersistName() != null && !infoNode.getPersistName().isEmpty() )
 		{
-			newKey += ":" + infoNode.getPersistName();
+			newKey += KeyValueWriter.SEPARATOR + infoNode.getPersistName();
 		}
-//		final String value = "\"" + (String)infoNode.getValue() + "\"";
 		final String value = decorators.get( infoNode.getValue().getClass() ).decorate( infoNode.getValue() );
 		keyValues.add( new Pair< String, Object >( newKey, value ) );
 	}

@@ -10,22 +10,38 @@ import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.Constants;
 import org.freezedry.persistence.utils.ReflectionUtils;
 import org.freezedry.persistence.writers.keyvalue.KeyValueWriter;
+import org.freezedry.persistence.writers.keyvalue.renderers.decorators.StringDecorator;
 
 public class MapRenderer extends AbstractPersistenceRenderer {
 
 	private static final Logger LOGGER = Logger.getLogger( MapRenderer.class );
+
+	private static StringDecorator KEY_DECORATOR = new StringDecorator( "{", "}" );
 	
 	private String mapEntryName = PersistMap.ENTRY_PERSIST_NAME;
 	private String mapKeyName = PersistMap.KEY_PERSIST_NAME;
 	private String mapValueName = PersistMap.VALUE_PERSIST_NAME;
 	
+	private StringDecorator keyDecorator;
+
+	/**
+	 * 
+	 * @param writer
+	 */
+	public MapRenderer( final KeyValueWriter writer, final StringDecorator indexDecorator )
+	{
+		super( writer );
+		
+		this.keyDecorator = indexDecorator.getCopy();
+	}
+
 	/**
 	 * 
 	 * @param writer
 	 */
 	public MapRenderer( final KeyValueWriter writer )
 	{
-		super( writer );
+		this( writer, KEY_DECORATOR );
 	}
 	
 	/**
@@ -35,8 +51,10 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 	public MapRenderer( final MapRenderer renderer )
 	{
 		super( renderer );
+		
+		this.keyDecorator = renderer.keyDecorator.getCopy();
 	}
-	
+
 	public void setMapEntryName( final String name )
 	{
 		this.mapEntryName = name;
@@ -125,16 +143,19 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 				}
 				
 				// no we can continue to parse the nodes.
-				String newKey = createKey( key, infoNode ) + "{";
+				String newKey = createKey( key, infoNode );
 				if( keyNode.isLeafNode() )
 				{
-					newKey += keyNode.getValue() + "}";
+					newKey += keyDecorator.decorate( keyNode.getValue() );
 				}
 				else
 				{
-					newKey += "{";
-					getPersistenceWriter().buildKeyValuePairs( keyNode, newKey, keyValues );
-					newKey += "}";
+					// TODO currently we have a slight problem here for compound keys.
+					final StringBuffer message = new StringBuffer();
+					message.append( "The MapRenderer doesn't allow compound (composite) keys at this point." + Constants.NEW_LINE );
+					message.append( "  Current Key: " + newKey + Constants.NEW_LINE );
+					LOGGER.error( message.toString() );
+					throw new IllegalStateException( message.toString() );
 				}
 				
 				// create the key-value pair and return it. we know that we have value node, and that
@@ -163,7 +184,7 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 		String newKey = key;
 		if( node.getPersistName() != null && !node.getPersistName().isEmpty() )
 		{
-			newKey += ":" + node.getPersistName();
+			newKey += KeyValueWriter.SEPARATOR + node.getPersistName();
 		}
 		return newKey;
 	}

@@ -5,8 +5,24 @@ import java.util.List;
 import org.freezedry.persistence.containers.Pair;
 import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.writers.keyvalue.KeyValueWriter;
+import org.freezedry.persistence.writers.keyvalue.renderers.decorators.StringDecorator;
 
 public class CollectionRenderer extends AbstractPersistenceRenderer {
+	
+	private static StringDecorator INDEX_DECORATOR = new StringDecorator( "[", "]" );
+	
+	private StringDecorator indexDecorator;
+	
+	/**
+	 * 
+	 * @param writer
+	 */
+	public CollectionRenderer( final KeyValueWriter writer, final StringDecorator indexDecorator )
+	{
+		super( writer );
+		
+		this.indexDecorator = indexDecorator.getCopy();
+	}
 	
 	/**
 	 * 
@@ -14,7 +30,7 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 	 */
 	public CollectionRenderer( final KeyValueWriter writer )
 	{
-		super( writer );
+		this( writer, INDEX_DECORATOR );
 	}
 	
 	/**
@@ -24,6 +40,8 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 	public CollectionRenderer( final CollectionRenderer renderer )
 	{
 		super( renderer );
+		
+		this.indexDecorator = renderer.indexDecorator.getCopy();
 	}
 
 	/*
@@ -36,7 +54,6 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 		int index = 0;
 		for( InfoNode node : infoNode.getChildren() )
 		{
-//			final String newKey = key + ":" + infoNode.getPersistName() + "[" + index + "]";
 			final String newKey = createKey( key, infoNode, index );
 			if( node.isLeafNode() )
 			{
@@ -61,9 +78,9 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 		String newKey = key;
 		if( node.getPersistName() != null && !node.getPersistName().isEmpty() )
 		{
-			newKey += ":" + node.getPersistName();
+			newKey += KeyValueWriter.SEPARATOR + node.getPersistName();
 		}
-		newKey += "[" + index + "]";
+		newKey += indexDecorator.decorate( index );
 		return newKey;
 	}
 	

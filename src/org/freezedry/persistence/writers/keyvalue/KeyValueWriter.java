@@ -35,6 +35,7 @@ import org.w3c.dom.Document;
 public class KeyValueWriter implements PersistenceWriter {
 
 //	private static final Logger LOGGER = Logger.getLogger( KeyValueWriter.class );
+	public static final String SEPARATOR = ":";
 	
 	private Map< Class< ? >, PersistenceRenderer > renderers;
 	private PersistenceRenderer arrayRenderer;
@@ -263,7 +264,7 @@ public class KeyValueWriter implements PersistenceWriter {
 			newKey.append( key );
 			if( !isWithholdPersitName )
 			{
-				newKey.append( ":" );
+				newKey.append( SEPARATOR );
 			}
 		}
 		if( !isWithholdPersitName )
