@@ -749,7 +749,7 @@ public class PersistenceEngine {
 			
 			// create the semantic model
 			final InfoNode rootNode = engine.createSemanticModel( division );
-			System.out.println( rootNode.treeToString() );
+			System.out.println( rootNode.simpleTreeToString() );
 	
 			// write out XML
 			try( final PrintWriter printWriter = new PrintWriter( new FileWriter( "person.xml" ) ) )
@@ -780,7 +780,7 @@ public class PersistenceEngine {
 			final InputStream inputStream = new BufferedInputStream( new FileInputStream( "person.xml" ) );
 			final Reader input = new InputStreamReader( inputStream );
 			final InfoNode infoNode = reader.read( Division.class, input );
-			System.out.println( infoNode.treeToString() );
+			System.out.println( infoNode.simpleTreeToString() );
 			
 			final Object redivision = engine.parseSemanticModel( Division.class, infoNode );
 			System.out.println( redivision );
