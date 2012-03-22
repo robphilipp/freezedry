@@ -1,6 +1,5 @@
 package org.freezedry.persistence.writers.keyvalue.renderers;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -8,62 +7,26 @@ import org.apache.log4j.Logger;
 import org.freezedry.persistence.containers.Pair;
 import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.Constants;
-import org.freezedry.persistence.utils.ReflectionUtils;
 import org.freezedry.persistence.writers.keyvalue.KeyValueWriter;
-import org.freezedry.persistence.writers.keyvalue.renderers.decorators.BooleanDecorator;
 import org.freezedry.persistence.writers.keyvalue.renderers.decorators.Decorator;
-import org.freezedry.persistence.writers.keyvalue.renderers.decorators.DoubleDecorator;
-import org.freezedry.persistence.writers.keyvalue.renderers.decorators.IntegerDecorator;
-import org.freezedry.persistence.writers.keyvalue.renderers.decorators.StringDecorator;
 
 public class LeafNodeRenderer extends AbstractPersistenceRenderer {
 	
 	private static final Logger LOGGER = Logger.getLogger( LeafNodeRenderer.class );
 	
-	public Map< Class< ? >, Decorator > decorators;
-
 	public LeafNodeRenderer( final KeyValueWriter writer, final Map< Class< ? >, Decorator > decorators )
 	{
-		super( writer );
-
-		this.decorators = decorators;
+		super( writer, decorators );
 	}
 	
 	public LeafNodeRenderer( final KeyValueWriter writer )
 	{
-		this( writer, createDefaultDecorators() );
+		super( writer );
 	}
 	
 	public LeafNodeRenderer( final LeafNodeRenderer renderer )
 	{
 		super( renderer );
-		
-		// make a deep copy of the decorators
-		decorators = new HashMap< Class< ? >, Decorator >();
-		for( final Map.Entry< Class< ? >, Decorator > entry : renderer.decorators.entrySet() )
-		{
-			decorators.put( entry.getKey(), entry.getValue().getCopy() );
-		}
-	}
-	
-	private static Map< Class< ? >, Decorator > createDefaultDecorators()
-	{
-		final Map< Class< ? >, Decorator > decorators = new HashMap<>();
-		decorators.put( String.class, new StringDecorator() );
-
-		decorators.put( Integer.class, new IntegerDecorator() );
-		decorators.put( Long.class, new IntegerDecorator() );
-		decorators.put( Short.class, new IntegerDecorator() );
-		decorators.put( Double.class, new DoubleDecorator() );
-		decorators.put( Boolean.class, new BooleanDecorator() );
-
-		decorators.put( Integer.TYPE, new IntegerDecorator() );
-		decorators.put( Long.TYPE, new IntegerDecorator() );
-		decorators.put( Short.TYPE, new IntegerDecorator() );
-		decorators.put( Double.TYPE, new DoubleDecorator() );
-		decorators.put( Boolean.TYPE, new BooleanDecorator() );
-		
-		return decorators;
 	}
 	
 	/*
@@ -111,34 +74,6 @@ public class LeafNodeRenderer extends AbstractPersistenceRenderer {
 		keyValues.add( new Pair< String, Object >( newKey, value ) );
 	}
 
-	/**
-	 * Finds the {@link Decorator} associated with the class. If the specified class
-	 * doesn't have a decorator, then it searches for the closest parent class (inheritance)
-	 * and returns that. In this case, it adds an entry to the decorator map for the
-	 * specified class associating it with the returned decorator (performance speed-up for
-	 * subsequent calls).
-	 * @param clazz The class for which to find a decorator
-	 * @return the {@link Decorator} associated with the class
-	 */
-	public Decorator getDecorator( final Class< ? > clazz )
-	{
-		return ReflectionUtils.getItemOrAncestor( clazz, decorators );
-	}
-
-	/**
-	 * Finds the {@link PersistenceRenderer} associated with the class. If the specified class
-	 * doesn't have a renderer, then it searches for the closest parent class (inheritance)
-	 * and returns that. In this case, it adds an entry to the persistence renderer map for the
-	 * specified class associating it with the returned persistence renderer (performance speed-up for
-	 * subsequent calls).
-	 * @param clazz The class for which to find a persistence renderer
-	 * @return the true if a persistence renderer was found; false otherwise
-	 */
-	public boolean containsDecorator( final Class< ? > clazz )
-	{
-		return ( getDecorator( clazz ) != null );
-	}
-	
 	/*
 	 * (non-Javadoc)
 	 * @see org.freezedry.persistence.copyable.Copyable#getCopy()

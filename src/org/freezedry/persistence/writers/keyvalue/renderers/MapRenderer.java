@@ -146,7 +146,18 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 				String newKey = createKey( key, infoNode );
 				if( keyNode.isLeafNode() )
 				{
-					newKey += keyDecorator.decorate( keyNode.getValue() );
+					String value;
+					final Object object = keyNode.getValue();
+					final Class< ? > clazz = object.getClass();
+					if( containsDecorator( clazz ) )
+					{
+						value = getDecorator( clazz ).decorate( object );
+					}
+					else
+					{
+						value = object.toString();
+					}
+					newKey += keyDecorator.decorate( value );
 				}
 				else
 				{
