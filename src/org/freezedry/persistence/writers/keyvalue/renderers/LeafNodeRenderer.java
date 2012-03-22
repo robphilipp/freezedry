@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.freezedry.persistence.containers.Pair;
-import org.freezedry.persistence.containers.orderedseries.IntegerOrderedSeries;
 import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.Constants;
 import org.freezedry.persistence.utils.ReflectionUtils;
@@ -123,37 +122,7 @@ public class LeafNodeRenderer extends AbstractPersistenceRenderer {
 	 */
 	public Decorator getDecorator( final Class< ? > clazz )
 	{
-		// simplest case is that the info node builders map has an entry for the class
-		Decorator decorator = decorators.get( clazz );
-		
-		// if the info node builder didn't have a direct entry, work our way up the inheritance
-		// hierarchy, and find the closed parent class, assigning it its associated info node builder
-		if( decorator == null )
-		{
-			// run through the available info node builders holding the distance (number of levels in the
-			// inheritance hierarchy) they are from the specified class
-			final IntegerOrderedSeries< Class< ? > > hierarchy = new IntegerOrderedSeries<>();
-			for( Map.Entry< Class< ? >, Decorator > entry : decorators.entrySet() )
-			{
-				final Class< ? > targetClass = entry.getKey();
-				final int level = ReflectionUtils.calculateClassDistance( clazz, targetClass );
-				if( level > -1 )
-				{
-					hierarchy.add( level, targetClass );
-				}
-			}
-			
-			// if one or more parent classes were found, then take the first one,
-			// which is the closest one, grab its info node builder, and add an entry for the
-			// specified class to the associated info node builder for faster subsequent look-ups
-			if( !hierarchy.isEmpty() )
-			{
-				final Class< ? > closestParent = hierarchy.getFirstValue();
-				decorator = decorators.get( closestParent );
-				decorators.put( clazz, decorator.getCopy() );
-			}
-		}
-		return decorator;
+		return ReflectionUtils.getItemOrAncestor( clazz, decorators );
 	}
 
 	/**
