@@ -27,11 +27,9 @@ import org.freezedry.persistence.utils.DateUtils;
 import org.freezedry.persistence.utils.ReflectionUtils;
 import org.freezedry.persistence.writers.PersistenceWriter;
 import org.freezedry.persistence.writers.keyvalue.renderers.CollectionRenderer;
-import org.freezedry.persistence.writers.keyvalue.renderers.DoubleRenderer;
-import org.freezedry.persistence.writers.keyvalue.renderers.IntegerRenderer;
+import org.freezedry.persistence.writers.keyvalue.renderers.LeafNodeRenderer;
 import org.freezedry.persistence.writers.keyvalue.renderers.MapRenderer;
 import org.freezedry.persistence.writers.keyvalue.renderers.PersistenceRenderer;
-import org.freezedry.persistence.writers.keyvalue.renderers.StringRenderer;
 import org.w3c.dom.Document;
 
 public class KeyValueWriter implements PersistenceWriter {
@@ -59,9 +57,20 @@ public class KeyValueWriter implements PersistenceWriter {
 		final Map< Class< ? >, PersistenceRenderer > renderers = new HashMap<>();
 		renderers.put( Collection.class, new CollectionRenderer( this ) );
 		renderers.put( Map.class, new MapRenderer( this ) );
-		renderers.put( String.class, new StringRenderer( this ) );
-		renderers.put( Integer.class, new IntegerRenderer( this ) );
-		renderers.put( Double.class, new DoubleRenderer( this ) );
+
+		renderers.put( String.class, new LeafNodeRenderer( this ) );
+		
+		renderers.put( Integer.class, new LeafNodeRenderer( this ) );
+		renderers.put( Long.class, new LeafNodeRenderer( this ) );
+		renderers.put( Short.class, new LeafNodeRenderer( this ) );
+		renderers.put( Double.class, new LeafNodeRenderer( this ) );
+		renderers.put( Boolean.class, new LeafNodeRenderer( this ) );
+		
+		renderers.put( Integer.TYPE, new LeafNodeRenderer( this ) );
+		renderers.put( Long.TYPE, new LeafNodeRenderer( this ) );
+		renderers.put( Short.TYPE, new LeafNodeRenderer( this ) );
+		renderers.put( Double.TYPE, new LeafNodeRenderer( this ) );
+		renderers.put( Boolean.TYPE, new LeafNodeRenderer( this ) );
 		
 		return renderers;
 	}
