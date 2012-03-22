@@ -13,6 +13,7 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.freezedry.persistence.PersistenceEngine;
 import org.freezedry.persistence.containers.Pair;
@@ -26,7 +27,8 @@ import org.freezedry.persistence.utils.DateUtils;
 
 public class KeyValueWriter implements PersistenceWriter {
 
-//	private static final Logger LOGGER = Logger.getLogger( KeyValueWriter.class );
+	private static final Logger LOGGER = Logger.getLogger( KeyValueWriter.class );
+	
 	private KeyValueBuilder builder;
 	
 	/**
@@ -94,6 +96,16 @@ public class KeyValueWriter implements PersistenceWriter {
 		catch( IOException e )
 		{
 			throw new IllegalStateException( e );
+		}
+		
+		if( LOGGER.isInfoEnabled() )
+		{
+			final StringBuffer message = new StringBuffer();
+			for( final Pair< String, Object > pair : keyValuePairs )
+			{
+				message.append( pair.getFirst() + " = " + pair.getSecond().toString() + Constants.NEW_LINE );
+			}
+			LOGGER.info( message.toString() );
 		}
 	}
 	
