@@ -18,8 +18,11 @@ package org.freezedry.persistence.keyvalue.renderers.decorators;
 import java.text.DecimalFormat;
 
 /**
+ * {@link Decorator} that formats an {@link Integer}. The default format is to format
+ * the {@link Integer} with no decimal point and must have at least one digit. However,
+ * a different format may be specified.
  * 
- * @author rob
+ * @author Robert Philipp
  */
 public class IntegerDecorator implements Decorator {
 
@@ -27,16 +30,28 @@ public class IntegerDecorator implements Decorator {
 	
 	private DecimalFormat formatter;
 	
+	/**
+	 * Constructs a {@link Decorator} that formats an {@link Integer}.
+	 * @param formatter The format with which to format the {@link Integer}.
+	 */
 	public IntegerDecorator( final DecimalFormat formatter )
 	{
 		this.formatter = formatter;
 	}
 	
+	/**
+	 * Constructs a {@link Decorator} that formats an {@link Integer} with the default
+	 * format, which is no decimal point and must have at least one digit.
+	 */
 	public IntegerDecorator()
 	{
 		this( FORMATTER );
 	}
 	
+	/**
+	 * Copy constructor
+	 * @param decorator The {@link IntegerDecorator} to copy
+	 */
 	public IntegerDecorator( final IntegerDecorator decorator )
 	{
 		this.formatter = decorator.formatter;

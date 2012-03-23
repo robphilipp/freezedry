@@ -15,6 +15,16 @@
  */
 package org.freezedry.persistence.keyvalue.renderers.decorators;
 
+
+/**
+ * A {@link Decorator} that surrounds a {@link String} with quotes. For example,
+ * if the value of the {@link String} was {@code house} this method would return {@code "house"}.
+ * The default decoration is to prepend the {@link String} with a quote ({@code "}) and append
+ * a quote to the {@link String}. However, the prepended and appended {@link String} can be set
+ * to other values. For example, one could surround the {@link String} with parantheses or curly-braces.
+ * 
+ * @author Robert Philipp
+ */
 public class StringDecorator implements Decorator {
 
 	private final static String QUOTE = "\"";
@@ -22,17 +32,35 @@ public class StringDecorator implements Decorator {
 	private String open;
 	private String close;
 	
+	/**
+	 * Constructs a {@link StringDecorator} that sets the prepending and appending {@link String}
+	 * for the decoration operation. The default decoration is to prepend the {@link String} with a 
+	 * quote ({@code "}) and append a quote to the {@link String}. However, the prepended and appended 
+	 * {@link String} can be set to other values. For example, one could surround the {@link String} 
+	 * with parantheses or curly-braces.
+	 * @param open The {@link String} that is prepended to the {@link String} being decorated.
+	 * @param close The {@link String} that is appended to the {@link String} being decorated.
+	 */
 	public StringDecorator( final String open, final String close )
 	{
 		this.open = open;
 		this.close = close;
 	}
 	
+	/**
+	 * Constructs a {@link StringDecorator} that sets the prepending and appending {@link String}
+	 * for the decoration operation. Uses the default decoration: prepend the {@link String} with a 
+	 * quote ({@code "}) and append a quote to the {@link String}. 
+	 */
 	public StringDecorator()
 	{
 		this( QUOTE, QUOTE );
 	}
 	
+	/**
+	 * Copy constructor
+	 * @param decorator The {@link StringDecorator} to copy
+	 */
 	public StringDecorator( final StringDecorator decorator )
 	{
 		this.open = decorator.open;

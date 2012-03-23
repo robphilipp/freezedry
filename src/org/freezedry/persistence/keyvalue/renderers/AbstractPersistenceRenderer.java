@@ -28,27 +28,44 @@ import org.freezedry.persistence.utils.Require;
 import org.freezedry.persistence.keyvalue.KeyValueBuilder;
 import org.freezedry.persistence.writers.PersistenceWriter;
 
+/**
+ * Abstract class that holds the information about the {@link KeyValueBuilder} and
+ * the {@link Decorator}s.
+ * 
+ * @author Robert Philipp
+ */
 public abstract class AbstractPersistenceRenderer implements PersistenceRenderer {
 
-	private final KeyValueBuilder writer;
-	
-	public Map< Class< ? >, Decorator > decorators;
+	private final KeyValueBuilder builder;
+	private final Map< Class< ? >, Decorator > decorators;
 
-	public AbstractPersistenceRenderer( final KeyValueBuilder writer, final Map< Class< ? >, Decorator > decorators )
+	/**
+	 * Abstract class that holds the information about the {@link KeyValueBuilder} and the {@link Decorator}s.
+	 * @param builder The {@link KeyValueBuilder} used to flatten out the semantic model into a 
+	 * list of key-value pairs. This builder will call the 
+	 * {@link #buildKeyValuePair(org.freezedry.persistence.tree.InfoNode, String, java.util.List, boolean)}
+	 * method of the classes implementing this class as part of a recursive algorithm to flatten the 
+	 * semantic model.
+	 * @param decorators The mapping between the classes and their decorators. The decorators format the
+	 * strings, ints, doubles, etc. For example, by default, strings are surrounded by quotes.
+	 */
+	public AbstractPersistenceRenderer( final KeyValueBuilder builder, final Map< Class< ? >, Decorator > decorators )
 	{
-		Require.notNull( writer );
-		this.writer = writer;
+		Require.notNull( builder );
+		this.builder = builder;
 		this.decorators = decorators;
 	}
 	
 	/**
-	 * Constructor for the {@link PersistenceRenderer}s that stores the associated 
-	 * {@link PersistenceWriter} needed for resursion.
-	 * @param writer The associated {@link PersistenceWriter}
+	 * Constructor for the {@link PersistenceRenderer}s that stores the associated. Uses the default
+	 * mapping for classes and their decorators. 
+	 * {@link PersistenceWriter} needed for recursion.
+	 * @param builder The associated {@link PersistenceWriter}
+	 * @see Decorator
 	 */
-	public AbstractPersistenceRenderer( final KeyValueBuilder writer )
+	public AbstractPersistenceRenderer( final KeyValueBuilder builder )
 	{
-		this( writer, createDefaultDecorators() );
+		this( builder, createDefaultDecorators() );
 	}
 	
 	/**
@@ -57,7 +74,7 @@ public abstract class AbstractPersistenceRenderer implements PersistenceRenderer
 	 */
 	public AbstractPersistenceRenderer( final AbstractPersistenceRenderer renderer )
 	{
-		this.writer = renderer.writer;
+		this.builder = renderer.builder;
 		
 		// make a deep copy of the decorators
 		decorators = new HashMap< Class< ? >, Decorator >();
@@ -67,6 +84,9 @@ public abstract class AbstractPersistenceRenderer implements PersistenceRenderer
 		}
 	}
 	
+	/*
+	 * @return creates and returns the default mapping between classes and their decorators
+	 */
 	private static Map< Class< ? >, Decorator > createDefaultDecorators()
 	{
 		final Map< Class< ? >, Decorator > decorators = new HashMap<>();
@@ -85,6 +105,30 @@ public abstract class AbstractPersistenceRenderer implements PersistenceRenderer
 		decorators.put( Boolean.TYPE, new BooleanDecorator() );
 		
 		return decorators;
+	}
+	
+	/**
+	 * Adds a new {@link Decorator} for the specified class. If the specified class
+	 * already had a {@link Decorator}, then overwrites that association and returns
+	 * the previous {@link Decorator}. Recall that {@link Decorator}s format keys
+	 * and values. For example, by default, {@link String}s are surrounded with quotes.
+	 * @param clazz The class to associate with the specified {@link Decorator}
+	 * @param decorator The {@link Decorator} to associated with the class.
+	 * @return the {@link Decorator} previously associated with the specified {@link Class}.
+	 */
+	public Decorator addDecorator( final Class< ? > clazz, final Decorator decorator )
+	{
+		return decorators.put( clazz, decorator );
+	}
+	
+	/**
+	 * Removes the {@link Decorator} associated with the specified class.
+	 * @param clazz The {@link Class} for which to remove the {@link Decorator}
+	 * @return the {@link Decorator} previously associated with the specified {@link Class}
+	 */
+	public Decorator removeDecorator( final Class< ? > clazz )
+	{
+		return decorators.remove( clazz );
 	}
 	
 	/**
@@ -116,10 +160,10 @@ public abstract class AbstractPersistenceRenderer implements PersistenceRenderer
 	}
 	
 	/**
-	 * @return The persistence writer associated with this renderer for use in recursion.
+	 * @return The persistence builder associated with this renderer for use in recursion.
 	 */
 	protected KeyValueBuilder getPersistenceWriter()
 	{
-		return writer;
+		return builder;
 	}
 }

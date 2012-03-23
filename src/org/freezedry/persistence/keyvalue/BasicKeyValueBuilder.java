@@ -23,6 +23,12 @@ import org.freezedry.persistence.containers.Pair;
 import org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer;
 import org.freezedry.persistence.tree.InfoNode;
 
+/**
+ * Basic key-value list builder that flattens the semantic model and returns a list of key-value pairs.
+ * The entry point into the builder is the {@link #buildKeyValuePairs(InfoNode)} method.
+ *  
+ * @author rob
+ */
 public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 
 //	private static final Logger LOGGER = Logger.getLogger( BasicKeyValueBuilder.class );
@@ -114,7 +120,11 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 	@Override
 	public void createKeyValuePairs( final InfoNode infoNode, final String key, final List< Pair< String, Object > > keyValues, final boolean isWithholdPersitName )
 	{
+		// determine whether to show the persistence name. the isShowFullKey is top dog.
 		final boolean isHidePersistName = ( isShowFullKey() ? false : isWithholdPersitName );
+		
+		// grab the persistence renderer for the class or for its closest ancestor, or for the 
+		// array renderer if the class is an array
 		final Class< ? > clazz = infoNode.getClazz();
 		if( containsRenderer( clazz ) )
 		{
@@ -131,9 +141,11 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 			final Pair< String, Object > keyValuePair = new Pair< String, Object >( newKey, null );
 			
 			// if the node is a leaf node, then it has a value, and we need to create a key-value pair
+			// otherwise we need to recurse back to the calling method to build out the key-value pairs
+			// for a compound node
 			if( infoNode.isLeafNode() )
 			{
-				// create the key-value pair and return it
+				// create the key-value pair and add it to the list of key-values
 				keyValuePair.setSecond( infoNode.getValue() );
 				keyValues.add( keyValuePair );
 			}
@@ -156,6 +168,8 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 	private String createKey( final InfoNode infoNode, final String key, final boolean isWithholdPersitName )
 	{
 		final StringBuffer newKey = new StringBuffer();
+		
+		// if the key is empty then don't add anything
 		if( key != null && !key.isEmpty() )
 		{
 			newKey.append( key );
@@ -164,10 +178,13 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 				newKey.append( getSeparator() );
 			}
 		}
+		
+		// if we're withholding the persistence name, then don't add it to the key
 		if( !isWithholdPersitName )
 		{
 			newKey.append( infoNode.getPersistName() );
 		}
+		
 		return newKey.toString();
 	}
 }

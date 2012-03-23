@@ -26,6 +26,13 @@ import org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer;
 import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.ReflectionUtils;
 
+/**
+ * {@link AbstractKeyValueBuilder} that holds information about the mapping between classes
+ * and their {@link PersistenceRenderer}s, and specifies the separator to be used between the
+ * elements of the key.
+ * 
+ * @author Robert Philipp
+ */
 public abstract class AbstractKeyValueBuilder implements KeyValueBuilder {
 
 	protected static final String SEPARATOR = ":";

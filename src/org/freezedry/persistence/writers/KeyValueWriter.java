@@ -32,6 +32,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.freezedry.persistence.PersistenceEngine;
 import org.freezedry.persistence.containers.Pair;
+import org.freezedry.persistence.keyvalue.AbstractKeyValueBuilder;
 import org.freezedry.persistence.keyvalue.BasicKeyValueBuilder;
 import org.freezedry.persistence.keyvalue.KeyValueBuilder;
 import org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer;
@@ -43,8 +44,11 @@ import org.freezedry.persistence.utils.DateUtils;
 
 /**
  * Writes the semantic model as a list of key-value pairs to the specified output stream.
- * @author rob
- *
+ * The writer uses a {@link KeyValueBuilder} that flattens the semantic model and returns 
+ * a list of key-value pairs. The {@link KeyValueBuilder} can be specified, or a default one is created
+ * based on the supplied specifications for the {@link KeyValueBuilder}. 
+ * 
+ * @author Robert Philipp
  */
 public class KeyValueWriter implements PersistenceWriter {
 
@@ -53,7 +57,13 @@ public class KeyValueWriter implements PersistenceWriter {
 	private KeyValueBuilder builder;
 	
 	/**
-	 * 
+	 * Constructs a basic key-value writer that uses the specified renderers and separator.
+	 * @param renderers The mapping between the {@link Class} represented by an {@link InfoNode} and
+	 * the {@link PersistenceRenderer} used to create the key-value pair.
+	 * @param arrayRenderer The {@link PersistenceRenderer} used to create key-value pairs for
+	 * {@link InfoNode}s that represent an array.
+	 * @param separator The separator between the flattened elements of the key
+	 * @see AbstractKeyValueBuilder#getRenderer(Class)
 	 */
 	public KeyValueWriter( final Map< Class< ? >, PersistenceRenderer > renderers, 
 						   final PersistenceRenderer arrayRenderer,
@@ -63,7 +73,8 @@ public class KeyValueWriter implements PersistenceWriter {
 	}
 
 	/**
-	 * 
+	 * Constructs a basic key-value writer that uses the default renderers and specified separator.
+	 * @param separator The separator between the flattened elements of the key
 	 */
 	public KeyValueWriter( final String separator )
 	{
@@ -71,11 +82,20 @@ public class KeyValueWriter implements PersistenceWriter {
 	}
 
 	/**
-	 * 
+	 * Constructs a basic key-value writer that uses the default renderers and separator.
 	 */
 	public KeyValueWriter()
 	{
 		builder = new BasicKeyValueBuilder();
+	}
+	
+	/**
+	 * Constructs a key-value writer using the specified key-value list builder
+	 * @param builder The {@link KeyValueBuilder} used to flatten the semantic model
+	 */
+	public KeyValueWriter( final KeyValueBuilder builder )
+	{
+		this.builder = builder;
 	}
 	
 	/**
@@ -104,7 +124,8 @@ public class KeyValueWriter implements PersistenceWriter {
 	/**
 	 * When set to true, the full key is persisted. So for example, normally, if there is a {@link List}
 	 * of {@link String} called {@code names}, then the key will have the form {@code names[i]}. When this is
-	 * set to true, then the {@link List} would have a key of the form {@code names[i].String}
+	 * set to true, then the {@link List} would have a key of the form {@code names[i].String}. I recommend
+	 * against setting this to true.
 	 * @param isShowFullKey true means that the full key will be persisted; false is default
 	 */
 	public void setShowFullKey( final boolean isShowFullKey )
@@ -209,7 +230,7 @@ public class KeyValueWriter implements PersistenceWriter {
 		try( final PrintWriter printWriter = new PrintWriter( new FileWriter( "person.txt" ) ) )
 		{
 			final KeyValueWriter writer = new KeyValueWriter();
-			writer.setShowFullKey( true );
+//			writer.setShowFullKey( true );
 			writer.setSeparator( "." );
 			writer.write( rootNode, printWriter );
 		}

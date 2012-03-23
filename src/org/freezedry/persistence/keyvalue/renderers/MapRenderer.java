@@ -27,6 +27,25 @@ import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.Constants;
 import org.freezedry.persistence.utils.ReflectionUtils;
 
+/**
+ * Renders the subtree of the semantic model that represents a {@link Map}. {@link Map}s are rendered
+ * as the map's persistence name followed by the decorated key. For example, a {@code Map< String, Double >}
+ * would be persisted in the following format when using the default decorator and settings:
+ * <code><pre>
+ * Person.friends{"Polly"} = "bird"
+ * Person.friends{"Sparky"} = "dog"
+ * </pre></code>
+ * or for a more complicated map such as {@code Map< String, Map< String, String > >}:
+ * <code><pre>
+ * Person.groups{"numbers"}{"one"} = "ONE"
+ * Person.groups{"numbers"}{"two"} = "TWO"
+ * Person.groups{"numbers"}{"three"} = "THREE"
+ * Person.groups{"letters"}{"a"} = "AY"
+ * Person.groups{"letters"}{"b"} = "BEE"
+ * </pre></code>
+ * 
+ * @author Robert Philipp
+ */
 public class MapRenderer extends AbstractPersistenceRenderer {
 
 	private static final Logger LOGGER = Logger.getLogger( MapRenderer.class );
@@ -40,23 +59,28 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 	private StringDecorator keyDecorator;
 
 	/**
-	 * 
-	 * @param writer
+	 * Constructs a key-value {@link MapRenderer} for renderering the key-values for a {@link Map}
+	 * @param builder The {@link KeyValueBuilder} that makes calls to this renderer. Recall that this
+	 * is part of a recursive algorithm.
+	 * @param keyDecorator The decorator for the key. For example, it may surround the key with "<code>{</code>"
+	 * and "<code>}</code>". 
 	 */
-	public MapRenderer( final KeyValueBuilder writer, final StringDecorator indexDecorator )
+	public MapRenderer( final KeyValueBuilder builder, final StringDecorator keyDecorator )
 	{
-		super( writer );
+		super( builder );
 		
-		this.keyDecorator = indexDecorator.getCopy();
+		this.keyDecorator = keyDecorator.getCopy();
 	}
 
 	/**
-	 * 
-	 * @param writer
+	 * Constructs a key-value {@link MapRenderer} for renderering the key-values for a {@link Map}.
+	 * Decorates the key with the default decorations.
+	 * @param builder The {@link KeyValueBuilder} that makes calls to this renderer. Recall that this
+	 * is part of a recursive algorithm.
 	 */
-	public MapRenderer( final KeyValueBuilder writer )
+	public MapRenderer( final KeyValueBuilder builder )
 	{
-		this( writer, KEY_DECORATOR );
+		this( builder, KEY_DECORATOR );
 	}
 	
 	/**
@@ -70,31 +94,52 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 		this.keyDecorator = renderer.keyDecorator.getCopy();
 	}
 
+	/**
+	 * @param name the persistence name in the {@link InfoNode}s representing {@link Map.Entry}
+	 * The default value is {@link PersistMap.ENTRY_PERSIST_NAME} 
+	 */
 	public void setMapEntryName( final String name )
 	{
 		this.mapEntryName = name;
 	}
 	
+	/**
+	 * @return the persistence name in the {@link InfoNode}s representing {@link Map.Entry}
+	 */
 	public String getMapEntryName()
 	{
 		return mapEntryName;
 	}
 
+	/**
+	 * @param name the persistence name in the {@link InfoNode}s representing {@link Map} keys
+	 * The default value is {@link PersistMap.KEY_PERSIST_NAME}
+	 */
 	public void setMapKeyName( final String name )
 	{
 		this.mapKeyName = name;
 	}
 
+	/**
+	 * @return the persistence name in the {@link InfoNode}s representing {@link Map} keys
+	 */
 	public String getMapKeyName()
 	{
 		return mapKeyName;
 	}
 
+	/**
+	 * @param name the persistence name in the {@link InfoNode}s representing {@link Map} values
+	 * The default value is {@link PersistMap.VALUE_PERSIST_NAME}
+	 */
 	public void setMapValueName( final String name )
 	{
 		this.mapValueName = name;
 	}
 
+	/**
+	 * @return the persistence name in the {@link InfoNode}s representing {@link Map} values
+	 */
 	public String getMapValueName()
 	{
 		return mapValueName;
@@ -105,7 +150,10 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 	 * @see org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer#buildKeyValuePair(org.freezedry.persistence.tree.InfoNode, java.lang.String, java.util.List)
 	 */
 	@Override
-	public void buildKeyValuePair( final InfoNode infoNode, final String key, final List< Pair< String, Object > > keyValues, final boolean isWithholdPersistName )
+	public void buildKeyValuePair( final InfoNode infoNode, 
+								   final String key, 
+								   final List< Pair< String, Object > > keyValues, 
+								   final boolean isWithholdPersistName )
 	{
 		// [Division:months{January}[0], 1]
 		// [Division:months{January}[1], 2]

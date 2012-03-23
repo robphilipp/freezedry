@@ -15,38 +15,59 @@
  */
 package org.freezedry.persistence.keyvalue.renderers;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.freezedry.persistence.containers.Pair;
 import org.freezedry.persistence.keyvalue.KeyValueBuilder;
+import org.freezedry.persistence.keyvalue.renderers.decorators.Decorator;
 import org.freezedry.persistence.keyvalue.renderers.decorators.StringDecorator;
 import org.freezedry.persistence.tests.Person;
 import org.freezedry.persistence.tree.InfoNode;
 
+/**
+ * Renders the subtree of the semantic model that represents a {@link Collection}. {@link Collection}s are rendered
+ * as the collection's persistence name followed by the decorated index. For example, a {@code List< String >}
+ * would be persisted in the following format when using the default decorator and settings:
+ * <code><pre>
+ * Division.carNames[0] = "civic"
+ * Division.carNames[1] = "tsx"
+ * Division.carNames[2] = "accord"
+ * </pre></code>
+ * 
+ * @author rob
+ */
 public class CollectionRenderer extends AbstractPersistenceRenderer {
 	
 	private static StringDecorator INDEX_DECORATOR = new StringDecorator( "[", "]" );
 	
 	private StringDecorator indexDecorator;
-	
+
 	/**
-	 * 
-	 * @param writer
+	 * Constructs a {@link CollectionRenderer} that is used to render {@link InfoNode} representing
+	 * {@link Collection}s into key value pairs.
+	 * @param builder The {@link KeyValueBuilder} used to flatten the semantic model. The builder calls
+	 * this class' {@link #buildKeyValuePair(InfoNode, String, List, boolean)} as part of the recursive
+	 * algorithm to flatten the semantic model
+	 * @param indexDecorator The {@link Decorator} for the index.
 	 */
-	public CollectionRenderer( final KeyValueBuilder writer, final StringDecorator indexDecorator )
+	public CollectionRenderer( final KeyValueBuilder builder, final StringDecorator indexDecorator )
 	{
-		super( writer );
+		super( builder );
 		
 		this.indexDecorator = indexDecorator.getCopy();
 	}
 	
 	/**
-	 * 
-	 * @param writer
+	 * Constructs a {@link CollectionRenderer} that is used to render {@link InfoNode} representing
+	 * {@link Collection}s into key value pairs. Uses the default the index decorator which prepends
+	 * a "{@code [}" onto the index and appends a "{@code ]}" to the end of the index. For example,
+	 * if the {@code index=1} then the index would be decorated to look like {@code [1]}.
+	 * @param builder
 	 */
-	public CollectionRenderer( final KeyValueBuilder writer )
+	public CollectionRenderer( final KeyValueBuilder builder )
 	{
-		this( writer, INDEX_DECORATOR );
+		this( builder, INDEX_DECORATOR );
 	}
 	
 	/**

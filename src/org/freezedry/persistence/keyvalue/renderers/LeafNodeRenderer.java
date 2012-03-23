@@ -29,6 +29,15 @@ public class LeafNodeRenderer extends AbstractPersistenceRenderer {
 	
 	private static final Logger LOGGER = Logger.getLogger( LeafNodeRenderer.class );
 	
+	/**
+	 * Constructs a {@link CollectionRenderer} that is used to render {@link InfoNode} representing
+	 * leaf {@link InfoNode}s into key value pairs.
+	 * @param builder The {@link KeyValueBuilder} used to flatten the semantic model. The builder calls
+	 * this class' {@link #buildKeyValuePair(InfoNode, String, List, boolean)} as part of the recursive
+	 * algorithm to flatten the semantic model
+	 * @param decorators The mapping between the classes and their {@link Decorator}s. The {@link Decorator}s format the
+	 * strings, ints, doubles, etc. For example, by default, strings are surrounded by quotes.
+	 */
 	public LeafNodeRenderer( final KeyValueBuilder writer, final Map< Class< ? >, Decorator > decorators )
 	{
 		super( writer, decorators );

@@ -19,20 +19,34 @@ import java.util.List;
 
 import org.freezedry.persistence.containers.Pair;
 import org.freezedry.persistence.copyable.Copyable;
+import org.freezedry.persistence.keyvalue.KeyValueBuilder;
 import org.freezedry.persistence.tree.InfoNode;
 
 /**
+ * Interface defining what a {@link PersistenceRenderer} should look like. The {@link PersistenceRenderer}s
+ * are intended to be used to create key-value pairs during the flattening of the semantic model. The 
+ * {@link PersistenceRenderer}s are intended to be part of the recursive algorithm in which the {@link KeyValueBuilder}s
+ * call the {@link #buildKeyValuePair(InfoNode, String, List, boolean)} method, which in turn, for compound
+ * {@link InfoNode}s may call the {@link KeyValueBuilder#buildKeyValuePairs(InfoNode, String, List)} or 
+ * the {@link KeyValueBuilder#createKeyValuePairs(InfoNode, String, List, boolean)} methods. 
  * 
- * @author rob
+ * It ends up being a beautiful dance of between the builders and renderers...though the code isn't so pretty.
+ * 
+ * @author Robert Philipp
  */
 public interface PersistenceRenderer extends Copyable< PersistenceRenderer >{
 
 	/**
-	 * 
-	 * @param infoNode
-	 * @param key
-	 * @param keyValues
-	 * @param isWithholdPersistName
+	 * Builds a key-value pair and adds it to the list of key-value pairs. If the
+	 * {@link InfoNode} is compound, then the {@link PersistenceRenderer} may refer back to 
+	 * the {@link KeyValueBuilder} to build out the compound node.
+	 * @param infoNode The current {@link InfoNode} in the semantic model.
+	 * @param key The current key. The key is constructed by appending persistence names, which
+	 * may or may not be decorated, to the current key. In this way it represents a flattening
+	 * of the semantic model.
+	 * @param keyValues The current list of key-value pairs
+	 * @param isWithholdPersistName true if the renderer implementation should not append the
+	 * {@link InfoNode}'s persistence name to the key.
 	 */
 	void buildKeyValuePair( final InfoNode infoNode, 
 							final String key, 

@@ -15,6 +15,13 @@
  */
 package org.freezedry.persistence.keyvalue.renderers.decorators;
 
+/**
+ * Decorator that converts a boolean into a String. The default behavior is to convert
+ * a boolean value of {@code true} into a {@link String} "{@code true}"; and a boolean 
+ * value of {@code false} into a {@link String} "{@code false}". 
+ * 
+ * @author Robert Philipp
+ */
 public class BooleanDecorator implements Decorator {
 
 	private final static String TRUE = "true";
@@ -23,17 +30,31 @@ public class BooleanDecorator implements Decorator {
 	private String trueString;
 	private String falseString;
 	
+	/**
+	 * Constructs a {@link BooleanDecorator} that sets converts a boolean into a {@link String}.
+	 * @param trueString The {@link String} is used for {@code true} values.
+	 * @param falseString The {@link String} is used for {@code true} values.
+	 */
 	public BooleanDecorator( final String trueString, final String falseString )
 	{
 		this.trueString = trueString;
 		this.falseString = falseString;
 	}
-	
+
+	/**
+	 * Constructs a {@link BooleanDecorator} that sets converts a boolean into a {@link String}.
+	 * Uses the default behavior is to convert a boolean value of {@code true} into a {@link String}
+	 * "{@code true}"; and a boolean value of {@code false} into a {@link String} "{@code false}".
+	 */
 	public BooleanDecorator()
 	{
 		this( TRUE, FALSE );
 	}
 	
+	/**
+	 * Copy constructor
+	 * @param decorator The {@link BooleanDecorator} to copy
+	 */
 	public BooleanDecorator( final BooleanDecorator decorator )
 	{
 		this.trueString = decorator.trueString;
