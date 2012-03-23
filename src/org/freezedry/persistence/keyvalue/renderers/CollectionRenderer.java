@@ -54,14 +54,15 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 		int index = 0;
 		for( InfoNode node : infoNode.getChildren() )
 		{
-			final String newKey = createKey( key, infoNode, index );
 			if( node.isLeafNode() )
 			{
 				// create the key-value pair and return it
+				final String newKey = createLeafNodeKey( key, infoNode, index );
 				getPersistenceWriter().createKeyValuePairs( node, newKey, keyValues, true );
 			}
 			else
 			{
+				final String newKey = createNodeKey( key, infoNode, node, index );
 				getPersistenceWriter().buildKeyValuePairs( node, newKey, keyValues );
 			}
 
@@ -72,13 +73,42 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 			node.setIsProcessed( true );
 		}
 	}
-	
-	private String createKey( final String key, final InfoNode node, final int index )
+
+	/**
+	 * Creates a key for a leaf node collection. For example, if the persist name for a {@link List} is
+	 * people, which is a <code>{@link List}< {@link String} ></code>, then the key will be {@code people[i]}
+	 * where the {@code i} is the index of the list.
+	 * @param key The current key to which to append the persisted name and decorated index
+	 * @param parentNode The parent node, which holds the name of the field
+	 * @param index The index of the element in the {@link List}
+	 * @return The key
+	 */
+	private String createLeafNodeKey( final String key, final InfoNode parentNode, final int index )
+	{
+		return createNodeKey( key, parentNode, null, index );
+	}
+
+	/**
+	 * Creates a key for a compound node collection. For example, if the persist name for a {@link List} is
+	 * people, which is a <code>{@link List}< {@link Person} ></code>, then the key will be {@code people.Person[i]}
+	 * where the {@code i} is the index of the list.
+	 * @param key The current key to which to append the persisted name and decorated index
+	 * @param parentNode The parent node, which holds the name of the field (in this example, "{@code people}")
+	 * @param node The current node (in this example, "{@code Person}")
+	 * @param index The index of the element in the {@link List}
+	 * @return The key
+	 */
+	private String createNodeKey( final String key, final InfoNode parentNode, final InfoNode node, final int index )
 	{
 		String newKey = key;
-		if( node.getPersistName() != null && !node.getPersistName().isEmpty() )
+		if( parentNode.getPersistName() != null && !parentNode.getPersistName().isEmpty() )
 		{
-			newKey += getPersistenceWriter().getSeparator() + node.getPersistName();
+			final String separator = getPersistenceWriter().getSeparator(); 
+			newKey += separator + parentNode.getPersistName();
+			if( node != null )
+			{
+				newKey += separator + node.getPersistName();
+			}
 		}
 		newKey += indexDecorator.decorate( index );
 		return newKey;
