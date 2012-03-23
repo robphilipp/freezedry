@@ -16,6 +16,7 @@
 package org.freezedry.persistence.keyvalue.renderers.decorators;
 
 import java.text.DecimalFormat;
+import java.text.ParseException;
 
 /**
  * {@link Decorator} that formats an {@link Double}. The default format is to format
@@ -67,6 +68,24 @@ public class DoubleDecorator implements Decorator {
 	public String decorate( Object object )
 	{
 		return formatter.format( (Number)object );
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.keyvalue.renderers.decorators.Decorator#isDecorated(java.lang.String)
+	 */
+	@Override
+	public boolean isDecorated( final String value )
+	{
+		boolean isDecorated = false;
+		try
+		{
+			formatter.parse( value );
+			isDecorated = true;
+		}
+		catch( ParseException e ) {}
+		
+		return isDecorated;
 	}
 
 	/*

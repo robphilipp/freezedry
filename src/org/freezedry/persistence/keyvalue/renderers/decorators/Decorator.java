@@ -36,4 +36,11 @@ public interface Decorator extends Copyable< Decorator > {
 	 * @return The decorated object
 	 */
 	String decorate( final Object object );
+	
+	/**
+	 * Returns true if the specified value matches the formatting used to decorate the object; false otherwise
+	 * @param value The value to test to see if it is decorated according to this class.
+	 * @return true if the specified value matches the formatting used to decorate the object; false otherwise
+	 */
+	boolean isDecorated( final String value );
 }

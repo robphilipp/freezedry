@@ -72,9 +72,19 @@ public class StringDecorator implements Decorator {
 	 * @see org.freezedry.persistence.keyvalue.renderers.decorators.Decorator#decorate(java.lang.Object)
 	 */
 	@Override
-	public String decorate( Object object )
+	public String decorate( final Object object )
 	{
 		return open + object + close;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.keyvalue.renderers.decorators.Decorator#isDecorated(java.lang.String)
+	 */
+	@Override
+	public boolean isDecorated( final String value )
+	{
+		return value.startsWith( open ) && value.endsWith( close ) && value.length() > 1;
 	}
 
 	/*

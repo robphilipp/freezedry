@@ -73,6 +73,16 @@ public class BooleanDecorator implements Decorator {
 
 	/*
 	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.keyvalue.renderers.decorators.Decorator#isDecorated(java.lang.String)
+	 */
+	@Override
+	public boolean isDecorated( final String value )
+	{
+		return value.equals( trueString ) || value.equals( falseString );
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.freezedry.persistence.copyable.Copyable#getCopy()
 	 */
 	@Override
