@@ -10,16 +10,16 @@ import org.freezedry.persistence.keyvalue.renderers.decorators.IntegerDecorator;
 import org.freezedry.persistence.keyvalue.renderers.decorators.StringDecorator;
 import org.freezedry.persistence.utils.ReflectionUtils;
 import org.freezedry.persistence.utils.Require;
-import org.freezedry.persistence.keyvalue.KeyValueBuilder;
+import org.freezedry.persistence.keyvalue.BasicKeyValueBuilder;
 import org.freezedry.persistence.writers.PersistenceWriter;
 
 public abstract class AbstractPersistenceRenderer implements PersistenceRenderer {
 
-	private final KeyValueBuilder writer;
+	private final BasicKeyValueBuilder writer;
 	
 	public Map< Class< ? >, Decorator > decorators;
 
-	public AbstractPersistenceRenderer( final KeyValueBuilder writer, final Map< Class< ? >, Decorator > decorators )
+	public AbstractPersistenceRenderer( final BasicKeyValueBuilder writer, final Map< Class< ? >, Decorator > decorators )
 	{
 		Require.notNull( writer );
 		this.writer = writer;
@@ -31,7 +31,7 @@ public abstract class AbstractPersistenceRenderer implements PersistenceRenderer
 	 * {@link PersistenceWriter} needed for resursion.
 	 * @param writer The associated {@link PersistenceWriter}
 	 */
-	public AbstractPersistenceRenderer( final KeyValueBuilder writer )
+	public AbstractPersistenceRenderer( final BasicKeyValueBuilder writer )
 	{
 		this( writer, createDefaultDecorators() );
 	}
@@ -103,7 +103,7 @@ public abstract class AbstractPersistenceRenderer implements PersistenceRenderer
 	/**
 	 * @return The persistence writer associated with this renderer for use in recursion.
 	 */
-	protected KeyValueBuilder getPersistenceWriter()
+	protected BasicKeyValueBuilder getPersistenceWriter()
 	{
 		return writer;
 	}

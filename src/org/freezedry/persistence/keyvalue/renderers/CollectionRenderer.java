@@ -5,7 +5,7 @@ import java.util.List;
 import org.freezedry.persistence.containers.Pair;
 import org.freezedry.persistence.keyvalue.renderers.decorators.StringDecorator;
 import org.freezedry.persistence.tree.InfoNode;
-import org.freezedry.persistence.keyvalue.KeyValueBuilder;
+import org.freezedry.persistence.keyvalue.BasicKeyValueBuilder;
 
 public class CollectionRenderer extends AbstractPersistenceRenderer {
 	
@@ -17,7 +17,7 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 	 * 
 	 * @param writer
 	 */
-	public CollectionRenderer( final KeyValueBuilder writer, final StringDecorator indexDecorator )
+	public CollectionRenderer( final BasicKeyValueBuilder writer, final StringDecorator indexDecorator )
 	{
 		super( writer );
 		
@@ -28,7 +28,7 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 	 * 
 	 * @param writer
 	 */
-	public CollectionRenderer( final KeyValueBuilder writer )
+	public CollectionRenderer( final BasicKeyValueBuilder writer )
 	{
 		this( writer, INDEX_DECORATOR );
 	}

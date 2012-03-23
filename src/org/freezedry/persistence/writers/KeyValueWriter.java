@@ -17,7 +17,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.freezedry.persistence.PersistenceEngine;
 import org.freezedry.persistence.containers.Pair;
-import org.freezedry.persistence.keyvalue.KeyValueBuilder;
+import org.freezedry.persistence.keyvalue.BasicKeyValueBuilder;
 import org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer;
 import org.freezedry.persistence.tests.Division;
 import org.freezedry.persistence.tests.Person;
@@ -29,7 +29,7 @@ public class KeyValueWriter implements PersistenceWriter {
 
 	private static final Logger LOGGER = Logger.getLogger( KeyValueWriter.class );
 	
-	private KeyValueBuilder builder;
+	private BasicKeyValueBuilder builder;
 	
 	/**
 	 * 
@@ -38,7 +38,7 @@ public class KeyValueWriter implements PersistenceWriter {
 						   final PersistenceRenderer arrayRenderer,
 						   final String separator )
 	{
-		builder = new KeyValueBuilder( renderers, arrayRenderer, separator );
+		builder = new BasicKeyValueBuilder( renderers, arrayRenderer, separator );
 	}
 
 	/**
@@ -46,7 +46,7 @@ public class KeyValueWriter implements PersistenceWriter {
 	 */
 	public KeyValueWriter( final String separator )
 	{
-		builder = new KeyValueBuilder( separator );
+		builder = new BasicKeyValueBuilder( separator );
 	}
 
 	/**
@@ -54,7 +54,7 @@ public class KeyValueWriter implements PersistenceWriter {
 	 */
 	public KeyValueWriter()
 	{
-		builder = new KeyValueBuilder();
+		builder = new BasicKeyValueBuilder();
 	}
 	
 	public void setSeparator( final String separator )

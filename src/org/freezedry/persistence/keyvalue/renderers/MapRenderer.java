@@ -10,7 +10,7 @@ import org.freezedry.persistence.keyvalue.renderers.decorators.StringDecorator;
 import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.Constants;
 import org.freezedry.persistence.utils.ReflectionUtils;
-import org.freezedry.persistence.keyvalue.KeyValueBuilder;
+import org.freezedry.persistence.keyvalue.BasicKeyValueBuilder;
 
 public class MapRenderer extends AbstractPersistenceRenderer {
 
@@ -28,7 +28,7 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 	 * 
 	 * @param writer
 	 */
-	public MapRenderer( final KeyValueBuilder writer, final StringDecorator indexDecorator )
+	public MapRenderer( final BasicKeyValueBuilder writer, final StringDecorator indexDecorator )
 	{
 		super( writer );
 		
@@ -39,7 +39,7 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 	 * 
 	 * @param writer
 	 */
-	public MapRenderer( final KeyValueBuilder writer )
+	public MapRenderer( final BasicKeyValueBuilder writer )
 	{
 		this( writer, KEY_DECORATOR );
 	}
