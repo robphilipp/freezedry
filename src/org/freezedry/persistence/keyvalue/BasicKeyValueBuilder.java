@@ -1,30 +1,18 @@
 package org.freezedry.persistence.keyvalue;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.freezedry.persistence.containers.Pair;
-import org.freezedry.persistence.keyvalue.renderers.CollectionRenderer;
-import org.freezedry.persistence.keyvalue.renderers.LeafNodeRenderer;
-import org.freezedry.persistence.keyvalue.renderers.MapRenderer;
 import org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer;
 import org.freezedry.persistence.tree.InfoNode;
-import org.freezedry.persistence.utils.ReflectionUtils;
-import org.w3c.dom.Document;
 
-public class BasicKeyValueBuilder {
+public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 
 //	private static final Logger LOGGER = Logger.getLogger( BasicKeyValueBuilder.class );
-	private static final String SEPARATOR = ":";
-	
-	private Map< Class< ? >, PersistenceRenderer > renderers;
-	private PersistenceRenderer arrayRenderer;
+
 	private boolean isShowFullKey = false;
-	
-	private String separator;
 	
 	/**
 	 * 
@@ -33,9 +21,7 @@ public class BasicKeyValueBuilder {
 							final PersistenceRenderer arrayRenderer,
 							final String separator )
 	{
-		this.renderers = renderers;
-		this.arrayRenderer = arrayRenderer;
-		this.separator = separator;
+		super( renderers, arrayRenderer, separator );
 	}
 
 	/**
@@ -43,9 +29,7 @@ public class BasicKeyValueBuilder {
 	 */
 	public BasicKeyValueBuilder( final String separator )
 	{
-		renderers = createDefaultRenderers();
-		arrayRenderer = new CollectionRenderer( this );
-		this.separator = separator;
+		super( separator );
 	}
 
 	/**
@@ -53,89 +37,36 @@ public class BasicKeyValueBuilder {
 	 */
 	public BasicKeyValueBuilder()
 	{
-		renderers = createDefaultRenderers();
-		arrayRenderer = new CollectionRenderer( this );
-		separator = SEPARATOR;
+		super();
 	}
 	
-	/*
-	 * @return The mapping between class and their associated renderer
-	 */
-	private Map< Class< ? >, PersistenceRenderer > createDefaultRenderers()
-	{
-		final Map< Class< ? >, PersistenceRenderer > renderers = new HashMap<>();
-		renderers.put( Collection.class, new CollectionRenderer( this ) );
-		renderers.put( Map.class, new MapRenderer( this ) );
 
-		renderers.put( String.class, new LeafNodeRenderer( this ) );
-		
-		renderers.put( Integer.class, new LeafNodeRenderer( this ) );
-		renderers.put( Long.class, new LeafNodeRenderer( this ) );
-		renderers.put( Short.class, new LeafNodeRenderer( this ) );
-		renderers.put( Double.class, new LeafNodeRenderer( this ) );
-		renderers.put( Boolean.class, new LeafNodeRenderer( this ) );
-		
-		renderers.put( Integer.TYPE, new LeafNodeRenderer( this ) );
-		renderers.put( Long.TYPE, new LeafNodeRenderer( this ) );
-		renderers.put( Short.TYPE, new LeafNodeRenderer( this ) );
-		renderers.put( Double.TYPE, new LeafNodeRenderer( this ) );
-		renderers.put( Boolean.TYPE, new LeafNodeRenderer( this ) );
-		
-		return renderers;
-	}
-	
-	public void setSeparator( final String separator )
-	{
-		this.separator = separator;
-	}
-	
-	public String getSeparator()
-	{
-		return separator;
-	}
-	
+	/**
+	 * When set to true, the full key is persisted. So for example, normally, if there is a {@link List}
+	 * of {@link String} called {@code names}, then the key will have the form {@code names[i]}. When this is
+	 * set to true, then the {@link List} would have a key of the form {@code names[i].String}
+	 * @param isShowFullKey true means that the full key will be persisted; false is default
+	 */
 	public void setShowFullKey( final boolean isShowFullKey )
 	{
 		this.isShowFullKey = isShowFullKey;
 	}
 	
+	/**
+	 * When set to true, the full key is persisted. So for example, normally, if there is a {@link List}
+	 * of {@link String} called {@code names}, then the key will have the form {@code names[i]}. When this is
+	 * set to true, then the {@link List} would have a key of the form {@code names[i].String}
+	 * @return true means that the full key will be persisted; false is default
+	 */
 	public boolean isShowFullKey()
 	{
 		return isShowFullKey;
 	}
 	
 	/**
-	 * Finds the {@link PersistenceRenderer} associated with the class. If the specified class
-	 * doesn't have a renderer, then it searches for the closest parent class (inheritance)
-	 * and returns that. In this case, it adds an entry to the persistence renderer map for the
-	 * specified class associating it with the returned persistence renderer (performance speed-up for
-	 * subsequent calls).
-	 * @param clazz The class for which to find a persistence renderer
-	 * @return the {@link PersistenceRenderer} associated with the class
-	 */
-	public PersistenceRenderer getRenderer( final Class< ? > clazz )
-	{
-		return ReflectionUtils.getItemOrAncestor( clazz, renderers );
-	}
-
-	/**
-	 * Finds the {@link PersistenceRenderer} associated with the class. If the specified class
-	 * doesn't have a renderer, then it searches for the closest parent class (inheritance)
-	 * and returns that. In this case, it adds an entry to the persistence renderer map for the
-	 * specified class associating it with the returned persistence renderer (performance speed-up for
-	 * subsequent calls).
-	 * @param clazz The class for which to find a persistence renderer
-	 * @return the true if a persistence renderer was found; false otherwise
-	 */
-	public boolean containsRenderer( final Class< ? > clazz )
-	{
-		return ( getRenderer( clazz ) != null );
-	}
-	
-	/**
-	 * Builds the DOM tree from the info node tree through recursive algorithm.
+	 * Builds the {@link List} of key-value pairs from the info node tree through recursive algorithm.
 	 * @param rootInfoNode The root {@link InfoNode}
-	 * @return The DOM tree as a {@link Document}
+	 * @return the {@link List} of key-value pairs 
 	 */
 	public List< Pair< String, Object > > buildKeyValuePairs( final InfoNode rootInfoNode )
 	{
@@ -180,17 +111,6 @@ public class BasicKeyValueBuilder {
 		}
 	}
 
-//	/**
-//	 * 
-//	 * @param infoNode
-//	 * @param key
-//	 * @param keyValues
-//	 */
-//	public void createKeyValuePairs( final InfoNode infoNode, final String key, final List< Pair< String, Object > > keyValues )
-//	{
-//		createKeyValuePairs( infoNode, key, keyValues, false );
-//	}
-	
 	/**
 	 * 
 	 * @param infoNode
@@ -208,7 +128,7 @@ public class BasicKeyValueBuilder {
 		}
 		else if( clazz.isArray() )
 		{
-			arrayRenderer.buildKeyValuePair( infoNode, key, keyValues, isHidePersistName );
+			getArrayRenderer().buildKeyValuePair( infoNode, key, keyValues, isHidePersistName );
 		}
 		else
 		{
@@ -238,7 +158,7 @@ public class BasicKeyValueBuilder {
 			newKey.append( key );
 			if( !isWithholdPersitName )
 			{
-				newKey.append( separator );
+				newKey.append( getSeparator() );
 			}
 		}
 		if( !isWithholdPersitName )

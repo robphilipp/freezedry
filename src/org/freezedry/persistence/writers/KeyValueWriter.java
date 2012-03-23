@@ -163,7 +163,7 @@ public class KeyValueWriter implements PersistenceWriter {
 		try( final PrintWriter printWriter = new PrintWriter( new FileWriter( "person.txt" ) ) )
 		{
 			final KeyValueWriter writer = new KeyValueWriter();
-//			writer.setShowFullKey( true );
+			writer.setShowFullKey( true );
 			writer.setSeparator( "." );
 			writer.write( rootNode, printWriter );
 		}

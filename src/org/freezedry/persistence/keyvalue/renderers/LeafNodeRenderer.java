@@ -5,21 +5,21 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.freezedry.persistence.containers.Pair;
+import org.freezedry.persistence.keyvalue.KeyValueBuilder;
 import org.freezedry.persistence.keyvalue.renderers.decorators.Decorator;
 import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.Constants;
-import org.freezedry.persistence.keyvalue.BasicKeyValueBuilder;
 
 public class LeafNodeRenderer extends AbstractPersistenceRenderer {
 	
 	private static final Logger LOGGER = Logger.getLogger( LeafNodeRenderer.class );
 	
-	public LeafNodeRenderer( final BasicKeyValueBuilder writer, final Map< Class< ? >, Decorator > decorators )
+	public LeafNodeRenderer( final KeyValueBuilder writer, final Map< Class< ? >, Decorator > decorators )
 	{
 		super( writer, decorators );
 	}
 	
-	public LeafNodeRenderer( final BasicKeyValueBuilder writer )
+	public LeafNodeRenderer( final KeyValueBuilder writer )
 	{
 		super( writer );
 	}
