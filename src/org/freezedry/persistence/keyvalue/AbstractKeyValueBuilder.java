@@ -1,3 +1,18 @@
+/*
+ * Copyright 2012 Robert Philipp
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 package org.freezedry.persistence.keyvalue;
 
 import java.util.Collection;
@@ -8,6 +23,7 @@ import org.freezedry.persistence.keyvalue.renderers.CollectionRenderer;
 import org.freezedry.persistence.keyvalue.renderers.LeafNodeRenderer;
 import org.freezedry.persistence.keyvalue.renderers.MapRenderer;
 import org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer;
+import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.ReflectionUtils;
 
 public abstract class AbstractKeyValueBuilder implements KeyValueBuilder {
@@ -18,9 +34,17 @@ public abstract class AbstractKeyValueBuilder implements KeyValueBuilder {
 	private PersistenceRenderer arrayRenderer;
 	
 	private String separator;
+
+	private boolean isShowFullKey = false;
 	
 	/**
-	 * 
+	 * Constructs a basic key-value builder that uses the specified renderers and separator.
+	 * @param renderers The mapping between the {@link Class} represented by an {@link InfoNode} and
+	 * the {@link PersistenceRenderer} used to create the key-value pair.
+	 * @param arrayRenderer The {@link PersistenceRenderer} used to create key-value pairs for
+	 * {@link InfoNode}s that represent an array.
+	 * @param separator The separator between the flattened elements of the key
+	 * @see AbstractKeyValueBuilder#getRenderer(Class)
 	 */
 	public AbstractKeyValueBuilder( final Map< Class< ? >, PersistenceRenderer > renderers, 
 									final PersistenceRenderer arrayRenderer,
@@ -86,15 +110,37 @@ public abstract class AbstractKeyValueBuilder implements KeyValueBuilder {
 	{
 		return separator;
 	}
-	/**
-	 * Sets the separator between the elements of the key.
-	 * @param separator The separator that is placed between the elements of the key
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.keyvalue.KeyValueBuilder#setSeparator(java.lang.String)
 	 */
+	@Override
 	public void setSeparator( final String separator )
 	{
 		this.separator = separator;
 	}
-	
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.keyvalue.KeyValueBuilder#setShowFullKey(boolean)
+	 */
+	@Override
+	public void setShowFullKey( final boolean isShowFullKey )
+	{
+		this.isShowFullKey = isShowFullKey;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.keyvalue.KeyValueBuilder#isShowFullKey()
+	 */
+	@Override
+	public boolean isShowFullKey()
+	{
+		return isShowFullKey;
+	}
+
 	public void setRenderers( final Map< Class< ? >, PersistenceRenderer > renderers )
 	{
 		this.renderers = renderers;

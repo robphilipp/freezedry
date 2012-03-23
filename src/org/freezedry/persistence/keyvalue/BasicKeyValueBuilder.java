@@ -1,3 +1,18 @@
+/*
+ * Copyright 2012 Robert Philipp
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 package org.freezedry.persistence.keyvalue;
 
 import java.util.ArrayList;
@@ -12,20 +27,25 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 
 //	private static final Logger LOGGER = Logger.getLogger( BasicKeyValueBuilder.class );
 
-	private boolean isShowFullKey = false;
-	
 	/**
-	 * 
+	 * Constructs a basic key-value builder that uses the specified renderers and separator.
+	 * @param renderers The mapping between the {@link Class} represented by an {@link InfoNode} and
+	 * the {@link PersistenceRenderer} used to create the key-value pair.
+	 * @param arrayRenderer The {@link PersistenceRenderer} used to create key-value pairs for
+	 * {@link InfoNode}s that represent an array.
+	 * @param separator The separator between the flattened elements of the key
+	 * @see AbstractKeyValueBuilder#getRenderer(Class)
 	 */
 	public BasicKeyValueBuilder( final Map< Class< ? >, PersistenceRenderer > renderers, 
-							final PersistenceRenderer arrayRenderer,
-							final String separator )
+								 final PersistenceRenderer arrayRenderer,
+								 final String separator )
 	{
 		super( renderers, arrayRenderer, separator );
 	}
 
 	/**
-	 * 
+	 * Constructs a basic key-value builder that uses the default renderers and specified separator.
+	 * @param separator The separator between the flattened elements of the key
 	 */
 	public BasicKeyValueBuilder( final String separator )
 	{
@@ -33,41 +53,18 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 	}
 
 	/**
-	 * 
+	 * Constructs a basic key-value builder that uses the default renderers and separator.
 	 */
 	public BasicKeyValueBuilder()
 	{
 		super();
 	}
-	
 
-	/**
-	 * When set to true, the full key is persisted. So for example, normally, if there is a {@link List}
-	 * of {@link String} called {@code names}, then the key will have the form {@code names[i]}. When this is
-	 * set to true, then the {@link List} would have a key of the form {@code names[i].String}
-	 * @param isShowFullKey true means that the full key will be persisted; false is default
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.keyvalue.KeyValueBuilder#buildKeyValuePairs(org.freezedry.persistence.tree.InfoNode)
 	 */
-	public void setShowFullKey( final boolean isShowFullKey )
-	{
-		this.isShowFullKey = isShowFullKey;
-	}
-	
-	/**
-	 * When set to true, the full key is persisted. So for example, normally, if there is a {@link List}
-	 * of {@link String} called {@code names}, then the key will have the form {@code names[i]}. When this is
-	 * set to true, then the {@link List} would have a key of the form {@code names[i].String}
-	 * @return true means that the full key will be persisted; false is default
-	 */
-	public boolean isShowFullKey()
-	{
-		return isShowFullKey;
-	}
-	
-	/**
-	 * Builds the {@link List} of key-value pairs from the info node tree through recursive algorithm.
-	 * @param rootInfoNode The root {@link InfoNode}
-	 * @return the {@link List} of key-value pairs 
-	 */
+	@Override
 	public List< Pair< String, Object > > buildKeyValuePairs( final InfoNode rootInfoNode )
 	{
 		// create the map for holding the key-value pairs.
@@ -84,12 +81,11 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 		return keyValuePairs;
 	}
 
-	/**
-	 * 
-	 * @param infoNode
-	 * @param key
-	 * @param keyValues
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.keyvalue.KeyValueBuilder#buildKeyValuePairs(org.freezedry.persistence.tree.InfoNode, java.lang.String, java.util.List)
 	 */
+	@Override
 	public void buildKeyValuePairs( final InfoNode infoNode, final String key, final List< Pair< String, Object > > keyValues )
 	{
 		// run through the node's children, and for each one create and add the key-value pairs
@@ -111,16 +107,14 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 		}
 	}
 
-	/**
-	 * 
-	 * @param infoNode
-	 * @param key
-	 * @param keyValues
-	 * @param isWithholdPersitName
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.keyvalue.KeyValueBuilder#createKeyValuePairs(org.freezedry.persistence.tree.InfoNode, java.lang.String, java.util.List, boolean)
 	 */
+	@Override
 	public void createKeyValuePairs( final InfoNode infoNode, final String key, final List< Pair< String, Object > > keyValues, final boolean isWithholdPersitName )
 	{
-		final boolean isHidePersistName = ( isShowFullKey ? false : isWithholdPersitName );
+		final boolean isHidePersistName = ( isShowFullKey() ? false : isWithholdPersitName );
 		final Class< ? > clazz = infoNode.getClazz();
 		if( containsRenderer( clazz ) )
 		{
@@ -150,6 +144,15 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 		}
 	}
 	
+	/*
+	 * Creates a key based on the specified information. In particular, it deals with the suppression
+	 * of the leading separators when the specified key is null or empty. Also withholds the persistence name
+	 * from the key if it is intended to be withheld.
+	 * @param infoNode The current info node.
+	 * @param key The current key
+	 * @param isWithholdPersitName true if the persistence name is to be withheld from the key; false otherwise.
+	 * @return The newly minted key
+	 */
 	private String createKey( final InfoNode infoNode, final String key, final boolean isWithholdPersitName )
 	{
 		final StringBuffer newKey = new StringBuffer();

@@ -1,3 +1,18 @@
+/*
+ * Copyright 2012 Robert Philipp
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 package org.freezedry.persistence.writers;
 
 import java.io.FileWriter;
@@ -18,6 +33,7 @@ import org.apache.log4j.xml.DOMConfigurator;
 import org.freezedry.persistence.PersistenceEngine;
 import org.freezedry.persistence.containers.Pair;
 import org.freezedry.persistence.keyvalue.BasicKeyValueBuilder;
+import org.freezedry.persistence.keyvalue.KeyValueBuilder;
 import org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer;
 import org.freezedry.persistence.tests.Division;
 import org.freezedry.persistence.tests.Person;
@@ -25,11 +41,16 @@ import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.Constants;
 import org.freezedry.persistence.utils.DateUtils;
 
+/**
+ * Writes the semantic model as a list of key-value pairs to the specified output stream.
+ * @author rob
+ *
+ */
 public class KeyValueWriter implements PersistenceWriter {
 
 	private static final Logger LOGGER = Logger.getLogger( KeyValueWriter.class );
 	
-	private BasicKeyValueBuilder builder;
+	private KeyValueBuilder builder;
 	
 	/**
 	 * 
@@ -57,21 +78,46 @@ public class KeyValueWriter implements PersistenceWriter {
 		builder = new BasicKeyValueBuilder();
 	}
 	
+	/**
+	 * The separator between the flattened key elements. For example, suppose that a {@code Division} has a {@link List}
+	 * of {@code Person} objects, called {@code people}. The the key for a person's first name may be of the form:
+	 * {@code Division.people.Person[2].firstName}, or {@code Division:people:Person[2]:firstName}. The "{@code .}" and
+	 * the "{@code :}" are separators.
+	 * @param separator The separator
+	 */
 	public void setSeparator( final String separator )
 	{
 		builder.setSeparator( separator );
 	}
 	
+	/**
+	 * @return The separator between the flattened key elements. For example, suppose that a {@code Division} has a {@link List}
+	 * of {@code Person} objects, called {@code people}. The the key for a person's first name may be of the form:
+	 * {@code Division.people.Person[2].firstName}, or {@code Division:people:Person[2]:firstName}. The "{@code .}" and
+	 * the "{@code :}" are separators.
+	 */
 	public String getSeparator()
 	{
 		return builder.getSeparator();
 	}
 	
+	/**
+	 * When set to true, the full key is persisted. So for example, normally, if there is a {@link List}
+	 * of {@link String} called {@code names}, then the key will have the form {@code names[i]}. When this is
+	 * set to true, then the {@link List} would have a key of the form {@code names[i].String}
+	 * @param isShowFullKey true means that the full key will be persisted; false is default
+	 */
 	public void setShowFullKey( final boolean isShowFullKey )
 	{
 		builder.setShowFullKey( isShowFullKey );
 	}
 	
+	/**
+	 * When set to true, the full key is persisted. So for example, normally, if there is a {@link List}
+	 * of {@link String} called {@code names}, then the key will have the form {@code names[i]}. When this is
+	 * set to true, then the {@link List} would have a key of the form {@code names[i].String}
+	 * @return true means that the full key will be persisted; false is default
+	 */
 	public boolean isShowFullKey()
 	{
 		return builder.isShowFullKey();
