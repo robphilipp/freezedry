@@ -750,6 +750,8 @@ public class PersistenceEngine {
 			// create the semantic model
 			final InfoNode rootNode = engine.createSemanticModel( division );
 			System.out.println( rootNode.simpleTreeToString() );
+//			System.out.println( "\n\nCopied Tree\n" );
+//			System.out.println( rootNode.getCopy().simpleTreeToString() );
 	
 			// write out XML
 			try( final PrintWriter printWriter = new PrintWriter( new FileWriter( "person.xml" ) ) )
@@ -762,6 +764,17 @@ public class PersistenceEngine {
 			{
 				e.printStackTrace();
 			}
+			try( final PrintWriter printWriter = new PrintWriter( new FileWriter( "person2.xml" ) ) )
+			{
+				final XmlWriter writer = new XmlWriter();
+				writer.setDisplayTypeInfo( false );
+				writer.write( rootNode.getCopy(), printWriter );
+			}
+			catch( IOException e )
+			{
+				e.printStackTrace();
+			}
+			
 			
 			// write out JSON
 			try( final PrintWriter printWriter = new PrintWriter( new FileWriter( "person.json" ) ) )

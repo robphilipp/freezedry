@@ -33,7 +33,7 @@ public interface KeyValueBuilder {
 	/**
 	 * The entry point for building the {@link List} of key-value pairs from the semantic model,
 	 * through a recursive algorithm ({@link #buildKeyValuePairs(InfoNode, String, List)}. Effectively,
-	 * this will flatten the tree into a key-value pair structure.
+	 * this will flatten the tree into a list of key-value pairs.
 	 * @param rootInfoNode The root {@link InfoNode} of the semantic model
 	 * @return the {@link List} of key-value pairs 
 	 * @see #buildKeyValuePairs(InfoNode, String, List)

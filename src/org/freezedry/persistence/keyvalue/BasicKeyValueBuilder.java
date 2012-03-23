@@ -75,13 +75,16 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 	{
 		// create the map for holding the key-value pairs.
 		final List< Pair< String, Object > > keyValuePairs = new ArrayList<>();
-		
+
+		// make a deep copy of the semantic model (since there are parts of the code that change the model)
+		final InfoNode rootNode = rootInfoNode.getCopy();
+
 		// create the first DOM node from the info-node and add it to the document
-//		final Pair< String, Object > rootPair = createKeyValuePairs( rootInfoNode, "", keyValuePairs );
+//		final Pair< String, Object > rootPair = createKeyValuePairs( rootNode, "", keyValuePairs );
 		
 		// recursively build the DOM tree from the info-node tree
-//		buildKeyValuePairs( rootInfoNode, rootPair.getFirst(), keyValuePairs );
-		buildKeyValuePairs( rootInfoNode, rootInfoNode.getPersistName(), keyValuePairs );
+//		buildKeyValuePairs( rootNode, rootPair.getFirst(), keyValuePairs );
+		buildKeyValuePairs( rootNode, rootNode.getPersistName(), keyValuePairs );
 		
 		// once complete, then return the document (root node of the DOM tree)
 		return keyValuePairs;

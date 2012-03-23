@@ -20,9 +20,11 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.freezedry.persistence.copyable.Copyable;
 import org.freezedry.persistence.utils.Constants;
 
 /**
@@ -31,7 +33,7 @@ import org.freezedry.persistence.utils.Constants;
  * 
  * @author Robert Philipp
  */
-public class InfoNode {
+public class InfoNode implements Copyable< InfoNode > {
 
 	// tree variables
 	private InfoNode parent;
@@ -96,6 +98,34 @@ public class InfoNode {
 		{
 			return new InfoNode( NodeType.LEAF_NODE, fieldName, value, persistName, clazz, null, null, null );
 		}
+	}
+	
+	/*
+	 * Creates a new {@link InfoNode} and makes a copy of the data in that node. NOTE, it does NOT copy the
+	 * children. To copy the children use the {@link #getCopy()} method.
+	 * @param node The node from which to copy the data
+	 * @return a new {@link InfoNode} and makes a copy of the data in that node
+	 */
+	private static InfoNode copyNodeData( final InfoNode node )
+	{
+		Map< String, Method > setFieldMap = null;
+		if( node.setFieldMap != null )
+		{
+			setFieldMap = new HashMap<>( node.setFieldMap );
+		}
+		Map< String, Method > getFieldMap = null;
+		if( node.getFieldMap != null )
+		{
+			getFieldMap = new HashMap<>( node.getFieldMap );
+		}
+		return new InfoNode( node.nodeType, 
+							 node.fieldName, 
+							 node.value, 
+							 node.persistName, 
+							 node.clazz, 
+							 node.constructor,
+							 setFieldMap,
+							 getFieldMap );
 	}
 	
 	/**
@@ -687,6 +717,34 @@ public class InfoNode {
 		return buffer.toString();
 	}
 	
+	/**
+	 * Copies the entire tree from the specified node down.
+	 * @param node The node from which to copy the tree
+	 * @return The copied tree
+	 */
+	public static InfoNode getCopy( final InfoNode node )
+	{
+		// copy the node data (not the children, yet)
+		final InfoNode copiedNode = InfoNode.copyNodeData( node );
+		
+		// now copy the children (recursively)
+		for( InfoNode child : node.getChildren() )
+		{
+			copiedNode.addChild( getCopy( child ) );
+		}
+		return copiedNode;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.copyable.Copyable#getCopy()
+	 */
+	@Override
+	public InfoNode getCopy()
+	{
+		return getCopy( this );
+	}
+
 	/**
 	 * Represents the types of nodes
 	 */
