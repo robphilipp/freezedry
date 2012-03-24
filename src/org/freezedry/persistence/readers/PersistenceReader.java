@@ -31,7 +31,8 @@ public interface PersistenceReader {
 
 	/**
 	 * Reads the input stream into a semantic model represented by the return root {@link InfoNode}.
-	 * @param clazz The {@link Class} to use as a template for creating the semantic model.
+	 * @param clazz The {@link Class} to use as a template for creating the semantic model. This is
+	 * effectively the "target" class.
 	 * @param input The input stream from which to read the persisted object.
 	 * @return The root {@link InfoNode} representing the semantic model.
 	 */
