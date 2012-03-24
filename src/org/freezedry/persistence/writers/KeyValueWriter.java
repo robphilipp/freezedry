@@ -54,7 +54,10 @@ public class KeyValueWriter implements PersistenceWriter {
 
 	private static final Logger LOGGER = Logger.getLogger( KeyValueWriter.class );
 	
+	public static final String KEY_VALUE_SEPARATOR = "=";
+	
 	private KeyValueBuilder builder;
+	private String keyValueSeparator = KEY_VALUE_SEPARATOR;
 	
 	/**
 	 * Constructs a basic key-value writer that uses the specified renderers and separator.
@@ -62,23 +65,28 @@ public class KeyValueWriter implements PersistenceWriter {
 	 * the {@link PersistenceRenderer} used to create the key-value pair.
 	 * @param arrayRenderer The {@link PersistenceRenderer} used to create key-value pairs for
 	 * {@link InfoNode}s that represent an array.
-	 * @param separator The separator between the flattened elements of the key
+	 * @param keySeparator The separator between the flattened elements of the key
+	 * @param keyValueSeparator The separator between the key and the value
 	 * @see AbstractKeyValueBuilder#getRenderer(Class)
 	 */
 	public KeyValueWriter( final Map< Class< ? >, PersistenceRenderer > renderers, 
 						   final PersistenceRenderer arrayRenderer,
-						   final String separator )
+						   final String keySeparator,
+						   final String keyValueSeparator )
 	{
-		builder = new BasicKeyValueBuilder( renderers, arrayRenderer, separator );
+		builder = new BasicKeyValueBuilder( renderers, arrayRenderer, keySeparator );
+		this.keyValueSeparator = keyValueSeparator;
 	}
 
 	/**
 	 * Constructs a basic key-value writer that uses the default renderers and specified separator.
-	 * @param separator The separator between the flattened elements of the key
+	 * @param keySeparator The separator between the flattened elements of the key
+	 * @param keyValueSeparator The separator between the key and the value
 	 */
-	public KeyValueWriter( final String separator )
+	public KeyValueWriter( final String keySeparator, final String keyValueSeparator )
 	{
-		builder = new BasicKeyValueBuilder( separator );
+		builder = new BasicKeyValueBuilder( keySeparator );
+		this.keyValueSeparator = keyValueSeparator;
 	}
 
 	/**
@@ -105,7 +113,7 @@ public class KeyValueWriter implements PersistenceWriter {
 	 * the "{@code :}" are separators.
 	 * @param separator The separator
 	 */
-	public void setSeparator( final String separator )
+	public void setKeyElementSeparator( final String separator )
 	{
 		builder.setSeparator( separator );
 	}
@@ -116,9 +124,26 @@ public class KeyValueWriter implements PersistenceWriter {
 	 * {@code Division.people.Person[2].firstName}, or {@code Division:people:Person[2]:firstName}. The "{@code .}" and
 	 * the "{@code :}" are separators.
 	 */
-	public String getSeparator()
+	public String getKeyElementSeparator()
 	{
 		return builder.getSeparator();
+	}
+	
+	/**
+	 * @param separator The separator between the key and the value. The default value is given by the
+	 * {@link #KEY_VALUE_SEPARATOR} which has a value of {@value #KEY_VALUE_SEPARATOR}.
+	 */
+	public void setKeyValueSeparator( final String separator )
+	{
+		this.keyValueSeparator = separator;
+	}
+	
+	/**
+	 * @return The separator between the key and the value.
+	 */
+	public String getKeyValueSeparator()
+	{
+		return keyValueSeparator;
 	}
 	
 	/**
@@ -231,7 +256,7 @@ public class KeyValueWriter implements PersistenceWriter {
 		{
 			final KeyValueWriter writer = new KeyValueWriter();
 //			writer.setShowFullKey( true );
-			writer.setSeparator( "." );
+			writer.setKeyElementSeparator( "." );
 			writer.write( rootNode, printWriter );
 		}
 		catch( IOException e )

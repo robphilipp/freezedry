@@ -35,7 +35,7 @@ import org.freezedry.persistence.utils.ReflectionUtils;
  */
 public abstract class AbstractKeyValueBuilder implements KeyValueBuilder {
 
-	protected static final String SEPARATOR = ":";
+	public static final String KEY_ELEMENT_SEPARATOR = ":";
 
 	private Map< Class< ? >, PersistenceRenderer > renderers;
 	private PersistenceRenderer arrayRenderer;
@@ -79,7 +79,7 @@ public abstract class AbstractKeyValueBuilder implements KeyValueBuilder {
 	{
 		renderers = createDefaultRenderers();
 		arrayRenderer = new CollectionRenderer( this );
-		separator = SEPARATOR;
+		separator = KEY_ELEMENT_SEPARATOR;
 	}
 	
 	/*

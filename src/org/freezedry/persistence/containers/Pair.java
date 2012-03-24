@@ -15,12 +15,14 @@
  */
 package org.freezedry.persistence.containers;
 
+import org.freezedry.persistence.copyable.Copyable;
+
 /**
  * Simple class to represent the concept of a pair. 
  * 
  * @author Robert Philipp
  */
-public class Pair< F, S > {
+public class Pair< F, S > implements Copyable< Pair< F, S > > {
 
 	private volatile int hashCode;
 
@@ -49,6 +51,16 @@ public class Pair< F, S > {
 	 * Default constructor
 	 */
 	public Pair() {}
+	
+	/**
+	 * Copy constructor
+	 * @param pair The pair to copy
+	 */
+	public Pair( final Pair< F, S > pair )
+	{
+		this.first = pair.first;
+		this.second = pair.second;
+	}
 	
 	/**
 	 * Allows the setting of the pair in one call 
@@ -141,9 +153,8 @@ public class Pair< F, S > {
 		return hashCode;
 	}
 
-	/**
-	 * Returns the pair in a human readable format
-	 * @return
+	/*
+	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
@@ -153,5 +164,15 @@ public class Pair< F, S > {
 		asString.append( (first != null ? first.toString() : "[null]" ) ).append( ", " );
 		asString.append( (second != null ? second.toString() : "[null]" ) ).append( "]" );
 		return asString.toString();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.copyable.Copyable#getCopy()
+	 */
+	@Override
+	public Pair< F, S > getCopy()
+	{
+		return new Pair< F, S >( this );
 	}
 }
