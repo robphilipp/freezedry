@@ -22,7 +22,6 @@ import org.freezedry.persistence.containers.Pair;
 import org.freezedry.persistence.keyvalue.KeyValueBuilder;
 import org.freezedry.persistence.keyvalue.renderers.decorators.Decorator;
 import org.freezedry.persistence.keyvalue.renderers.decorators.StringDecorator;
-import org.freezedry.persistence.tests.Person;
 import org.freezedry.persistence.tree.InfoNode;
 
 /**
@@ -125,9 +124,9 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 		return createNodeKey( key, parentNode, null, index );
 	}
 
-	/**
+	/*
 	 * Creates a key for a compound node collection. For example, if the persist name for a {@link List} is
-	 * people, which is a <code>{@link List}< {@link Person} ></code>, then the key will be {@code people.Person[i]}
+	 * people, which is a <code>{@link List}< {@link Person} ></code>, then the key will be {@code people[i].Person}
 	 * where the {@code i} is the index of the list.
 	 * @param key The current key to which to append the persisted name and decorated index
 	 * @param parentNode The parent node, which holds the name of the field (in this example, "{@code people}")
@@ -137,17 +136,28 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 	 */
 	private String createNodeKey( final String key, final InfoNode parentNode, final InfoNode node, final int index )
 	{
+		// grab the key-element separator
+		final String separator = getPersistenceWriter().getSeparator();
+
+		// if the parent node has a persistence name then add it
 		String newKey = key;
 		if( parentNode.getPersistName() != null && !parentNode.getPersistName().isEmpty() )
 		{
-			final String separator = getPersistenceWriter().getSeparator(); 
 			newKey += separator + parentNode.getPersistName();
-			if( node != null )
-			{
-				newKey += separator + node.getPersistName();
-			}
 		}
+		
+		// decorate the index. for example prepend a "[" and append a "]"
 		newKey += indexDecorator.decorate( index );
+		
+		// if the current node isn't null, and the parent has a persistence name, then add the 
+		// current nodes persistence name. For example, if you have a list of compound objects,
+		// such as 
+		//    List< Person > people;
+		// then this part of the key would look like people[0].Person. etc...
+		if( node != null && parentNode.getPersistName() != null && !parentNode.getPersistName().isEmpty() )
+		{
+			newKey += separator + node.getPersistName();
+		}
 		return newKey;
 	}
 	
