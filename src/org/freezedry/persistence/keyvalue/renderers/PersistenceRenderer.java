@@ -54,6 +54,16 @@ public interface PersistenceRenderer extends Copyable< PersistenceRenderer >{
 							final boolean isWithholdPersistName );
 
 	/**
+	 * Builds an {@link InfoNode} and adds it to the parent node, using the specified list of
+	 * key-value pairs. Each key in the list of key-value pairs should have its first key-element's
+	 * group name equal to the persistence name in the parent node.  
+	 * @param parentNode The parent {@link InfoNode} to which to add the newly created child(ren).
+	 * @param keyValues The associated list of key value pairs. Each key in the list of key-value pairs 
+	 * should have its first key-element's group name equal to the persistence name in the parent node.
+	 */
+	void buildInfoNode( final InfoNode parentNode, final List< Pair< String, String > > keyValues );
+	
+	/**
 	 * Returns true if the specified key matches the pattern created by the renderer; false otherwise
 	 * @param keyElement The element of the key to test
 	 * @return true if the specified key matches the pattern created by the renderer; false otherwise

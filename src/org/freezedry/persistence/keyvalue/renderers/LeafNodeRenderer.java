@@ -112,6 +112,16 @@ public class LeafNodeRenderer extends AbstractPersistenceRenderer {
 
 	/*
 	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer#buildInfoNode(org.freezedry.persistence.tree.InfoNode, java.util.List)
+	 */
+	@Override
+	public void buildInfoNode( final InfoNode parentNode, final List< Pair< String, String > > keyValues )
+	{
+		
+	}
+	
+	/*
+	 * (non-Javadoc)
 	 * @see org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer#isRenderer(java.lang.String)
 	 */
 	@Override
