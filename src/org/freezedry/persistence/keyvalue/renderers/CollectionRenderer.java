@@ -135,32 +135,6 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer#isRenderer(java.lang.String)
-	 */
-	@Override
-	public boolean isRenderer( final String keyElement )
-	{
-		return validationPattern.matcher( keyElement ).find();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer#getGroupName(java.lang.String)
-	 */
-	@Override
-	public String getGroupName( final String key )
-	{
-		final Matcher matcher = decorationPattern.matcher( key );
-		String group = null;
-		if( matcher.find() )
-		{
-			group = key.substring( 0, matcher.start() );
-		}
-		return group;
-	}
-	
 	/**
 	 * Creates a key for a leaf node collection. For example, if the persist name for a {@link List} is
 	 * people, which is a <code>{@link List}< {@link String} ></code>, then the key will be {@code people[i]}
@@ -212,6 +186,34 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 		return newKey;
 	}
 	
+	// public void buildInfoNode(...)
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer#isRenderer(java.lang.String)
+	 */
+	@Override
+	public boolean isRenderer( final String keyElement )
+	{
+		return validationPattern.matcher( keyElement ).find();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer#getGroupName(java.lang.String)
+	 */
+	@Override
+	public String getGroupName( final String key )
+	{
+		final Matcher matcher = decorationPattern.matcher( key );
+		String group = null;
+		if( matcher.find() )
+		{
+			group = key.substring( 0, matcher.start() );
+		}
+		return group;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.freezedry.persistence.copyable.Copyable#getCopy()

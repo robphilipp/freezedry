@@ -63,7 +63,9 @@ public abstract class AbstractKeyValueBuilder implements KeyValueBuilder {
 	}
 
 	/**
-	 * 
+	 * Constructs a basic key-value builder that uses the default renderers and the specified separator.
+	 * @param separator The separator between the flattened elements of the key
+	 * @see AbstractKeyValueBuilder#getRenderer(Class)
 	 */
 	public AbstractKeyValueBuilder( final String separator )
 	{
@@ -73,7 +75,8 @@ public abstract class AbstractKeyValueBuilder implements KeyValueBuilder {
 	}
 
 	/**
-	 * 
+	 * Constructs a basic key-value builder that uses the default renderers and separator.
+	 * @see AbstractKeyValueBuilder#getRenderer(Class)
 	 */
 	public AbstractKeyValueBuilder()
 	{
@@ -175,6 +178,27 @@ public abstract class AbstractKeyValueBuilder implements KeyValueBuilder {
 	public PersistenceRenderer getRenderer( final Class< ? > clazz )
 	{
 		return ReflectionUtils.getItemOrAncestor( clazz, renderers );
+	}
+	
+	/**
+	 * Finds the {@link PersistenceRenderer} for which the specified key matches its regular expression for keys;
+	 * null if no {@link PersistenceRenderer} is found.
+	 * @param key The key to test
+	 * @return the {@link PersistenceRenderer} for which the specified key matches its regular expression for keys; 
+	 * null if no {@link PersistenceRenderer} is found.
+	 */
+	public PersistenceRenderer getRenderer( final String key )
+	{
+		PersistenceRenderer matchingRenderer = null;
+		for( PersistenceRenderer renderer : renderers.values() )
+		{
+			if( renderer.isRenderer( key ) )
+			{
+				matchingRenderer = renderer;
+				break;
+			}
+		}
+		return matchingRenderer;
 	}
 
 	/**

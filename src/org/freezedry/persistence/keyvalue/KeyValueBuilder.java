@@ -92,4 +92,31 @@ public interface KeyValueBuilder {
 	 * @return true means that the full key will be persisted; false is default
 	 */
 	boolean isShowFullKey();
+	
+	/**
+	 * Main entry point for building the semantic model from a list of key-value pairs and the target class.
+	 * @param clazz The target class for the building of the semantic model
+	 * @param keyValues The key-value pairs
+	 * @return The root {@link InfoNode} of the semantic model
+	 */
+	InfoNode buildInfoNode( final Class< ? > clazz, final List< Pair< String, String > > keyValues );
+	
+	/**
+	 * Recursively builds the semantic model. The keys in the key-value list should all have as their
+	 * first element, the name found in the parentNode's persistence name.
+	 * @param parentNode The node to which to add the child nodes
+	 * @param keyValues The list of key-value pairs. The first key element of every key should match
+	 * the persistence name of the parent node.
+	 * @return the new info node
+	 */
+	void buildInfoNode( final InfoNode parentNode, final List< Pair< String, String > > keyValues );
+	
+	/**
+	 * Returns the root key. If the {@code useClassAsRootKey} default was set via the constructor or the {@link #setRootKey(String)}
+	 * method, then it returns that root key. Otherwise, it pulls the first key element from each key, ensures that
+	 * they are all the same, and then returns that root key.
+	 * @param keyValues The list of key-value pairs
+	 * @return the root key.
+	 */
+	String getRootKey( final List< Pair< String, String > > keyValues, final Class< ? > clazz );
 }
