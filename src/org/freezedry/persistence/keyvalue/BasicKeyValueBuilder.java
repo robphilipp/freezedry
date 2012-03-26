@@ -240,33 +240,97 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 		final Map< String, List< Pair< String, String > > > groups = getGroups( strippedKeyValues, getSeparator() );
 		for( Map.Entry< String, List< Pair< String, String > > > entry : groups.entrySet() )
 		{
-			System.out.println( entry.getKey() );
-			for( Pair< String, String > pair : entry.getValue() )
-			{
-				System.out.println( pair );
-			}
-			System.out.println();
+			// create the info node
+			createInfoNode( parentNode, entry.getKey(), entry.getValue() );
 			
-			final String groupName = entry.getKey();
-			final List< Pair< String, String > > pairs = entry.getValue();
-			// leaf node
-			if( pairs.size() == 1 )
+//			System.out.println( entry.getKey() );
+//			for( Pair< String, String > pair : entry.getValue() )
+//			{
+//				System.out.println( pair );
+//			}
+//			System.out.println();
+//			
+//			final String groupName = entry.getKey();
+//			final List< Pair< String, String > > pairs = entry.getValue();
+//			// leaf node
+//			if( pairs.size() == 1 )
+//			{
+//				final String name = pairs.get( 0 ).getFirst();
+//				if( !groupName.equals( name ) )
+//				{
+//					// houston, we have a problem
+//					throw new IllegalStateException( "The group name must match the persist name for a leaf node." );
+//				}
+//				final String value = pairs.get( 0 ).getSecond();
+//				parentNode.addChild( InfoNode.createLeafNode( null, value, name, null ) );
+//			}
+//			else
+//			{
+//				final InfoNode node = InfoNode.createCompoundNode( null, groupName, null );
+//				parentNode.addChild( node );
+//				buildInfoNode( node, entry.getValue() );
+//			}
+		}
+	}
+	
+	// TODO add a createInfoNode method that figures out which renderer to call for building the info node
+	// probably need to rewrite the above method a bit.
+	public void createInfoNode( final InfoNode parentNode, final String groupName, final List< Pair< String, String > > keyValues )
+	{
+		System.out.println( groupName );
+		for( Pair< String, String > pair : keyValues )
+		{
+			System.out.println( pair );
+		}
+		System.out.println();
+
+		// key-value list cannot be empty.
+		if( keyValues.isEmpty() )
+		{
+			final StringBuffer message = new StringBuffer();
+			message.append( "Cannot create an InfoNode when the specified list of key-values for the group is empty." + Constants.NEW_LINE );
+			message.append( "  Parent Node's Persistence Name: " + parentNode.getPersistName() + Constants.NEW_LINE );
+			message.append( "  Group Name: " + groupName + Constants.NEW_LINE );
+			LOGGER.error( message.toString() );
+			throw new IllegalArgumentException( message.toString() );
+		}
+		// leaf node
+		else if( keyValues.size() == 1 )
+		{
+			// grab the key and make sure that it matches the group name. at this point it shouldn't
+			// have any decorations (i.e. for collection or map or anything else)
+			final String name = keyValues.get( 0 ).getFirst();
+			if( !groupName.equals( name ) )
 			{
-				final String name = pairs.get( 0 ).getFirst();
-				if( !groupName.equals( name ) )
-				{
-					// houston, we have a problem
-					throw new IllegalStateException( "The group name must match the persist name for a leaf node." );
-				}
-				final String value = pairs.get( 0 ).getSecond();
-				parentNode.addChild( InfoNode.createLeafNode( null, value, name, null ) );
+				final StringBuffer message = new StringBuffer();
+				message.append( "The group name must match the persist name for a leaf node." + Constants.NEW_LINE );
+				message.append( "  Parent Node's Persistence Name: " + parentNode.getPersistName() + Constants.NEW_LINE );
+				message.append( "  Group Name: " + groupName + Constants.NEW_LINE );
+				message.append( "  Key: " + name + Constants.NEW_LINE );
+				message.append( "  Value: " + keyValues.get( 0 ).getSecond() );
+				LOGGER.error( message.toString() );
+				throw new IllegalStateException( message.toString() );
 			}
-			else
-			{
-				final InfoNode node = InfoNode.createCompoundNode( null, groupName, null );
-				parentNode.addChild( node );
-				buildInfoNode( node, entry.getValue() );
-			}
+
+			// in this case, the renderer for the key name should be a leaf-node renderer, so
+			// lets pull it, and then asky it to build the info node for us, and add that new
+			// info node to the parent, and then we're done
+			getRenderer( name ).buildInfoNode( parentNode, keyValues );
+		}
+		// for compound nodes, we need to call the appropriate renderer's buildInfoNode(...) method. and
+		// let the recursion begin.
+		else
+		{
+			// make sure the elements are all correct (this may be an unnecessary check)
+			validiateRootKey( keyValues, getSeparator(), groupName );
+
+			// grab the key from the first key value, and since all keys have the same group
+			// all we need is to grab the first key and use it as a pattern for the remaining
+			// key-value pairs in this group
+			final String rootKey = keyValues.get( 0 ).getFirst();
+			
+			// get the appropriate renderer and ask it to build the info node from that type
+			getRenderer( rootKey ).buildInfoNode( parentNode, keyValues );
 		}
 	}
 		
@@ -327,18 +391,19 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 		final Set< String > keySet = new LinkedHashSet<>();
 		for( Pair< String, String > pair : keyValues )
 		{
-			keySet.add( getFirstKeyElement( pair.getFirst(), keyElementSeparator ) );
+			keySet.add( getGroupName( getFirstKeyElement( pair.getFirst(), keyElementSeparator ) ) );
 		}
 		
-		// the first key must be unique
+		// the first key must all be in the same group. that is the case if the set only
+		// has one element, or if all the group names are the same
 		if( keySet.size() != 1 )
 		{
 			final StringBuffer message = new StringBuffer();
 			message.append( "The first element of all the keys must be the same. This is the root key." + Constants.NEW_LINE );
 			message.append( "  Set elements:" + Constants.NEW_LINE );
-			for( String key : keySet )
+			for( String keyName : keySet )
 			{
-				message.append( "    " + key + Constants.NEW_LINE );
+				message.append( "    " + keyName + Constants.NEW_LINE );
 			}
 			LOGGER.error( message.toString() );
 			throw new IllegalArgumentException( message.toString() );
@@ -464,23 +529,23 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 		return group;
 	}
 
-	/*
-	 * Returns true if the group name of the first key matches the group name of the second key;
-	 * false otherwise, or if either key is null.
-	 * @param key1 The first key
-	 * @param key2 The second key
-	 * @return true if the group name of the first key matches the group name of the second key;
-	 * false otherwise, or if either key is null.
-	 */
-	private boolean groupNamesMatch( final String key1, final String key2 )
-	{
-		boolean areEqual = false;
-		final String groupName1 = getGroupName( key1 );
-		final String groupName2 = getGroupName( key2 );
-		if( groupName1 != null && groupName2 != null && groupName1.equals( groupName2 ) )
-		{
-			areEqual = true;
-		}
-		return areEqual;
-	}
+//	/*
+//	 * Returns true if the group name of the first key matches the group name of the second key;
+//	 * false otherwise, or if either key is null.
+//	 * @param key1 The first key
+//	 * @param key2 The second key
+//	 * @return true if the group name of the first key matches the group name of the second key;
+//	 * false otherwise, or if either key is null.
+//	 */
+//	private boolean groupNamesMatch( final String key1, final String key2 )
+//	{
+//		boolean areEqual = false;
+//		final String groupName1 = getGroupName( key1 );
+//		final String groupName2 = getGroupName( key2 );
+//		if( groupName1 != null && groupName2 != null && groupName1.equals( groupName2 ) )
+//		{
+//			areEqual = true;
+//		}
+//		return areEqual;
+//	}
 }
