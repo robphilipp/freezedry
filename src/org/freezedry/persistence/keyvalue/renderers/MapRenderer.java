@@ -17,6 +17,7 @@ package org.freezedry.persistence.keyvalue.renderers;
 
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
@@ -59,8 +60,10 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 	private String mapValueName = PersistMap.VALUE_PERSIST_NAME;
 	
 	private final StringDecorator keyDecorator;
-	private final String regex;
-	private final Pattern pattern;
+	private final String decorationRegex;
+	private final Pattern decorationPattern;
+	private final String validationRegex;
+	private final Pattern validationPattern;
 
 	/**
 	 * Constructs a key-value {@link MapRenderer} for renderering the key-values for a {@link Map}
@@ -81,8 +84,14 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 		// so we want to check that only word characters precede the "["
 		final String open = Pattern.quote( openKey );
 		final String close = Pattern.quote( closeKey );
-		this.regex = "\\w+" + open + "\\p{Punct}*\\w+\\p{Punct}*" + close + "|^" + open + "\\p{Punct}*\\w+\\p{Punct}*" + close;
-		this.pattern = Pattern.compile( regex );
+		
+		// create and compile the regex pattern for the decoration
+		decorationRegex = open + "\\p{Punct}?\\w+\\p{Punct}?" + close;
+		decorationPattern = Pattern.compile( decorationRegex );
+		
+		// create and compile the regex pattern for validating the complete key
+		validationRegex = "\\w+" + decorationRegex + "|^" + decorationRegex;
+		validationPattern = Pattern.compile( validationRegex );
 	}
 
 	/**
@@ -105,8 +114,10 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 		super( renderer );
 		
 		this.keyDecorator = renderer.keyDecorator.getCopy();
-		this.regex = renderer.regex;
-		this.pattern = renderer.pattern;
+		this.decorationRegex = renderer.decorationRegex;
+		this.decorationPattern = renderer.decorationPattern;
+		this.validationRegex = renderer.validationRegex;
+		this.validationPattern = renderer.validationPattern;
 	}
 
 	/**
@@ -291,9 +302,25 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 	@Override
 	public boolean isRenderer( String keyElement )
 	{
-		return pattern.matcher( keyElement ).find();
+		return validationPattern.matcher( keyElement ).find();
 	}
-
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer#getGroupName(java.lang.String)
+	 */
+	@Override
+	public String getGroupName( final String key )
+	{
+		final Matcher matcher = decorationPattern.matcher( key );
+		String group = null;
+		if( matcher.find() )
+		{
+			group = key.substring( 0, matcher.start() );
+		}
+		return group;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.freezedry.persistence.copyable.Copyable#getCopy()

@@ -17,6 +17,7 @@ package org.freezedry.persistence.keyvalue.renderers;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.freezedry.persistence.containers.Pair;
@@ -43,8 +44,10 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 	private static String CLOSE = "]";
 	
 	private final StringDecorator indexDecorator;
-	private final String regex;
-	private final Pattern pattern;
+	private final String decorationRegex;
+	private final Pattern decorationPattern;
+	private final String validationRegex;
+	private final Pattern validationPattern;
 
 	/**
 	 * Constructs a {@link CollectionRenderer} that is used to render {@link InfoNode} representing
@@ -65,8 +68,14 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 		// so we want to check that only word characters precede the "["
 		final String open = Pattern.quote( openIndex );
 		final String close = Pattern.quote( closeIndex );
-		this.regex = "\\w+" + open + "[0-9]" + close + "|^" + open + "[0-9]+" + close;
-		this.pattern = Pattern.compile( regex );
+		
+		// create and compile the regex pattern for the decoration
+		decorationRegex = open + "[0-9]" + close ;
+		decorationPattern = Pattern.compile( decorationRegex );
+		
+		// create and compile the regex pattern for validating the complete key
+		validationRegex = "\\w+" + decorationRegex + "|^" + decorationRegex;
+		validationPattern = Pattern.compile( validationRegex );
 	}
 	
 	/**
@@ -90,8 +99,10 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 		super( renderer );
 		
 		this.indexDecorator = renderer.indexDecorator.getCopy();
-		this.regex = renderer.regex;
-		this.pattern = renderer.pattern;
+		this.decorationRegex = renderer.decorationRegex;
+		this.decorationPattern = renderer.decorationPattern;
+		this.validationRegex = renderer.validationRegex;
+		this.validationPattern = renderer.validationPattern;
 	}
 
 	/*
@@ -131,26 +142,25 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 	@Override
 	public boolean isRenderer( final String keyElement )
 	{
-		return pattern.matcher( keyElement ).find();
-//		boolean isFound = false;
-//		// does the pattern exist in any part of the key.
-//		final Matcher matcher = pattern.matcher( keyElement );
-//		if( matcher.find() )
-//		{
-//			isFound = true;
-//			// now check to make sure that it was the primary type. for example,
-//			// people[0] is a collection, but people{"test"}[0] is a map< string, list< integer > >
-//			// so we want to check that only word characters preceed the "["
-//			final Pattern strictPattern = Pattern.compile( "\\w" + regex );
-//			final Matcher strictMatcher = strictPattern.matcher( keyElement );
-//			if( strictMatcher.find() )
-//			{
-//				isFound = true;
-//			}
-//		}
-//		return isFound;
+		return validationPattern.matcher( keyElement ).find();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer#getGroupName(java.lang.String)
+	 */
+	@Override
+	public String getGroupName( final String key )
+	{
+		final Matcher matcher = decorationPattern.matcher( key );
+		String group = null;
+		if( matcher.find() )
+		{
+			group = key.substring( 0, matcher.start() );
+		}
+		return group;
+	}
+	
 	/**
 	 * Creates a key for a leaf node collection. For example, if the persist name for a {@link List} is
 	 * people, which is a <code>{@link List}< {@link String} ></code>, then the key will be {@code people[i]}

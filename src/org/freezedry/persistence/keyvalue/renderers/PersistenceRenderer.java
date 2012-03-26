@@ -59,4 +59,12 @@ public interface PersistenceRenderer extends Copyable< PersistenceRenderer >{
 	 * @return true if the specified key matches the pattern created by the renderer; false otherwise
 	 */
 	boolean isRenderer( final String keyElement );
+	
+	/**
+	 * Returns the group name for the key. For example, if the key is <code>"people{"test"}[0].Person"</code> then
+	 * the group name from the {@link MapRenderer} will be {@code "people"}
+	 * @param key The key from which to extract the group name
+	 * @return the group name for the key
+	 */
+	String getGroupName( final String key );
 }

@@ -385,6 +385,7 @@ public class KeyValueReader implements PersistenceReader {
 		return groups;
 	}
 	
+	// TODO in this method, find the correct renderer, and then get the group name from that renderer.
 	private static String getGroupName( final String key )
 	{
 		Pattern pattern = Pattern.compile( "^[\\w]*" );

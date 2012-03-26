@@ -36,6 +36,13 @@ public class RendererTest {
 		assertFalse( renderer.isRenderer( "people[2]" ) );
 		assertFalse( renderer.isRenderer( "people[0]{\"test\"}" ) );
 	}
+	
+	@Test
+	public void testMapGetGroupName()
+	{
+		final MapRenderer renderer = new MapRenderer( new BasicKeyValueBuilder(), "{", "}" );
+		assertTrue( "people".equals( renderer.getGroupName( "people{\"test\"}[0].Person" ) ) );
+	}
 
 	@Test
 	public void testLeafIsRenderer()
@@ -48,6 +55,15 @@ public class RendererTest {
 		assertFalse( renderer.isRenderer( "people{\"test\"}[0]" ) );
 		assertFalse( renderer.isRenderer( "people[2]" ) );
 		assertFalse( renderer.isRenderer( "people[0]{\"test\"}" ) );
+	}
+
+	@Test
+	public void testLeafGetGroupName()
+	{
+		final LeafNodeRenderer renderer = new LeafNodeRenderer( new BasicKeyValueBuilder() );
+		assertTrue( "people".equals( renderer.getGroupName( "people" ) ) );
+		assertFalse( "people".equals( renderer.getGroupName( "people.Person" ) ) );
+		assertFalse( "people".equals( renderer.getGroupName( "people{\"test\"}[0].Person" ) ) );
 	}
 
 }
