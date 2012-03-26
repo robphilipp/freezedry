@@ -17,6 +17,7 @@ package org.freezedry.persistence.keyvalue.renderers;
 
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.freezedry.persistence.containers.Pair;
@@ -43,11 +44,22 @@ public class LeafNodeRenderer extends AbstractPersistenceRenderer {
 		super( writer, decorators );
 	}
 	
+	/**
+	 * Constructs a {@link CollectionRenderer} that is used to render {@link InfoNode} representing
+	 * leaf {@link InfoNode}s into key value pairs. Uses the default decorators
+	 * @param builder The {@link KeyValueBuilder} used to flatten the semantic model. The builder calls
+	 * this class' {@link #buildKeyValuePair(InfoNode, String, List, boolean)} as part of the recursive
+	 * algorithm to flatten the semantic model
+	 */
 	public LeafNodeRenderer( final KeyValueBuilder writer )
 	{
 		super( writer );
 	}
 	
+	/**
+	 * Copy constructor
+	 * @param renderer
+	 */
 	public LeafNodeRenderer( final LeafNodeRenderer renderer )
 	{
 		super( renderer );
@@ -83,7 +95,6 @@ public class LeafNodeRenderer extends AbstractPersistenceRenderer {
 		}
 		
 		// find the decorator, if one exists, that is associated with the class
-//		final String value = decorators.get( infoNode.getValue().getClass() ).decorate( infoNode.getValue() );
 		final Object object = infoNode.getValue();
 		final Class< ? > clazz = object.getClass();
 		String value;
@@ -96,6 +107,16 @@ public class LeafNodeRenderer extends AbstractPersistenceRenderer {
 			value = object.toString();
 		}
 		keyValues.add( new Pair< String, Object >( newKey, value ) );
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer#isRenderer(java.lang.String)
+	 */
+	@Override
+	public boolean isRenderer( String keyElement )
+	{
+		return Pattern.matches( "^\\w+$", keyElement );
 	}
 
 	/*

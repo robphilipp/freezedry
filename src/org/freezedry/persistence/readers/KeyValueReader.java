@@ -24,11 +24,12 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
@@ -124,7 +125,7 @@ public class KeyValueReader implements PersistenceReader {
 	 * the persistence name of the parent node.
 	 * @return the new info node
 	 */
-	private InfoNode buildInfoNode( final InfoNode parentNode, final List< Pair< String, String > > keyValues )
+	private void buildInfoNode( final InfoNode parentNode, final List< Pair< String, String > > keyValues )
 	{
 		// grab the persistence name from the parent node. Validate that the first elements of each 
 		// key equal this the persistence name 
@@ -141,10 +142,33 @@ public class KeyValueReader implements PersistenceReader {
 		for( Map.Entry< String, List< Pair< String, String > > > entry : groups.entrySet() )
 		{
 			System.out.println( entry.getKey() );
-			System.out.println( entry.getValue() + "\n\n" );
+			for( Pair< String, String > pair : entry.getValue() )
+			{
+				System.out.println( pair );
+			}
+			System.out.println();
+			
+			final String groupName = entry.getKey();
+			final List< Pair< String, String > > pairs = entry.getValue();
+			// leaf node
+			if( pairs.size() == 1 )
+			{
+				final String name = pairs.get( 0 ).getFirst();
+				if( !groupName.equals( name ) )
+				{
+					// houston, we have a problem
+					throw new IllegalStateException( "The group name must match the persist name for a leaf node." );
+				}
+				final String value = pairs.get( 0 ).getSecond();
+				parentNode.addChild( InfoNode.createLeafNode( null, value, name, null ) );
+			}
+			else
+			{
+				final InfoNode node = InfoNode.createCompoundNode( null, groupName, null );
+				parentNode.addChild( node );
+				buildInfoNode( node, entry.getValue() );
+			}
 		}
-		
-		return null;
 	}
 	
 	/*
@@ -246,7 +270,7 @@ public class KeyValueReader implements PersistenceReader {
 	 */
 	private String validiateRootKey( final List< Pair< String, String > > keyValues, final String keyElementSeparator, final String desiredName )
 	{
-		final Set< String > keySet = new HashSet<>();
+		final Set< String > keySet = new LinkedHashSet<>();
 		for( Pair< String, String > pair : keyValues )
 		{
 			keySet.add( getFirstKeyElement( pair.getFirst(), keyElementSeparator ) );
@@ -334,20 +358,43 @@ public class KeyValueReader implements PersistenceReader {
 		final Map< String, List< Pair< String, String > > > groups = new LinkedHashMap<>();
 		for( Pair< String, String > pair : keyValues )
 		{
+			// get the first key element.
 			final String group = getFirstKeyElement( pair.getFirst(), separator );
-			if( groups.containsKey( group ) )
+			
+			// the thing is, though, that this could be decorated or formatted for a map or list 
+			// or something else. so we need to pull the group name off, and then we'll have to 
+			// figure out what the key represents, and how to deal with it. the good thing is that
+			// the key name can only be part of [a-zA-Z_0-9], and so we can find the first character
+			// that isn't that, and pull the key name out as the group
+			final String groupName = getGroupName( group );
+			
+			// either add the pair to the list of key-value pairs of an existing group, or create 
+			// a new group that contains the key-value pair
+			if( groups.containsKey( groupName ) )
 			{
-				groups.get( group ).add( new Pair<>( pair ) );
+				groups.get( groupName ).add( new Pair<>( pair ) );
 			}
 			else
 			{
 				final List< Pair< String, String > > pairs = new ArrayList<>();
 				pairs.add( new Pair<>( pair ) );
-				groups.put( group, pairs );
+				groups.put( groupName, pairs );
 			}
 		}
 		
 		return groups;
+	}
+	
+	private static String getGroupName( final String key )
+	{
+		Pattern pattern = Pattern.compile( "^[\\w]*" );
+		Matcher matcher = pattern.matcher( key );
+		String group = key;
+		if( matcher.find() )
+		{
+			group = key.substring( 0, matcher.end() );
+		}
+		return group;
 	}
 	
 	/**

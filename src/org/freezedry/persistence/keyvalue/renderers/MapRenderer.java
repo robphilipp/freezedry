@@ -17,6 +17,7 @@ package org.freezedry.persistence.keyvalue.renderers;
 
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.freezedry.persistence.annotations.PersistMap;
@@ -50,13 +51,16 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 
 	private static final Logger LOGGER = Logger.getLogger( MapRenderer.class );
 
-	private static StringDecorator KEY_DECORATOR = new StringDecorator( "{", "}" );
+	private static String OPEN = "{";
+	private static String CLOSE = "}";
 	
 	private String mapEntryName = PersistMap.ENTRY_PERSIST_NAME;
 	private String mapKeyName = PersistMap.KEY_PERSIST_NAME;
 	private String mapValueName = PersistMap.VALUE_PERSIST_NAME;
 	
-	private StringDecorator keyDecorator;
+	private final StringDecorator keyDecorator;
+	private final String regex;
+	private final Pattern pattern;
 
 	/**
 	 * Constructs a key-value {@link MapRenderer} for renderering the key-values for a {@link Map}
@@ -65,11 +69,20 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 	 * @param keyDecorator The decorator for the key. For example, it may surround the key with "<code>{</code>"
 	 * and "<code>}</code>". 
 	 */
-	public MapRenderer( final KeyValueBuilder builder, final StringDecorator keyDecorator )
+	public MapRenderer( final KeyValueBuilder builder, final String openKey, final String closeKey )
 	{
 		super( builder );
 		
-		this.keyDecorator = keyDecorator.getCopy();
+		// create the decorator for the key
+		this.keyDecorator = new StringDecorator( openKey, closeKey );
+		
+		// create the regular expression that determines if a string is renderered by this class
+		// people[0] is a collection, but people{"test"}[0] is a map< string, list< integer > >
+		// so we want to check that only word characters precede the "["
+		final String open = Pattern.quote( openKey );
+		final String close = Pattern.quote( closeKey );
+		this.regex = "\\w+" + open + "\\p{Punct}*\\w+\\p{Punct}*" + close + "|^" + open + "\\p{Punct}*\\w+\\p{Punct}*" + close;
+		this.pattern = Pattern.compile( regex );
 	}
 
 	/**
@@ -80,7 +93,7 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 	 */
 	public MapRenderer( final KeyValueBuilder builder )
 	{
-		this( builder, KEY_DECORATOR );
+		this( builder, OPEN, CLOSE );
 	}
 	
 	/**
@@ -92,6 +105,8 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 		super( renderer );
 		
 		this.keyDecorator = renderer.keyDecorator.getCopy();
+		this.regex = renderer.regex;
+		this.pattern = renderer.pattern;
 	}
 
 	/**
@@ -252,7 +267,13 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 			}
 		}
 	}
-	
+
+	/*
+	 * Creates a new key based on the specified key and the persistence name found in the info node
+	 * @param key The current key
+	 * @param node The {@link InfoNode}
+	 * @return a new key based on the specified key and the persistence name found in the info node
+	 */
 	private String createKey( final String key, final InfoNode node )
 	{
 		String newKey = key;
@@ -265,6 +286,16 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 
 	/*
 	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer#isRenderer(java.lang.String)
+	 */
+	@Override
+	public boolean isRenderer( String keyElement )
+	{
+		return pattern.matcher( keyElement ).find();
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.freezedry.persistence.copyable.Copyable#getCopy()
 	 */
 	@Override
@@ -272,5 +303,4 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 	{
 		return new MapRenderer( this );
 	}
-
 }

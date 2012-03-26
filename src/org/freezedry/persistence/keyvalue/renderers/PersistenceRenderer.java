@@ -52,4 +52,11 @@ public interface PersistenceRenderer extends Copyable< PersistenceRenderer >{
 							final String key, 
 							final List< Pair< String, Object > > keyValues,
 							final boolean isWithholdPersistName );
+
+	/**
+	 * Returns true if the specified key matches the pattern created by the renderer; false otherwise
+	 * @param keyElement The element of the key to test
+	 * @return true if the specified key matches the pattern created by the renderer; false otherwise
+	 */
+	boolean isRenderer( final String keyElement );
 }

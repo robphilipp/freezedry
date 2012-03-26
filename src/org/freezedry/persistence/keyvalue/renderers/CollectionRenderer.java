@@ -17,6 +17,7 @@ package org.freezedry.persistence.keyvalue.renderers;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.freezedry.persistence.containers.Pair;
 import org.freezedry.persistence.keyvalue.KeyValueBuilder;
@@ -38,9 +39,12 @@ import org.freezedry.persistence.tree.InfoNode;
  */
 public class CollectionRenderer extends AbstractPersistenceRenderer {
 	
-	private static StringDecorator INDEX_DECORATOR = new StringDecorator( "[", "]" );
+	private static String OPEN = "[";
+	private static String CLOSE = "]";
 	
-	private StringDecorator indexDecorator;
+	private final StringDecorator indexDecorator;
+	private final String regex;
+	private final Pattern pattern;
 
 	/**
 	 * Constructs a {@link CollectionRenderer} that is used to render {@link InfoNode} representing
@@ -50,11 +54,19 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 	 * algorithm to flatten the semantic model
 	 * @param indexDecorator The {@link Decorator} for the index.
 	 */
-	public CollectionRenderer( final KeyValueBuilder builder, final StringDecorator indexDecorator )
+	public CollectionRenderer( final KeyValueBuilder builder, final String openIndex, final String closeIndex )
 	{
 		super( builder );
 		
-		this.indexDecorator = indexDecorator.getCopy();
+		this.indexDecorator = new StringDecorator( openIndex, closeIndex );
+		
+		// create the regular expression that determines if a string is renderered by this class
+		// people[0] is a collection, but people{"test"}[0] is a map< string, list< integer > >
+		// so we want to check that only word characters precede the "["
+		final String open = Pattern.quote( openIndex );
+		final String close = Pattern.quote( closeIndex );
+		this.regex = "\\w+" + open + "[0-9]" + close + "|^" + open + "[0-9]+" + close;
+		this.pattern = Pattern.compile( regex );
 	}
 	
 	/**
@@ -66,7 +78,7 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 	 */
 	public CollectionRenderer( final KeyValueBuilder builder )
 	{
-		this( builder, INDEX_DECORATOR );
+		this( builder, OPEN, CLOSE );
 	}
 	
 	/**
@@ -78,6 +90,8 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 		super( renderer );
 		
 		this.indexDecorator = renderer.indexDecorator.getCopy();
+		this.regex = renderer.regex;
+		this.pattern = renderer.pattern;
 	}
 
 	/*
@@ -108,6 +122,33 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 			// mark the node as processed so that it doesn't get processed again
 			node.setIsProcessed( true );
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer#isRenderer(java.lang.String)
+	 */
+	@Override
+	public boolean isRenderer( final String keyElement )
+	{
+		return pattern.matcher( keyElement ).find();
+//		boolean isFound = false;
+//		// does the pattern exist in any part of the key.
+//		final Matcher matcher = pattern.matcher( keyElement );
+//		if( matcher.find() )
+//		{
+//			isFound = true;
+//			// now check to make sure that it was the primary type. for example,
+//			// people[0] is a collection, but people{"test"}[0] is a map< string, list< integer > >
+//			// so we want to check that only word characters preceed the "["
+//			final Pattern strictPattern = Pattern.compile( "\\w" + regex );
+//			final Matcher strictMatcher = strictPattern.matcher( keyElement );
+//			if( strictMatcher.find() )
+//			{
+//				isFound = true;
+//			}
+//		}
+//		return isFound;
 	}
 
 	/**
