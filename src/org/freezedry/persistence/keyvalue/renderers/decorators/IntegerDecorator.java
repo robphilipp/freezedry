@@ -103,6 +103,16 @@ public class IntegerDecorator implements Decorator {
 
 	/*
 	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.keyvalue.renderers.decorators.Decorator#representedClass()
+	 */
+	@Override
+	public Class< ? > representedClass()
+	{
+		return Integer.class;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.freezedry.persistence.copyable.Copyable#getCopy()
 	 */
 	@Override

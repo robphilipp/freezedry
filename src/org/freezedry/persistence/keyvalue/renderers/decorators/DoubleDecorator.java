@@ -105,6 +105,16 @@ public class DoubleDecorator implements Decorator {
 
 	/*
 	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.keyvalue.renderers.decorators.Decorator#representedClass()
+	 */
+	@Override
+	public Class< ? > representedClass()
+	{
+		return Double.class;
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.freezedry.persistence.copyable.Copyable#getCopy()
 	 */
 	@Override

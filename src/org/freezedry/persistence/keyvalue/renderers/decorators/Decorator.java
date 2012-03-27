@@ -53,4 +53,10 @@ public interface Decorator extends Copyable< Decorator > {
 	 * @return true if the specified value matches the formatting used to decorate the object; false otherwise
 	 */
 	boolean isDecorated( final String value );
+	
+	/**
+	 * @return The {@link Class} represented by this decorator. For example, the {@link StringDecorator} represents
+	 * the {@link String} class.
+	 */
+	Class< ? > representedClass();
 }

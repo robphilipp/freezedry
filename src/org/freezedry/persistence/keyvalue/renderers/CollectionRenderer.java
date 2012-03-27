@@ -244,10 +244,12 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 				// its a leaf, so now we need to figure out what the value is. we know that
 				// it must be a number (integer, double) or a string.
 				final String value = keyValue.getSecond();
-				final String rawValue = getDecorator( value ).undecorate( value );
+				final Decorator decorator = getDecorator( value ); 
+				final String rawValue = decorator.undecorate( value );
+				final String persistName = decorator.representedClass().getSimpleName();
 				
 				// create the leaf info node and add it to the collection node
-				final InfoNode elementNode = InfoNode.createLeafNode( null, rawValue, null, null );
+				final InfoNode elementNode = InfoNode.createLeafNode( null, rawValue, persistName, null );
 				collectionNode.addChild( elementNode );
 			}
 			else if( compoundMatcher.find() )
@@ -279,7 +281,7 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 				collectionNode.addChild( elementNode );
 				
 				// call the builder (which called this method) to build the compound node
-				getPersistenceBuilder().buildInfoNode( /*collectionNode*/elementNode, elementKeyValues );
+				getPersistenceBuilder().buildInfoNode( elementNode, elementKeyValues );
 			}
 			else
 			{
