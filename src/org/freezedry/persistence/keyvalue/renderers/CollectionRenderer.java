@@ -29,6 +29,7 @@ import org.freezedry.persistence.keyvalue.renderers.decorators.StringDecorator;
 import org.freezedry.persistence.keyvalue.utils.KeyValueUtils;
 import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.Constants;
+import org.freezedry.persistence.utils.ReflectionUtils;
 
 /**
  * Renders the subtree of the semantic model that represents a {@link Collection}. {@link Collection}s are rendered
@@ -125,12 +126,21 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 			{
 				// create the key-value pair and return it
 				final String newKey = createLeafNodeKey( key, infoNode, index );
+//				node.setPersistName( "" );
 				getPersistenceBuilder().createKeyValuePairs( node, newKey, keyValues, true );
 			}
 			else
 			{
-				final String newKey = createNodeKey( key, infoNode, node, index );
-				getPersistenceBuilder().buildKeyValuePairs( node, newKey, keyValues );
+				// create the key-value pair and return it
+				final String newKey = createLeafNodeKey( key, infoNode, index );
+				final Class< ? > clazz = node.getClazz();
+				if( ReflectionUtils.isSuperclass( Collection.class, clazz ) || clazz.isArray() )
+				{
+					node.setPersistName( "" );
+				}
+				getPersistenceBuilder().createKeyValuePairs( node, newKey, keyValues, false );
+//				final String newKey = createNodeKey( key, infoNode, node, index );
+//				getPersistenceBuilder().buildKeyValuePairs( node, newKey, keyValues );
 			}
 
 			// increment the index count
@@ -261,11 +271,26 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 				for( Pair< String, String > copiedKeyValue : keyValues )
 				{
 					final String copiedKey = copiedKeyValue.getFirst();
-					final String keyFirstElement = key.split( Pattern.quote( separator ) )[ 0 ]; 
+//					final String keyFirstElement = key.split( Pattern.quote( separator ) )[ 0 ]; 
+//					if( copiedKey.startsWith( keyFirstElement ) )
+//					{
+//						// strip the first element off the key
+//						final String strippedKey = KeyValueUtils.stripFirstKeyElement( copiedKey, separator );
+//						
+//						// add the key to the list of keys that belong to the compound node
+//						elementKeyValues.add( new Pair< String, String >( strippedKey, copiedKeyValue.getSecond() ) );
+//						
+//						// and remove the element from the list of key values
+//						copiedKeyValues.remove( copiedKeyValue );
+//					}
+					final String keyFirstElement = extractElementKeyPart( key.split( Pattern.quote( separator ) )[ 0 ] ); 
 					if( copiedKey.startsWith( keyFirstElement ) )
 					{
-						// strip the first element off the key
-						final String strippedKey = KeyValueUtils.stripFirstKeyElement( copiedKey, separator );
+						// strip the first element off the key. this could mean one of three things:
+						// 1. for something like matrix[0][1] we remove all but the [1]
+						// 2. for something like matrix[0].Date we remove all but the Date
+						// 3. for something like matrix[0]{"April"}.Mood we remove all but [1].Mood
+						final String strippedKey = stripFirstElement( copiedKey, separator );
 						
 						// add the key to the list of keys that belong to the compound node
 						elementKeyValues.add( new Pair< String, String >( strippedKey, copiedKeyValue.getSecond() ) );
@@ -277,11 +302,13 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 				
 				// create the node that holds the compound object and add it to the collection node
 				final String persistName = KeyValueUtils.getFirstKeyElement( elementKeyValues.get( 0 ).getFirst(), separator );
-				final InfoNode elementNode = InfoNode.createCompoundNode( null, persistName, null );
-				collectionNode.addChild( elementNode );
+//				final InfoNode elementNode = InfoNode.createCompoundNode( null, persistName, null );
+//				collectionNode.addChild( elementNode );
 				
 				// call the builder (which called this method) to build the compound node
-				getPersistenceBuilder().buildInfoNode( elementNode, elementKeyValues );
+//				getPersistenceBuilder().buildInfoNode( elementNode, elementKeyValues );
+//				getPersistenceBuilder().createInfoNode( elementNode, persistName, elementKeyValues );
+				getPersistenceBuilder().createInfoNode( collectionNode, persistName, elementKeyValues );
 			}
 			else
 			{
@@ -294,6 +321,51 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 				throw new IllegalArgumentException( message.toString() );
 			}
 		}
+	}
+	
+	/*
+	 * Extracts the map key part from the key. For example, if the key is <code>months{"January"}[0]</code>
+	 * this method will return <code>months{"January"}</code>.
+	 * @param key The key from which to extract the map-key part
+	 * @return the map key part from the key
+	 */
+	private String extractElementKeyPart( final String key )
+	{
+		String mapKey = null;
+		final Matcher matcher = decorationPattern.matcher( key );
+		if( matcher.find() )
+		{
+			mapKey = key.substring( 0, matcher.end() );
+		}
+		return mapKey;
+	}
+	
+	/*
+	 * Removes the map key part from the key. For example, if the key is <code>months{"January"}[0]</code>
+	 * this method will return <code>[0]</code>.
+	 * @param key The key from which to strip the map-key part
+	 * @return the key, stripped of the map key part
+	 */
+	private String removeElementKeyPart( final String key )
+	{
+		String keyRemainder = null;
+		final Matcher matcher = decorationPattern.matcher( key );
+		if( matcher.find() )
+		{
+			keyRemainder = key.substring( matcher.end() );
+		}
+		return keyRemainder;
+	}
+	
+	private String stripFirstElement( final String key, final String separator )
+	{
+		String remainder = removeElementKeyPart( key );
+		if( remainder.startsWith( separator ) )
+		{
+//			remainder.replaceFirst( Pattern.quote( separator ) + "?", "" );
+			remainder = remainder.substring( 1 );
+		}
+		return remainder;
 	}
 	
 	/*

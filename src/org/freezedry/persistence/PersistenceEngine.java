@@ -737,6 +737,21 @@ public class PersistenceEngine {
 			
 			division.setCarNames( new String[] { "civic", "tsx", "accord" } );
 	
+//			int[][] arrayMatrix = { { 11, 12, 13 }, { 21, 22, 23 }, { 31, 32, 33 } };
+//			division.setArrayMatrix( arrayMatrix );
+			
+			List< List< Integer > > collectionMatrix = Arrays.asList( 
+					Arrays.asList( 11, 12, 13 ), 
+					Arrays.asList( 21, 22, 23 ), 
+					Arrays.asList( 31, 32, 33 ) );
+			division.setCollectionMatrix( collectionMatrix );
+			
+			Map< String, Person > personMap = new LinkedHashMap<>();
+			personMap.put( "funny", new Person( "Richard", "Pryor", 63 ) );
+			personMap.put( "sad", new Person( "Jenny", "Jones", 45 ) );
+			personMap.put( "pretty", new Person( "Ginder", "Mendez", 23 ) );
+			division.setPersonMap( personMap );
+			
 			// create the persistence engine that is used to create the semantic model from an object
 			// and used to create an object from the semantic model.
 			final PersistenceEngine engine = new PersistenceEngine();

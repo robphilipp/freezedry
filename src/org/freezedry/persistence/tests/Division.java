@@ -34,6 +34,12 @@ public class Division {
 	
 	private String[] carNames;
 	
+	private int[][] arrayMatrix;
+	
+	private List< List< Integer > > collectionMatrix;
+	
+	private Map< String, Person > personMap;
+	
 	public Division()
 	{
 	}
@@ -61,6 +67,21 @@ public class Division {
 		carNames = names;
 	}
 	
+	public void setArrayMatrix( final int[][] matrix )
+	{
+		this.arrayMatrix = matrix;
+	}
+	
+	public void setCollectionMatrix( final List< List< Integer > > matrix )
+	{
+		this.collectionMatrix = matrix;
+	}
+	
+	public void setPersonMap( final Map< String, Person > map )
+	{
+		this.personMap = map;
+	}
+	
 	public String toString()
 	{
 		final StringBuffer buffer = new StringBuffer();
@@ -83,6 +104,38 @@ public class Division {
 			for( String name : carNames )
 			{
 				buffer.append( name + Constants.NEW_LINE );
+			}
+		}
+		
+		if( collectionMatrix != null )
+		{
+			for( List< Integer > row : collectionMatrix )
+			{
+				for( int column : row )
+				{
+					buffer.append( column + "\t" );
+				}
+				buffer.append( Constants.NEW_LINE );
+			}
+		}
+
+		if( arrayMatrix != null )
+		{
+			for( int[] row : arrayMatrix )
+			{
+				for( int column : row )
+				{
+					buffer.append( column + "\t" );
+				}
+				buffer.append( Constants.NEW_LINE );
+			}
+		}
+		
+		if( personMap != null )
+		{
+			for( Map.Entry< String, Person > entry : personMap.entrySet() )
+			{
+				buffer.append( entry.getKey() + ": " + entry.getValue() + Constants.NEW_LINE );
 			}
 		}
 		return buffer.toString();

@@ -305,7 +305,19 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 			final String rootKey = keyValues.get( 0 ).getFirst();
 			
 			// get the appropriate renderer and ask it to build the info node from that type
-			getRenderer( rootKey ).buildInfoNode( parentNode, keyValues );
+//			getRenderer( rootKey ).buildInfoNode( parentNode, keyValues );
+			final PersistenceRenderer renderer = getRenderer( rootKey );
+			if( renderer != null )
+			{
+				renderer.buildInfoNode( parentNode, keyValues );
+			}
+			else
+			{
+				final InfoNode node = InfoNode.createCompoundNode( null, groupName, null );
+				parentNode.addChild( node );
+				buildInfoNode( node, keyValues );
+//				buildInfoNode( parentNode, keyValues );
+			}
 		}
 	}
 		

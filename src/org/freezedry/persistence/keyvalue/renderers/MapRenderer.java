@@ -384,6 +384,7 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 					// in this case, we'll have several entries that have the same index, so
 					// we'll need to pull those out and put them into a new key-value list
 					final String separator = getPersistenceBuilder().getSeparator();
+//					final String valueName = mapEntryName + separator + mapValueName;
 					final List< Pair< String, String > > mapValueKeyValues = new ArrayList<>();
 					for( Pair< String, String > copiedKeyValue : keyValues )
 					{
@@ -395,8 +396,8 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 							// 1. for something like months{"April"}[1] we remove all but the [1]
 							// 2. for something like months{"April"}.Date we remove all but the Date
 							// 3. for something like months{"April"}[1].Mood we remove all but [1].Mood
-//							final String strippedKey = KeyValueUtils.stripFirstKeyElement( copiedKey, separator );
 							final String strippedKey = mapValueName + stripFirstElement( copiedKey, separator );
+//							final String strippedKey = valueName + stripFirstElement( copiedKey, separator );
 							
 							// add the key to the list of keys that belong to the compound node
 							mapValueKeyValues.add( new Pair< String, String >( strippedKey, copiedKeyValue.getSecond() ) );
@@ -406,14 +407,12 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 						}
 					}
 					
-//					// create the node that holds the compound object and add it to the collection node
 //					final InfoNode valueNode = InfoNode.createCompoundNode( null, mapValueName, null );
 //					mapEntryNode.addChild( valueNode );
-					
+
 					// call the builder (which called this method) to build the compound node
-//					getPersistenceBuilder().buildInfoNode( valueNode, mapValueKeyValues );
-//					getPersistenceBuilder().createInfoNode( valueNode, "", mapValueKeyValues );
 					getPersistenceBuilder().createInfoNode( mapEntryNode, mapValueName, mapValueKeyValues );
+//					getPersistenceBuilder().createInfoNode( valueNode, "", mapValueKeyValues );
 				}
 				else
 				{
