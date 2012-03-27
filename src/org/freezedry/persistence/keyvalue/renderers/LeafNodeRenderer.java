@@ -92,7 +92,7 @@ public class LeafNodeRenderer extends AbstractPersistenceRenderer {
 		String newKey = key;
 		if( !isWithholdPersistName && infoNode.getPersistName() != null && !infoNode.getPersistName().isEmpty() )
 		{
-			newKey += getPersistenceWriter().getSeparator() + infoNode.getPersistName();
+			newKey += getPersistenceBuilder().getSeparator() + infoNode.getPersistName();
 		}
 		
 		// find the decorator, if one exists, that is associated with the class
@@ -117,7 +117,26 @@ public class LeafNodeRenderer extends AbstractPersistenceRenderer {
 	@Override
 	public void buildInfoNode( final InfoNode parentNode, final List< Pair< String, String > > keyValues )
 	{
+		// make sure there is one and ONLY one key-value pair
+		if( keyValues.size() != 1 )
+		{
+			final StringBuffer message = new StringBuffer();
+			message.append( "A leaf node can only have one key (name) and on value." + Constants.NEW_LINE );
+			message.append( "  Parent Node's Persistence Name: " + parentNode.getPersistName() + Constants.NEW_LINE );
+			message.append( "  Number of Key-Value Pairs: " + ( keyValues == null ? "[null]" : keyValues.size() ) + Constants.NEW_LINE );
+			for( Pair< String, String > keyValue : keyValues )
+			{
+				message.append( "    " + keyValue + Constants.NEW_LINE );
+			}
+			LOGGER.error( message.toString() );
+			throw new IllegalStateException( message.toString() );
+		}
 		
+		final String key = keyValues.get( 0 ).getFirst();
+		final String value = keyValues.get( 0 ).getSecond();
+		final String rawValue = getDecorator( value ).undecorate( value );
+		final InfoNode node = InfoNode.createLeafNode( null, rawValue, key, null );
+		parentNode.addChild( node );
 	}
 	
 	/*

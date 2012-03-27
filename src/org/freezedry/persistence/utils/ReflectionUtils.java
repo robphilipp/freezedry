@@ -370,7 +370,7 @@ public class ReflectionUtils {
 		for( final Field field : fields )
 		{
 			// grab the persistence name if the annotation @Persist( persistName = "xxxx" ) is specified
-			if( persistName.equals( getPersistenceName( field ) ) )
+			if( persistName != null && persistName.equals( getPersistenceName( field ) ) )
 			{
 				fieldName = field.getName();
 				break;

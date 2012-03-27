@@ -73,6 +73,21 @@ public class BooleanDecorator implements Decorator {
 
 	/*
 	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.keyvalue.renderers.decorators.Decorator#undecorate(java.lang.String)
+	 */
+	@Override
+	public String undecorate( final String value )
+	{
+		String undecorated = null;
+		if( isDecorated( value ) )
+		{
+			undecorated = value;
+		}
+		return undecorated;
+	}
+	
+	/*
+	 * (non-Javadoc)
 	 * @see org.freezedry.persistence.keyvalue.renderers.decorators.Decorator#isDecorated(java.lang.String)
 	 */
 	@Override

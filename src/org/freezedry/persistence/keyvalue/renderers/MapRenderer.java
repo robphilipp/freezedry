@@ -262,7 +262,7 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 				// the persistence name of the value is "Value" or something else set by the user. we
 				// don't want to write that out, so we simply remove the value from the node.
 				valueNode.setPersistName( "" );
-				getPersistenceWriter().createKeyValuePairs( valueNode, newKey, keyValues, true );
+				getPersistenceBuilder().createKeyValuePairs( valueNode, newKey, keyValues, true );
 				
 				// mark the node as processed so that it doesn't get processed again
 				node.setIsProcessed( true );
@@ -290,7 +290,7 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 		String newKey = key;
 		if( node.getPersistName() != null && !node.getPersistName().isEmpty() )
 		{
-			newKey += getPersistenceWriter().getSeparator() + node.getPersistName();
+			newKey += getPersistenceBuilder().getSeparator() + node.getPersistName();
 		}
 		return newKey;
 	}

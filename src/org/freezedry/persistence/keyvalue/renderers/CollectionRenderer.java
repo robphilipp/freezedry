@@ -15,16 +15,20 @@
  */
 package org.freezedry.persistence.keyvalue.renderers;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
 import org.freezedry.persistence.containers.Pair;
 import org.freezedry.persistence.keyvalue.KeyValueBuilder;
 import org.freezedry.persistence.keyvalue.renderers.decorators.Decorator;
 import org.freezedry.persistence.keyvalue.renderers.decorators.StringDecorator;
+import org.freezedry.persistence.keyvalue.utils.KeyValueUtils;
 import org.freezedry.persistence.tree.InfoNode;
+import org.freezedry.persistence.utils.Constants;
 
 /**
  * Renders the subtree of the semantic model that represents a {@link Collection}. {@link Collection}s are rendered
@@ -40,6 +44,8 @@ import org.freezedry.persistence.tree.InfoNode;
  */
 public class CollectionRenderer extends AbstractPersistenceRenderer {
 	
+	private static final Logger LOGGER = Logger.getLogger( CollectionRenderer.class );
+
 	private static String OPEN = "[";
 	private static String CLOSE = "]";
 	
@@ -119,12 +125,12 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 			{
 				// create the key-value pair and return it
 				final String newKey = createLeafNodeKey( key, infoNode, index );
-				getPersistenceWriter().createKeyValuePairs( node, newKey, keyValues, true );
+				getPersistenceBuilder().createKeyValuePairs( node, newKey, keyValues, true );
 			}
 			else
 			{
 				final String newKey = createNodeKey( key, infoNode, node, index );
-				getPersistenceWriter().buildKeyValuePairs( node, newKey, keyValues );
+				getPersistenceBuilder().buildKeyValuePairs( node, newKey, keyValues );
 			}
 
 			// increment the index count
@@ -162,7 +168,7 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 	private String createNodeKey( final String key, final InfoNode parentNode, final InfoNode node, final int index )
 	{
 		// grab the key-element separator
-		final String separator = getPersistenceWriter().getSeparator();
+		final String separator = getPersistenceBuilder().getSeparator();
 
 		// if the parent node has a persistence name then add it
 		String newKey = key;
@@ -193,7 +199,102 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 	@Override
 	public void buildInfoNode( final InfoNode parentNode, final List< Pair< String, String > > keyValues )
 	{
+		// nothing to do
+		if( keyValues == null || keyValues.isEmpty() )
+		{
+			return;
+		}
 		
+		// grab the group name for the collection, and create the compound node
+		// that holds the elements of the collection as child nodes, and add it
+		// to the parent node
+		final String group = getGroupName( keyValues.get( 0 ).getFirst() );
+		final InfoNode collectionNode = InfoNode.createCompoundNode( null, group, null );
+		parentNode.addChild( collectionNode );
+		
+		// construct the patterns to determine if the node should be a compound node,
+		// in which case we recurse back to the builder, or a leaf node, in which case
+		// we simply create it here and add it to the collection node
+		final String compoundRegex = "^" + group + decorationRegex;
+		final Pattern compoundPattern = Pattern.compile( compoundRegex );
+		
+		final String leafRegex = compoundRegex + "$";
+		final Pattern leafPattern = Pattern.compile( leafRegex );
+		
+		// run through the list of key-values creating the child nodes for the collection node
+		final List< Pair< String, String > > copiedKeyValues = new ArrayList<>( keyValues );
+		for( Pair< String, String > keyValue : keyValues )
+		{
+			// check to see if any items have been removed from the list. this could happen
+			// when there is a compound node that we have combined, and removed all the entries
+			// from this list
+			if( !copiedKeyValues.contains( keyValue ) )
+			{
+				continue;
+			}
+
+			// grab the key
+			final String key = keyValue.getFirst();
+			
+			// then we must figure out whether this is a compound node or a leaf node
+			final Matcher compoundMatcher = compoundPattern.matcher( key );
+			final Matcher leafMatcher = leafPattern.matcher( key );
+			if( leafMatcher.find() )
+			{
+				// its a leaf, so now we need to figure out what the value is. we know that
+				// it must be a number (integer, double) or a string.
+				final String value = keyValue.getSecond();
+				final String rawValue = getDecorator( value ).undecorate( value );
+				
+				// create the leaf info node and add it to the collection node
+				final InfoNode elementNode = InfoNode.createLeafNode( null, rawValue, null, null );
+				collectionNode.addChild( elementNode );
+			}
+			else if( compoundMatcher.find() )
+			{
+				// in this case, we'll have several entries that have the same index, so
+				// we'll need to pull those out and put them into a new key-value list
+				final String separator = getPersistenceBuilder().getSeparator();
+				final List< Pair< String, String > > elementKeyValues = new ArrayList<>();
+				for( Pair< String, String > copiedKeyValue : keyValues )
+				{
+					final String copiedKey = copiedKeyValue.getFirst();
+					final String keyFirstElement = key.split( Pattern.quote( separator ) )[ 0 ]; 
+					if( copiedKey.startsWith( keyFirstElement ) )
+					{
+						// strip the first element off the key
+						final String strippedKey = KeyValueUtils.stripFirstKeyElement( copiedKey, separator );
+						
+						// add the key to the list of keys that belong to the compound node
+						elementKeyValues.add( new Pair< String, String >( strippedKey, copiedKeyValue.getSecond() ) );
+						
+						// and remove the element from the list of key values
+						copiedKeyValues.remove( copiedKeyValue );
+					}
+				}
+				
+				// create the node that holds the compound object and add it to the collection node
+				final String persistName = KeyValueUtils.getFirstKeyElement( elementKeyValues.get( 0 ).getFirst(), separator );
+				final InfoNode elementNode = InfoNode.createCompoundNode( null, persistName, null );
+				collectionNode.addChild( elementNode );
+				
+				// call the builder (which called this method) to build the compound node
+				getPersistenceBuilder().buildInfoNode( /*collectionNode*/elementNode, elementKeyValues );
+			}
+			else
+			{
+				// error
+				final StringBuffer message = new StringBuffer();
+				message.append( "The key neither represents a leaf node nor a compound node. This is a real problem!" + Constants.NEW_LINE );
+				message.append( "  Parent Node Persistence Name: " + parentNode.getPersistName() + Constants.NEW_LINE );
+				message.append( "  Key: " + key + Constants.NEW_LINE );
+				LOGGER.error( message.toString() );
+				throw new IllegalArgumentException( message.toString() );
+			}
+			
+			// then for leaf nodes, we must figure out what the value is
+			
+		}
 	}
 	
 	/*

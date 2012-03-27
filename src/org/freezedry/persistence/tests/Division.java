@@ -64,9 +64,12 @@ public class Division {
 	public String toString()
 	{
 		final StringBuffer buffer = new StringBuffer();
-		for( Person person : people )
+		if( people != null )
 		{
-			buffer.append( person.toString() + Constants.NEW_LINE );
+			for( Person person : people )
+			{
+				buffer.append( person.toString() + Constants.NEW_LINE );
+			}
 		}
 		if( months != null )
 		{

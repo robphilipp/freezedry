@@ -21,11 +21,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.freezedry.persistence.containers.Pair;
 import org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer;
+import org.freezedry.persistence.keyvalue.utils.KeyValueUtils;
 import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.Constants;
 
@@ -233,8 +233,8 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 		
 		// strip the root key element from all the keys. For example, suppose the keys all start with
 		// "Division:". And suppose further that the rootKey = "Division". The "Division:" will be
-		// stripped from each key in the list. So, "Division.people.Persion[1]" would become "people.Persion[1]".
-		final List< Pair< String, String > > strippedKeyValues = stripFirstKeyElement( keyValues, getSeparator() );
+		// stripped from each key in the list. So, "Division.people.Persion[1]" would become "people.Person[1]".
+		final List< Pair< String, String > > strippedKeyValues = KeyValueUtils.stripFirstKeyElement( keyValues, getSeparator() );
 
 		// find the groups in the newly string list, and then create a new info node for each group
 		final Map< String, List< Pair< String, String > > > groups = getGroups( strippedKeyValues, getSeparator() );
@@ -242,34 +242,6 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 		{
 			// create the info node
 			createInfoNode( parentNode, entry.getKey(), entry.getValue() );
-			
-//			System.out.println( entry.getKey() );
-//			for( Pair< String, String > pair : entry.getValue() )
-//			{
-//				System.out.println( pair );
-//			}
-//			System.out.println();
-//			
-//			final String groupName = entry.getKey();
-//			final List< Pair< String, String > > pairs = entry.getValue();
-//			// leaf node
-//			if( pairs.size() == 1 )
-//			{
-//				final String name = pairs.get( 0 ).getFirst();
-//				if( !groupName.equals( name ) )
-//				{
-//					// houston, we have a problem
-//					throw new IllegalStateException( "The group name must match the persist name for a leaf node." );
-//				}
-//				final String value = pairs.get( 0 ).getSecond();
-//				parentNode.addChild( InfoNode.createLeafNode( null, value, name, null ) );
-//			}
-//			else
-//			{
-//				final InfoNode node = InfoNode.createCompoundNode( null, groupName, null );
-//				parentNode.addChild( node );
-//				buildInfoNode( node, entry.getValue() );
-//			}
 		}
 	}
 	
@@ -391,7 +363,7 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 		final Set< String > keySet = new LinkedHashSet<>();
 		for( Pair< String, String > pair : keyValues )
 		{
-			keySet.add( getGroupName( getFirstKeyElement( pair.getFirst(), keyElementSeparator ) ) );
+			keySet.add( getGroupName( KeyValueUtils.getFirstKeyElement( pair.getFirst(), keyElementSeparator ) ) );
 		}
 		
 		// the first key must all be in the same group. that is the case if the set only
@@ -425,50 +397,6 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 	}
 	
 	/*
-	 * Strips the first key-element from each key in the specified {@link List} of key-value pairs. Returns
-	 * a new list that contains the key-value pairs for which the keys have been stripped of their first element.
-	 * @param keyValues The list of key-value pairs
-	 * @param keyElementSeparator The separator used between the elements of the key.
-	 * @return a new list that contains the key-value pairs for which the keys have been stripped of their first element.
-	 */
-	private static List< Pair< String, String > > stripFirstKeyElement( final List< Pair< String, String > > keyValues, final String keyElementSeparator )
-	{
-		final List< Pair< String, String > > strippedKeyValues = new ArrayList<>();
-		for( Pair< String, String > pair : keyValues )
-		{
-			// grab the elements of the key
-			final String[] elements = pair.getFirst().split( Pattern.quote( keyElementSeparator ) );
-			
-			// create a key that has the first key element stripped off
-			final StringBuffer strippedKey = new StringBuffer();
-			for( int i = 1; i < elements.length; ++i )
-			{
-				strippedKey.append( elements[ i ] );
-				if( i < elements.length-1 )
-				{
-					strippedKey.append( keyElementSeparator );
-				}
-			}
-			
-			// add the new key and the old value to the list of stripped keys
-			strippedKeyValues.add( new Pair< String, String >( strippedKey.toString(), pair.getSecond() ) );
-		}
-		
-		return strippedKeyValues;
-	}
-	
-	/*
-	 * Returns the first key element for the specified key and separator
-	 * @param key The key from which to pull the first element
-	 * @param separator The key element separator
-	 * @return the first key element for the specified key and separator
-	 */
-	private static String getFirstKeyElement( final String key, final String separator )
-	{
-		return key.split( Pattern.quote( separator ) )[ 0 ];
-	}
-	
-	/*
 	 * Organizes the key values into groups based on the first key element of each key. Returns
 	 * a {@code Map< String, List< Pair< String, String > > >} where the map's key is the group
 	 * name. The group name is first key element from each key. The {@code List< Pair< String, String > >}
@@ -485,7 +413,7 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 		for( Pair< String, String > pair : keyValues )
 		{
 			// get the first key element.
-			final String group = getFirstKeyElement( pair.getFirst(), separator );
+			final String group = KeyValueUtils.getFirstKeyElement( pair.getFirst(), separator );
 			
 			// the thing is, though, that this could be decorated or formatted for a map or list 
 			// or something else. so we need to pull the group name off, and then we'll have to 
@@ -528,24 +456,4 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 		}
 		return group;
 	}
-
-//	/*
-//	 * Returns true if the group name of the first key matches the group name of the second key;
-//	 * false otherwise, or if either key is null.
-//	 * @param key1 The first key
-//	 * @param key2 The second key
-//	 * @return true if the group name of the first key matches the group name of the second key;
-//	 * false otherwise, or if either key is null.
-//	 */
-//	private boolean groupNamesMatch( final String key1, final String key2 )
-//	{
-//		boolean areEqual = false;
-//		final String groupName1 = getGroupName( key1 );
-//		final String groupName2 = getGroupName( key2 );
-//		if( groupName1 != null && groupName2 != null && groupName1.equals( groupName2 ) )
-//		{
-//			areEqual = true;
-//		}
-//		return areEqual;
-//	}
 }

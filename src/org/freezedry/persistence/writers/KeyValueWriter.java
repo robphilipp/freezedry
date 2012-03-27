@@ -20,9 +20,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.text.ParseException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -215,22 +212,22 @@ public class KeyValueWriter implements PersistenceWriter {
 
 		final Division division = new Division();
 		final Person johnny = new Person( "Hernandez", "Johnny", 13 );
-		johnny.addFriend( "Polly", "bird" );
-		johnny.addFriend( "Sparky", "dog" );
-		for( int i = 0; i < 10; ++i )
-		{
-			johnny.addMood( Math.sin( Math.PI / 4 * i ) );
-		}
-		Map< String, String > group = new LinkedHashMap<>();
-		group.put( "one", "ONE" );
-		group.put( "two", "TWO" );
-		group.put( "three", "THREE" );
-		johnny.addGroup( "numbers", group );
-
-		group = new LinkedHashMap<>();
-		group.put( "a", "AY" );
-		group.put( "b", "BEE" );
-		johnny.addGroup( "letters", group );
+//		johnny.addFriend( "Polly", "bird" );
+//		johnny.addFriend( "Sparky", "dog" );
+//		for( int i = 0; i < 10; ++i )
+//		{
+//			johnny.addMood( Math.sin( Math.PI / 4 * i ) );
+//		}
+//		Map< String, String > group = new LinkedHashMap<>();
+//		group.put( "one", "ONE" );
+//		group.put( "two", "TWO" );
+//		group.put( "three", "THREE" );
+//		johnny.addGroup( "numbers", group );
+//
+//		group = new LinkedHashMap<>();
+//		group.put( "a", "AY" );
+//		group.put( "b", "BEE" );
+//		johnny.addGroup( "letters", group );
 		
 		johnny.setBirthdate( DateUtils.createDateFromString( "1963-04-22", "yyyy-MM-dd" ) );
 		
@@ -240,10 +237,10 @@ public class KeyValueWriter implements PersistenceWriter {
 		division.addPerson( new Person( "Jones", "Janet", 13 ) );
 		division.addPerson( new Person( "Ghad", "Booda", 17 ) );
 		
-		division.addMonth( "January", new HashSet<>( Arrays.asList( 1, 2, 3, 31 ) ) );
-		division.addMonth( "February", new HashSet<>( Arrays.asList( 1, 2, 3, 28 ) ) );
-		division.addMonth( "March", new HashSet<>( Arrays.asList( 1, 2, 3, 31 ) ) );
-		division.addMonth( "April", new HashSet<>( Arrays.asList( 1, 2, 3, 30 ) ) );
+//		division.addMonth( "January", new HashSet<>( Arrays.asList( 1, 2, 3, 31 ) ) );
+//		division.addMonth( "February", new HashSet<>( Arrays.asList( 1, 2, 3, 28 ) ) );
+//		division.addMonth( "March", new HashSet<>( Arrays.asList( 1, 2, 3, 31 ) ) );
+//		division.addMonth( "April", new HashSet<>( Arrays.asList( 1, 2, 3, 30 ) ) );
 		
 		division.setCarNames( new String[] { "civic", "tsx", "accord" } );
 		

@@ -18,14 +18,15 @@ package org.freezedry.persistence.keyvalue.renderers;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.freezedry.persistence.keyvalue.KeyValueBuilder;
 import org.freezedry.persistence.keyvalue.renderers.decorators.BooleanDecorator;
 import org.freezedry.persistence.keyvalue.renderers.decorators.Decorator;
 import org.freezedry.persistence.keyvalue.renderers.decorators.DoubleDecorator;
 import org.freezedry.persistence.keyvalue.renderers.decorators.IntegerDecorator;
 import org.freezedry.persistence.keyvalue.renderers.decorators.StringDecorator;
+import org.freezedry.persistence.keyvalue.utils.KeyValueUtils;
 import org.freezedry.persistence.utils.ReflectionUtils;
 import org.freezedry.persistence.utils.Require;
-import org.freezedry.persistence.keyvalue.KeyValueBuilder;
 import org.freezedry.persistence.writers.PersistenceWriter;
 
 /**
@@ -144,6 +145,27 @@ public abstract class AbstractPersistenceRenderer implements PersistenceRenderer
 	{
 		return ReflectionUtils.getItemOrAncestor( clazz, decorators );
 	}
+	
+	/**
+	 * Returns the {@link Decorator} that was used to decorate the specified value, or
+	 * if no such {@link Decorator} was found, returns null.
+	 * @param value The decorated value (must be either a integer, double, string)
+	 * @return the {@link Decorator} that was used to decorate the specified value, or
+	 * if no such {@link Decorator} was found, returns null.
+	 */
+	public Decorator getDecorator( final String value )
+	{
+		Decorator foundDecorator = null;
+		for( Decorator decorator : decorators.values() )
+		{
+			if( decorator.isDecorated( value ) )
+			{
+				foundDecorator = decorator;
+				break;
+			}
+		}
+		return foundDecorator;
+	}
 
 	/**
 	 * Finds the {@link PersistenceRenderer} associated with the class. If the specified class
@@ -162,8 +184,18 @@ public abstract class AbstractPersistenceRenderer implements PersistenceRenderer
 	/**
 	 * @return The persistence builder associated with this renderer for use in recursion.
 	 */
-	protected KeyValueBuilder getPersistenceWriter()
+	protected KeyValueBuilder getPersistenceBuilder()
 	{
 		return builder;
+	}
+	
+	/**
+	 * 
+	 * @param key
+	 * @return
+	 */
+	protected String stripFirstKeyElement( final String key )
+	{
+		return KeyValueUtils.stripFirstKeyElement( key, builder.getSeparator() );
 	}
 }

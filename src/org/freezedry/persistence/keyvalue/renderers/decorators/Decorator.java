@@ -38,6 +38,16 @@ public interface Decorator extends Copyable< Decorator > {
 	String decorate( final Object object );
 	
 	/**
+	 * Removes any decoration from the object. For example, if the value has been decorated as a {@link String},
+	 * then it removes the quotation marks (or whatever is used for the decoration of the {@link String}). If 
+	 * the specified value was has not been decorated in a manner consistent with the {@link Decorator} implementation,
+	 * then the undecorated value return is {@code null}.
+	 * @param value The value from which to remove decorations
+	 * @return The undecorated value
+	 */
+	String undecorate( final String value );
+	
+	/**
 	 * Returns true if the specified value matches the formatting used to decorate the object; false otherwise
 	 * @param value The value to test to see if it is decorated according to this class.
 	 * @return true if the specified value matches the formatting used to decorate the object; false otherwise
