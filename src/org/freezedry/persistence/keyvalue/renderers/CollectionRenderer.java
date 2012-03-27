@@ -293,9 +293,6 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 				LOGGER.error( message.toString() );
 				throw new IllegalArgumentException( message.toString() );
 			}
-			
-			// then for leaf nodes, we must figure out what the value is
-			
 		}
 	}
 	

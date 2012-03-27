@@ -233,7 +233,7 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 		
 		// strip the root key element from all the keys. For example, suppose the keys all start with
 		// "Division:". And suppose further that the rootKey = "Division". The "Division:" will be
-		// stripped from each key in the list. So, "Division.people.Persion[1]" would become "people.Person[1]".
+		// stripped from each key in the list. So, "Division.people.Person[1]" would become "people.Person[1]".
 		final List< Pair< String, String > > strippedKeyValues = KeyValueUtils.stripFirstKeyElement( keyValues, getSeparator() );
 
 		// find the groups in the newly string list, and then create a new info node for each group
@@ -244,9 +244,12 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 			createInfoNode( parentNode, entry.getKey(), entry.getValue() );
 		}
 	}
-	
-	// TODO add a createInfoNode method that figures out which renderer to call for building the info node
-	// probably need to rewrite the above method a bit.
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.keyvalue.KeyValueBuilder#createInfoNode(org.freezedry.persistence.tree.InfoNode, java.lang.String, java.util.List)
+	 */
+	@Override
 	public void createInfoNode( final InfoNode parentNode, final String groupName, final List< Pair< String, String > > keyValues )
 	{
 		System.out.println( groupName );

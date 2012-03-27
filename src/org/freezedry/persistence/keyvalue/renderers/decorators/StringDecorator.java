@@ -15,6 +15,8 @@
  */
 package org.freezedry.persistence.keyvalue.renderers.decorators;
 
+import java.util.regex.Pattern;
+
 
 /**
  * A {@link Decorator} that surrounds a {@link String} with quotes. For example,
@@ -97,7 +99,7 @@ public class StringDecorator implements Decorator {
 		String undecorated = null;
 		if( isDecorated( value ) )
 		{
-			undecorated = value.replaceAll( open + "*" + close + "*", "" );
+			undecorated = value.replaceAll( Pattern.quote( open ) + "*" + Pattern.quote( close ) + "*", "" );
 		}
 		return undecorated;
 	}

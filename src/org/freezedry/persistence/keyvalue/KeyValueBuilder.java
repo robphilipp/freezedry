@@ -110,6 +110,17 @@ public interface KeyValueBuilder {
 	 * @return the new info node
 	 */
 	void buildInfoNode( final InfoNode parentNode, final List< Pair< String, String > > keyValues );
+
+	/**
+	 * Creates an {@link InfoNode} based on the group name and the specified key-value pairs. Part of the 
+	 * recursive algorithm to build the semantic model.
+	 * @param parentNode The node to which to add the child nodes
+	 * @param groupName The name of the group that will appear as the persistence name
+	 * @param keyValues The list of key-value pairs. The first key element of every key should match
+	 * the persistence name of the parent node.
+	 * @see #buildInfoNode(InfoNode, List)
+	 */
+	void createInfoNode( final InfoNode parentNode, final String groupName, final List< Pair< String, String > > keyValues );
 	
 	/**
 	 * Returns the root key. If the {@code useClassAsRootKey} default was set via the constructor or the {@link #setRootKey(String)}
