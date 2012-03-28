@@ -166,15 +166,11 @@ public abstract class AbstractKeyValueBuilder implements KeyValueBuilder {
 		return arrayRenderer;
 	}
 
-	/**
-	 * Finds the {@link PersistenceRenderer} associated with the class. If the specified class
-	 * doesn't have a renderer, then it searches for the closest parent class (inheritance)
-	 * and returns that. In this case, it adds an entry to the persistence renderer map for the
-	 * specified class associating it with the returned persistence renderer (performance speed-up for
-	 * subsequent calls).
-	 * @param clazz The class for which to find a persistence renderer
-	 * @return the {@link PersistenceRenderer} associated with the class
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.keyvalue.KeyValueBuilder#getRenderer(java.lang.Class)
 	 */
+	@Override
 	public PersistenceRenderer getRenderer( final Class< ? > clazz )
 	{
 		return ReflectionUtils.getItemOrAncestor( clazz, renderers );

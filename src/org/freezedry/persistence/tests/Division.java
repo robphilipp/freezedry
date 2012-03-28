@@ -40,6 +40,8 @@ public class Division {
 	
 	private Map< String, Person > personMap;
 	
+	private List< Map< String, String > > listOfMaps;
+	
 	public Division()
 	{
 	}
@@ -82,11 +84,17 @@ public class Division {
 		this.personMap = map;
 	}
 	
+	public void setListOfMaps( final List< Map< String, String > > listOfMaps )
+	{
+		this.listOfMaps = listOfMaps;
+	}
+	
 	public String toString()
 	{
 		final StringBuffer buffer = new StringBuffer();
 		if( people != null )
 		{
+			buffer.append( "people: " + Constants.NEW_LINE );
 			for( Person person : people )
 			{
 				buffer.append( person.toString() + Constants.NEW_LINE );
@@ -94,21 +102,24 @@ public class Division {
 		}
 		if( months != null )
 		{
+			buffer.append( "months: " + Constants.NEW_LINE );
 			for( Map.Entry< String, Set< Integer > > entry : months.entrySet() )
 			{
-				buffer.append( entry.toString() + Constants.NEW_LINE );
+				buffer.append( "  " + entry.toString() + Constants.NEW_LINE );
 			}
 		}
 		if( carNames != null )
 		{
+			buffer.append( "carNames: " + Constants.NEW_LINE );
 			for( String name : carNames )
 			{
-				buffer.append( name + Constants.NEW_LINE );
+				buffer.append( "  " + name + Constants.NEW_LINE );
 			}
 		}
 		
 		if( collectionMatrix != null )
 		{
+			buffer.append( "collectionMatrix: " + Constants.NEW_LINE );
 			for( List< Integer > row : collectionMatrix )
 			{
 				for( int column : row )
@@ -121,6 +132,7 @@ public class Division {
 
 		if( arrayMatrix != null )
 		{
+			buffer.append( "arrayMatrix: " + Constants.NEW_LINE );
 			for( int[] row : arrayMatrix )
 			{
 				for( int column : row )
@@ -133,9 +145,19 @@ public class Division {
 		
 		if( personMap != null )
 		{
+			buffer.append( "personMap: " + Constants.NEW_LINE );
 			for( Map.Entry< String, Person > entry : personMap.entrySet() )
 			{
-				buffer.append( entry.getKey() + ": " + entry.getValue() + Constants.NEW_LINE );
+				buffer.append( "  " + entry.getKey() + ": " + entry.getValue() + Constants.NEW_LINE );
+			}
+		}
+		
+		if( listOfMaps != null )
+		{
+			buffer.append( "listOfMaps: " + Constants.NEW_LINE );
+			for( Map< String, String > map : listOfMaps )
+			{
+				buffer.append( "  Map " + listOfMaps.indexOf( map ) + ": " + map.toString() + Constants.NEW_LINE );
 			}
 		}
 		return buffer.toString();

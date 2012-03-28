@@ -297,7 +297,7 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 		else
 		{
 			// make sure the elements are all correct (this may be an unnecessary check)
-			validiateRootKey( keyValues, getSeparator(), groupName );
+//			validiateRootKey( keyValues, getSeparator(), groupName );
 
 			// grab the key from the first key value, and since all keys have the same group
 			// all we need is to grab the first key and use it as a pattern for the remaining

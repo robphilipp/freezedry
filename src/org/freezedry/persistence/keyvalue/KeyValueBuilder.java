@@ -69,6 +69,20 @@ public interface KeyValueBuilder {
 	String getSeparator();
 	
 	/**
+	 * Returns the renderer for the specified {@link Class} or null if the specified {@link Class}
+	 * doesn't have an associated renderer. The returned renderer will either be the renderer associated
+	 * with:
+	 * <ul>
+	 * 	<li>the specified {@link Class}</li>
+	 * 	<li>the renderer associated with the closest ancestor</li>
+	 * 	<li>null if neither of the previous two are found</li>
+	 * </ul>
+	 * @param clazz The {@link Class} for which to return the renderer.
+	 * @return the renderer for the specified {@link Class} or null if the specified {@link Class}.
+	 */
+	PersistenceRenderer getRenderer( final Class< ? > clazz );
+	
+	/**
 	 * The separator between the flattened key elements. For example, suppose that a {@code Division} has a {@link List}
 	 * of {@code Person} objects, called {@code people}. The the key for a person's first name may be of the form:
 	 * {@code Division.people.Person[2].firstName}, or {@code Division:people:Person[2]:firstName}. The "{@code .}" and

@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -247,8 +248,8 @@ public class KeyValueWriter implements PersistenceWriter {
 		
 		division.setCarNames( new String[] { "civic", "tsx", "accord" } );
 		
-//		int[][] arrayMatrix = { { 11, 12, 13 }, { 21, 22, 23 }, { 31, 32, 33 } };
-//		division.setArrayMatrix( arrayMatrix );
+		int[][] arrayMatrix = { { 11, 12, 13 }, { 21, 22, 23 }, { 31, 32, 33 } };
+		division.setArrayMatrix( arrayMatrix );
 		
 		List< List< Integer > > collectionMatrix = Arrays.asList( 
 											Arrays.asList( 11, 12, 13 ), 
@@ -256,6 +257,26 @@ public class KeyValueWriter implements PersistenceWriter {
 											Arrays.asList( 31, 32, 33 ) );
 		division.setCollectionMatrix( collectionMatrix );
 		
+		List< Map< String, String > > listOfMaps = new ArrayList<>();
+		Map< String, String > map = new LinkedHashMap<>();
+		map.put( "color", "green" );
+		map.put( "size", "large" );
+		map.put( "condition", "used" );
+		listOfMaps.add( map );
+		
+		map = new LinkedHashMap<>();
+		map.put( "color", "red" );
+		map.put( "size", "small" );
+		map.put( "condition", "new" );
+		listOfMaps.add( map );
+		
+		map = new LinkedHashMap<>();
+		map.put( "color", "blue" );
+		map.put( "size", "medium" );
+		map.put( "condition", "good" );
+		listOfMaps.add( map );
+		division.setListOfMaps( listOfMaps );
+
 		Map< String, Person > personMap = new LinkedHashMap<>();
 		personMap.put( "funny", new Person( "Richard", "Pryor", 63 ) );
 		personMap.put( "sad", new Person( "Jenny", "Jones", 45 ) );

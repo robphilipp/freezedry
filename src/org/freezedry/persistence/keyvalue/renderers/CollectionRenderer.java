@@ -17,7 +17,10 @@ package org.freezedry.persistence.keyvalue.renderers;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,6 +58,9 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 	private final Pattern decorationPattern;
 	private final String validationRegex;
 	private final Pattern validationPattern;
+	
+	private final Set< Class< ? > > withholdPeristName;
+	private boolean withholdArrayPersistName = true;
 
 	/**
 	 * Constructs a {@link CollectionRenderer} that is used to render {@link InfoNode} representing
@@ -83,6 +89,11 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 		// create and compile the regex pattern for validating the complete key
 		validationRegex = "\\w+" + decorationRegex + "|^" + decorationRegex;
 		validationPattern = Pattern.compile( validationRegex );
+		
+		// create the set of classes for with to withhold the persistence name for compound collection elements
+		// for example, List< List< Double > > called matrix gets rendered as matrix[i][j] instead of
+		// matrix[i].ArrayList[j], or List< Map< String, String > > listOfMap gets renderered as listOfMap[i]{key}
+		withholdPeristName = createDefaultPersistenceWithholding();
 	}
 	
 	/**
@@ -110,6 +121,65 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 		this.decorationPattern = renderer.decorationPattern;
 		this.validationRegex = renderer.validationRegex;
 		this.validationPattern = renderer.validationPattern;
+		this.withholdPeristName = renderer.withholdPeristName;
+		this.withholdArrayPersistName = renderer.withholdArrayPersistName;
+	}
+
+	/*
+	 * Creates the set of classes for with to withhold the persistence name for compound collection elements
+	 * for example, List< List< Double > > called matrix gets rendered as matrix[i][j] instead of
+	 * matrix[i].ArrayList[j], or List< Map< String, String > > listOfMap gets renderered as listOfMap[i]{key}
+	 * @return
+	 */
+	private static Set< Class< ? > > createDefaultPersistenceWithholding()
+	{
+		final Set< Class< ? > > withhold = new HashSet<>();
+		withhold.add( Collection.class );
+		withhold.add( Map.class );
+		return withhold;
+	}
+	
+	/**
+	 * Tells the renderer to withhold the persistence name for the specified {@link Class} in
+	 * instances where the {@link Collection} element is compound, and that compound element
+	 * is the specified {@link Class} or a subclass of the specified {@link Class}. For example,
+	 * when we have a {@code List< Map< String, String > >} called {@code listOfMaps}, then for each
+	 * list element, we have a {@link Map}, and so we would want to render it as <code>listOfMap[i]{key}</code>.
+	 * Similarly, if we have a {@code List< List< Double > >} called {@code matrix}, we would want to 
+	 * render it as {@code matrix[i][j]}.
+	 * <p>For arrays, see the {@link #withholdArrayPersistName} method.
+	 * @param clazz The specified {@link Class} for which to withhold the persistence name
+	 * @return true if the {@link Class} was added; false otherwise
+	 * @see #withholdArrayPersistName
+	 */
+	public boolean withholdCompoundPersistNameFor( final Class< ? > clazz )
+	{
+		return withholdPeristName.add( clazz );
+	}
+	
+	/**
+	 * Tells the renderer that it should no longer withhold the persistence name for the specified {@link Class} or
+	 * its subclasses.
+	 * @param clazz The specified {@link Class} for which to no longer withhold the persistence name
+	 * @return true if the {@link Class} was removed; false otherwise
+	 * @see #withholdPeristName
+	 * @see #withholdArrayPersistName
+	 */
+	public boolean removePersistNameWithholding( final Class< ? > clazz )
+	{
+		return withholdPeristName.remove( clazz );
+	}
+	
+	/**
+	 * Tells the renderer to withhold the persistence name for arrays in instances where the {@link Collection} 
+	 * element is compound, and that compound element is an array. For example, if we have a {@code List< int[] > >} 
+	 * called {@code matrix}, we would want to render it as {@code matrix[i][j]}.
+	 * @param isWithhold true if peristence names are to be withheld; false otherwise
+	 * @see #withholdPeristName
+	 */
+	public void setWithholdCompoundPersistNameForArrays( final boolean isWithhold )
+	{
+		withholdArrayPersistName = isWithhold;
 	}
 
 	/*
@@ -126,21 +196,28 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 			{
 				// create the key-value pair and return it
 				final String newKey = createLeafNodeKey( key, infoNode, index );
-//				node.setPersistName( "" );
 				getPersistenceBuilder().createKeyValuePairs( node, newKey, keyValues, true );
 			}
 			else
 			{
 				// create the key-value pair and return it
 				final String newKey = createLeafNodeKey( key, infoNode, index );
-				final Class< ? > clazz = node.getClazz();
-				if( ReflectionUtils.isSuperclass( Collection.class, clazz ) || clazz.isArray() )
+				boolean hidePersistName = false;
+				
+				// next we need to check whether the group name for the key is empty. for example,
+				// when we have a List< Map< String, String > > called listOfMaps, then for each
+				// list element, we have a map, and so we would want to render it as listOfMap[i]{key}.
+				// similarly, if we have a List< List< Double > > called matrix, we would want to 
+				// render it as matrix[i][j].
+				if( isZeroOutPersistName( node ) )
 				{
 					node.setPersistName( "" );
+					hidePersistName = true;
 				}
-				getPersistenceBuilder().createKeyValuePairs( node, newKey, keyValues, false );
-//				final String newKey = createNodeKey( key, infoNode, node, index );
-//				getPersistenceBuilder().buildKeyValuePairs( node, newKey, keyValues );
+				
+				// have the key-value builder that called this method create a new node. back
+				// into the recursive algorithm.
+				getPersistenceBuilder().createKeyValuePairs( node, newKey, keyValues, hidePersistName );
 			}
 
 			// increment the index count
@@ -149,6 +226,47 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 			// mark the node as processed so that it doesn't get processed again
 			node.setIsProcessed( true );
 		}
+	}
+
+	/*
+	 * Returns true if we have specified that when the collection element is a compound
+	 * element of the certain types, then we zero out the node's persistence name. For example,
+	 * when we have a {@code List< Map< String, String > >} called {@code listOfMaps}, then for each
+	 * list element, we have a {@link Map}, and so we would want to render it as <code>listOfMap[i]{key}</code>.
+	 * Similarly, if we have a {@code List< List< Double > >} called {@code matrix}, we would want to 
+	 * render it as {@code matrix[i][j]}.
+	 * @param node The node containing the compound collection element
+	 * @return true if the persistence name of the node should be zeroed out. 
+	 */
+	private boolean isZeroOutPersistName( final InfoNode node )
+	{
+		boolean isZeroOut = false;
+		
+		// grab the class represented by the node
+		final Class< ? > nodeClazz = node.getClazz();
+		
+		// first we check to see if we are to withhold the perist name for
+		// compound collection elements that are arrays
+		if( withholdArrayPersistName && nodeClazz.isArray() )
+		{
+			isZeroOut = true;
+		}
+		else
+		{
+			// run through the list of the classes for which to withhold the
+			// persist name if the compound elements are those classes or
+			// subclasses of those classes
+			for( Class< ? > clazz : withholdPeristName )
+			{
+				if( ReflectionUtils.isClassOrSuperclass( clazz, nodeClazz ) )
+				{
+					isZeroOut = true;
+					break;
+				}
+			}
+		}
+		
+		return isZeroOut;
 	}
 
 	/**
@@ -271,18 +389,6 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 				for( Pair< String, String > copiedKeyValue : keyValues )
 				{
 					final String copiedKey = copiedKeyValue.getFirst();
-//					final String keyFirstElement = key.split( Pattern.quote( separator ) )[ 0 ]; 
-//					if( copiedKey.startsWith( keyFirstElement ) )
-//					{
-//						// strip the first element off the key
-//						final String strippedKey = KeyValueUtils.stripFirstKeyElement( copiedKey, separator );
-//						
-//						// add the key to the list of keys that belong to the compound node
-//						elementKeyValues.add( new Pair< String, String >( strippedKey, copiedKeyValue.getSecond() ) );
-//						
-//						// and remove the element from the list of key values
-//						copiedKeyValues.remove( copiedKeyValue );
-//					}
 					final String keyFirstElement = extractElementKeyPart( key.split( Pattern.quote( separator ) )[ 0 ] ); 
 					if( copiedKey.startsWith( keyFirstElement ) )
 					{

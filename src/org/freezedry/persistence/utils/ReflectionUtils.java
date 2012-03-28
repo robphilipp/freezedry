@@ -50,6 +50,17 @@ public class ReflectionUtils {
 	private static final Logger LOGGER = Logger.getLogger( ReflectionUtils.class );
 
 	/**
+	 * Returns true if the specified class is the specified super class or a descendant; false otherwise
+	 * @param superClass The specified super class
+	 * @param clazz The specified class
+	 * @return true if the specified class is the specified super class or a descendant; false otherwise
+	 */
+	public static boolean isClassOrSuperclass( final Class< ? > superClass, final Class< ? > clazz )
+	{
+		return clazz.equals( superClass ) || isSuperclass( superClass, clazz );
+	}
+	
+	/**
 	 * Returns true if the specified super class is a super class of the specified class; false otherwise
 	 * @param superClass The specified super class
 	 * @param clazz The specified class
