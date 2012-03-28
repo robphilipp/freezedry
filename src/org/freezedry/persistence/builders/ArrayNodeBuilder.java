@@ -49,6 +49,10 @@ public class ArrayNodeBuilder extends AbstractNodeBuilder {
 	
 	private static final Logger LOGGER = Logger.getLogger( ArrayNodeBuilder.class );
 	
+	public static final String COMPOUND_ARRAY_NAME_SUFFIX = "Array";
+	
+	private String compoundArrayNameSuffix = COMPOUND_ARRAY_NAME_SUFFIX;
+	
 	/**
 	 * Constructs the {@link NodeBuilder} for going between {@link Collection}s and 
 	 * {@link Object}s.
@@ -75,6 +79,35 @@ public class ArrayNodeBuilder extends AbstractNodeBuilder {
 	public ArrayNodeBuilder( final ArrayNodeBuilder generator )
 	{
 		super( generator );
+	}
+	
+	/**
+	 * Sets the suffix for replacing the "{@code []}" when the element of an array is itself an
+	 * array (or an array of arrays). For example, for an {@code int[][]} called {@code matrix}
+	 * the name of the array of {@code int[]} has the persist and field name {@code matrix}. But
+	 * the actual elements (which are arrays) in this case would have the name {@code int[]}. And
+	 * for XML and JSON, this is a problem. So by default, the name for the elements is converted
+	 * from {@code int[]} to {@code intArray}. Using this method, you can change the "{@code Array}"
+	 * suffix to any valid string suffix you like.
+	 * @param suffix The suffix the replaces the "{@code []}" for compound arrays.
+	 */
+	public void setCompoundArrayNameSuffix( final String suffix )
+	{
+		this.compoundArrayNameSuffix = suffix;
+	}
+	
+	/**
+	 * Returns the suffix for replacing the "{@code []}" when the element of an array is itself an
+	 * array (or an array of arrays). For example, for an {@code int[][]} called {@code matrix}
+	 * the name of the array of {@code int[]} has the persist and field name {@code matrix}. But
+	 * the actual elements (which are arrays) in this case would have the name {@code int[]}. And
+	 * for XML and JSON, this is a problem. So by default, the name for the elements is converted
+	 * from {@code int[]} to {@code intArray}.
+	 * @return The suffix the replaces the "{@code []}" for compound arrays.
+	 */
+	public String getCompoundArrayNameSuffix()
+	{
+		return compoundArrayNameSuffix;
 	}
 
 	/*
@@ -163,7 +196,12 @@ public class ArrayNodeBuilder extends AbstractNodeBuilder {
 			String name;
 			if( elementPersistName == null )
 			{
-				name = element.getClass().getSimpleName();
+				final Class< ? > elementClazz = element.getClass();
+				name = elementClazz.getSimpleName();
+				if( elementClazz.isArray() )
+				{
+					name = name.replaceAll( "\\[\\]", compoundArrayNameSuffix );
+				}
 			}
 			else
 			{

@@ -737,8 +737,8 @@ public class PersistenceEngine {
 			
 			division.setCarNames( new String[] { "civic", "tsx", "accord" } );
 	
-//			int[][] arrayMatrix = { { 11, 12, 13 }, { 21, 22, 23 }, { 31, 32, 33 } };
-//			division.setArrayMatrix( arrayMatrix );
+			int[][] arrayMatrix = { { 11, 12, 13 }, { 21, 22, 23 }, { 31, 32, 33 } };
+			division.setArrayMatrix( arrayMatrix );
 			
 			List< List< Integer > > collectionMatrix = Arrays.asList( 
 					Arrays.asList( 11, 12, 13 ), 

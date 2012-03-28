@@ -103,8 +103,8 @@ public class CollectionNodeBuilder extends AbstractNodeBuilder {
 		// factories for registered node generators for the Class< ? > of the object)
 		final Class< ? > clazz = object.getClass();
 
-		// create a compound node that holds the child nodes that form
-		// the element of the List. For each child element, call this
+		// create a compound node that holds the child nodes that forms
+		// the element of the Collection. For each child element, call this
 		// method recursively to create the appropriate node.
 		String persistName = null;
 		try
