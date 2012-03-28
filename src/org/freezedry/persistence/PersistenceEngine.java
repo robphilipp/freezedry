@@ -546,7 +546,7 @@ public class PersistenceEngine {
 					if( !instantiateType.equals( Persist.Null.class ) )
 					{
 						final Class< ? > nodeClazz = node.getClazz();
-						if( nodeClazz == null || ReflectionUtils.isSuperclass( nodeClazz, instantiateType ) )
+						if( nodeClazz == null || ReflectionUtils.isClassOrSuperclass( nodeClazz, instantiateType ) )
 						{
 							node.setClazz( instantiateType );
 						}

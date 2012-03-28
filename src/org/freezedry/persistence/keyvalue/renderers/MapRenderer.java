@@ -191,7 +191,7 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 		{
 			// the node should be a MapEntry class, if not, then we've got problems, which
 			// we will not hesitate to report to the proper authorities.
-			if( ReflectionUtils.isSuperclass( Map.Entry.class, node.getClazz() ) )
+			if( ReflectionUtils.isClassOrSuperclass( Map.Entry.class, node.getClazz() ) )
 			{
 				// there should be two nodes hanging off the MapEntry: the key and the value.
 				// each of these may have their own subnodes.
