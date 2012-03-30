@@ -18,6 +18,7 @@ package org.freezedry.persistence.keyvalue.renderers;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
@@ -113,7 +114,7 @@ public class FlatteningCollectionRenderer extends CollectionRenderer {
 		super( builder, openIndex, closeIndex );
 		
 		// create and compile the regex pattern for the decoration
-		decorationRegex = getDecorationRegex() + "$";
+		decorationRegex = Pattern.quote( getOpenIndex() ) + Pattern.quote( getCloseIndex() ) + "$";
 		decorationPattern = Pattern.compile( decorationRegex );
 		
 		// create and compile the regex pattern for validating the complete key
@@ -171,7 +172,7 @@ public class FlatteningCollectionRenderer extends CollectionRenderer {
 			{
 				keyBuffer.append( getPersistenceBuilder().getSeparator() );
 			}
-			keyBuffer.append( infoNode.getPersistName() );
+			keyBuffer.append( infoNode.getPersistName() ).append( getOpenIndex() ).append( getCloseIndex() );
 			
 			// now we construct the value in the form of "[ element1, element2, ..., elementN ]"
 			final StringBuffer value = new StringBuffer( "[" );
@@ -224,8 +225,48 @@ public class FlatteningCollectionRenderer extends CollectionRenderer {
 	@Override
 	public void buildInfoNode( final InfoNode parentNode, final List< Pair< String, String >> keyValues )
 	{
-		// TODO Auto-generated method stub
-
+		// nothing to do
+		if( keyValues == null || keyValues.isEmpty() )
+		{
+			return;
+		}
+		
+		// grab the group name for the collection, and create the compound node
+		// that holds the elements of the collection as child nodes, and add it
+		// to the parent node
+		final String group = getGroupName( keyValues.get( 0 ).getFirst() );
+		final InfoNode collectionNode = InfoNode.createCompoundNode( null, group, null );
+		parentNode.addChild( collectionNode );
+		
+		// run through the list of key-values creating the child nodes for the collection node
+		for( Pair< String, String > keyValue : keyValues )
+		{
+			// grab the key
+			final String key = keyValue.getFirst();
+			
+			// this must match the validation pattern, i.e. that it is a simple collection. if
+			// it doesn't match the simple collection pattern, the forward it to the compound 
+			// collection renderer (CollectionRenderer, this class' parent class)
+			final Matcher leafMatcher = validationPattern.matcher( key );
+			if( leafMatcher.find() )
+			{
+				// its a leaf, so now we need to figure out what the value is. we know that
+				// it must be a number (integer, double) or a string.
+				final String value = keyValue.getSecond();
+				final Decorator decorator = getDecorator( value ); 
+				final String rawValue = decorator.undecorate( value );
+				final String persistName = decorator.representedClass().getSimpleName();
+				
+				// create the leaf info node and add it to the collection node
+				final InfoNode elementNode = InfoNode.createLeafNode( null, rawValue, persistName, null );
+				collectionNode.addChild( elementNode );
+			}
+			else
+			{
+				// forward to parent
+				super.buildInfoNode( parentNode, keyValues );
+			}
+		}
 	}
 
 	/*
@@ -233,23 +274,26 @@ public class FlatteningCollectionRenderer extends CollectionRenderer {
 	 * @see org.freezedry.persistence.keyvalue.renderers.CollectionRenderer#isRenderer(java.lang.String)
 	 */
 	@Override
-	public boolean isRenderer( String keyElement )
+	public boolean isRenderer( final String keyElement )
 	{
-		// TODO Auto-generated method stub
-		return false;
+		return validationPattern.matcher( keyElement ).find() || super.isRenderer( keyElement );
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.freezedry.persistence.keyvalue.renderers.CollectionRenderer#getGroupName(java.lang.String)
+	 * @see org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer#getGroupName(java.lang.String)
 	 */
 	@Override
-	public String getGroupName( String key )
+	public String getGroupName( final String key )
 	{
-		// TODO Auto-generated method stub
-		return null;
+		final Matcher matcher = decorationPattern.matcher( key );
+		String group = null;
+		if( matcher.find() )
+		{
+			group = key.substring( 0, matcher.start() );
+		}
+		return group;
 	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see org.freezedry.persistence.keyvalue.renderers.CollectionRenderer#getCopy()

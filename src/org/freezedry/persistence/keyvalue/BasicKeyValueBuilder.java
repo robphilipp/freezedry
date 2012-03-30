@@ -316,7 +316,6 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 				final InfoNode node = InfoNode.createCompoundNode( null, groupName, null );
 				parentNode.addChild( node );
 				buildInfoNode( node, keyValues );
-//				buildInfoNode( parentNode, keyValues );
 			}
 		}
 	}

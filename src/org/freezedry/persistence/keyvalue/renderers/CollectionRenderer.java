@@ -53,6 +53,8 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 	protected static final String OPEN = "[";
 	protected static final String CLOSE = "]";
 	
+	private final String openIndex;
+	private final String closeIndex;
 	private final StringDecorator indexDecorator;
 	private final String decorationRegex;
 	private final Pattern decorationPattern;
@@ -74,6 +76,8 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 	{
 		super( builder );
 		
+		this.openIndex = openIndex;
+		this.closeIndex = closeIndex;
 		this.indexDecorator = new StringDecorator( openIndex, closeIndex );
 		
 		// create the regular expression that determines if a string is renderered by this class
@@ -116,6 +120,8 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 	{
 		super( renderer );
 		
+		this.openIndex = renderer.openIndex;
+		this.closeIndex = renderer.closeIndex;
 		this.indexDecorator = renderer.indexDecorator.getCopy();
 		this.decorationRegex = renderer.decorationRegex;
 		this.decorationPattern = renderer.decorationPattern;
@@ -385,12 +391,8 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 				
 				// create the node that holds the compound object and add it to the collection node
 				final String persistName = KeyValueUtils.getFirstKeyElement( elementKeyValues.get( 0 ).getFirst(), separator );
-//				final InfoNode elementNode = InfoNode.createCompoundNode( null, persistName, null );
-//				collectionNode.addChild( elementNode );
 				
 				// call the builder (which called this method) to build the compound node
-//				getPersistenceBuilder().buildInfoNode( elementNode, elementKeyValues );
-//				getPersistenceBuilder().createInfoNode( elementNode, persistName, elementKeyValues );
 				getPersistenceBuilder().createInfoNode( collectionNode, persistName, elementKeyValues );
 			}
 			else
@@ -475,6 +477,16 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 			group = key.substring( 0, matcher.start() );
 		}
 		return group;
+	}
+	
+	protected String getOpenIndex()
+	{
+		return openIndex;
+	}
+	
+	protected String getCloseIndex()
+	{
+		return closeIndex;
 	}
 	
 	/**
