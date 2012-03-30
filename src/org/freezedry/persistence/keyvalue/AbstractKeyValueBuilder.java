@@ -92,8 +92,8 @@ public abstract class AbstractKeyValueBuilder implements KeyValueBuilder {
 	private Map< Class< ? >, PersistenceRenderer > createDefaultRenderers()
 	{
 		final Map< Class< ? >, PersistenceRenderer > renderers = new HashMap<>();
-//		renderers.put( Collection.class, new CollectionRenderer( this ) );
-		renderers.put( Collection.class, new FlatteningCollectionRenderer( this ) );
+		renderers.put( Collection.class, new CollectionRenderer( this ) );
+//		renderers.put( Collection.class, new FlatteningCollectionRenderer( this ) );
 		renderers.put( Map.class, new MapRenderer( this ) );
 
 		renderers.put( String.class, new LeafNodeRenderer( this ) );

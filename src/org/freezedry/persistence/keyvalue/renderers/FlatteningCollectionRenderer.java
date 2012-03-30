@@ -15,13 +15,13 @@
  */
 package org.freezedry.persistence.keyvalue.renderers;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
 import org.freezedry.persistence.containers.Pair;
 import org.freezedry.persistence.keyvalue.KeyValueBuilder;
 import org.freezedry.persistence.keyvalue.renderers.decorators.Decorator;
@@ -94,12 +94,18 @@ import org.freezedry.persistence.tree.InfoNode;
  */
 public class FlatteningCollectionRenderer extends CollectionRenderer {
 
-	private static final Logger LOGGER = Logger.getLogger( FlatteningCollectionRenderer.class );
+//	private static final Logger LOGGER = Logger.getLogger( FlatteningCollectionRenderer.class );
 
 	private final String decorationRegex;
 	private final Pattern decorationPattern;
 	private final String validationRegex;
 	private final Pattern validationPattern;
+	
+	private final String listBegin = "[";
+	private final String listEnd= "]";
+	private final String listSeparator = ",";
+	private final String listRegex;
+	private final Pattern listPattern;
 
 	/**
 	 * Constructs a {@link FlatteningCollectionRenderer} that is used to render {@link InfoNode} representing
@@ -118,9 +124,30 @@ public class FlatteningCollectionRenderer extends CollectionRenderer {
 		decorationPattern = Pattern.compile( decorationRegex );
 		
 		// create and compile the regex pattern for validating the complete key
-		validationRegex = "\\w+" + decorationRegex + "|^" + decorationRegex;
+		// we allow \w+ and [0-9] and {"key"} before the ending "[]". For example, the following
+		// keys would be allowed: collection[]; collection[0][]; collection{3}[]; collection{"test"}[]
+		// The regular expression is ^\w*(\[[0-9]\])?((\{"\w+"\})|(\{\w+\}))?\[\]$
+		validationRegex = "^\\w*(\\[[0-9]\\])?(\\{(\\w+)|(\"\\w+\")\\})?" + decorationRegex;
 		validationPattern = Pattern.compile( validationRegex );
 
+		// create and compile the regex pattern for validating the list value 
+		// i.e [ element1, element2, ..., elementN ]
+		// the regex expression below describes the allowable lists
+		// (^\[(\s*"\w+"\s*,\s*)*(\s*"\w+"\s*)\]$)|(^\[(\s*\w+\s*,\s*)*(\s*\w+\s*)\]$)
+		// (^\[(\s*"\w+"\s*,\s*)*(\s*"\w+"\s*)\]$)|(^\[(\s*\w+(\.\w+)?\s*,\s*)*(\s*-?\w+(\.\w+)?\s*)\]$)
+		final StringBuffer listRegexBuffer = new StringBuffer();
+		// number lists
+		listRegexBuffer.append( "(^" + Pattern.quote( listBegin ) );
+		listRegexBuffer.append( "(\\s*-?\\w+(\\.\\w+)?\\s*" + Pattern.quote( listSeparator ) + "\\s*)*(\\s*-?\\w+(\\.\\w+)?\\s*)" );
+		listRegexBuffer.append( Pattern.quote( listEnd ) + ")$" );
+		// or
+		listRegexBuffer.append( "|" );
+		// string list
+		listRegexBuffer.append( "(^" + Pattern.quote( listBegin ) );
+		listRegexBuffer.append( "(\\s*\"\\w+\"\\s*" + Pattern.quote( listSeparator ) + "\\s*)*(\\s*\"\\w+\"\\s*)" );
+		listRegexBuffer.append( Pattern.quote( listEnd ) + ")$" );
+		listRegex = listRegexBuffer.toString();
+		listPattern = Pattern.compile( listRegex );
 	}
 
 	/**
@@ -147,6 +174,8 @@ public class FlatteningCollectionRenderer extends CollectionRenderer {
 		this.decorationPattern = renderer.decorationPattern;
 		this.validationRegex = renderer.validationRegex;
 		this.validationPattern = renderer.validationPattern;
+		this.listRegex = renderer.listRegex;
+		this.listPattern = renderer.listPattern;
 	}
 
 	/*
@@ -175,24 +204,25 @@ public class FlatteningCollectionRenderer extends CollectionRenderer {
 			keyBuffer.append( infoNode.getPersistName() ).append( getOpenIndex() ).append( getCloseIndex() );
 			
 			// now we construct the value in the form of "[ element1, element2, ..., elementN ]"
-			final StringBuffer value = new StringBuffer( "[" );
+			final StringBuffer value = new StringBuffer( listBegin );
 			int index = 0;
 			final int numChildren = infoNode.getChildCount();
 			for( InfoNode node : infoNode.getChildren() )
 			{
-				// add the value
-				value.append( node.getValue() );
+				// add the decorated value
+				final Decorator decorator = getDecorator( node.getClazz() );
+				value.append( decorator.decorate( node.getValue() ) );
 				
 				// add a comma between the values if it isn't the last value
 				if( index < numChildren-1 )
 				{
-					value.append( ", " );
+					value.append( listSeparator + " " );
 				}
 				
 				// increment the counter
 				index++;
 			}
-			value.append( "]" );
+			value.append( listEnd );
 			keyValues.add( new Pair< String, Object >( keyBuffer.toString(), value.toString() ) );
 		}
 	}
@@ -223,7 +253,7 @@ public class FlatteningCollectionRenderer extends CollectionRenderer {
 	 * @see org.freezedry.persistence.keyvalue.renderers.CollectionRenderer#buildInfoNode(org.freezedry.persistence.tree.InfoNode, java.util.List)
 	 */
 	@Override
-	public void buildInfoNode( final InfoNode parentNode, final List< Pair< String, String >> keyValues )
+	public void buildInfoNode( final InfoNode parentNode, final List< Pair< String, String > > keyValues )
 	{
 		// nothing to do
 		if( keyValues == null || keyValues.isEmpty() )
@@ -231,14 +261,68 @@ public class FlatteningCollectionRenderer extends CollectionRenderer {
 			return;
 		}
 		
-		// grab the group name for the collection, and create the compound node
-		// that holds the elements of the collection as child nodes, and add it
-		// to the parent node
-		final String group = getGroupName( keyValues.get( 0 ).getFirst() );
-		final InfoNode collectionNode = InfoNode.createCompoundNode( null, group, null );
-		parentNode.addChild( collectionNode );
-		
-		// run through the list of key-values creating the child nodes for the collection node
+		// if all the key-values aren't flattened, then we need to forward this to the 
+		// parent collection renderer 
+		if( !areAllFlattenedCollections( keyValues ) )
+		{
+			super.buildInfoNode( parentNode, keyValues );
+		}
+		else
+		{
+			// grab the group name for the collection, and create the compound node
+			// that holds the elements of the collection as child nodes, and add it
+			// to the parent node
+			final String group = getGroupName( keyValues.get( 0 ).getFirst() );
+			final InfoNode collectionNode = InfoNode.createCompoundNode( null, group, null );
+			parentNode.addChild( collectionNode );
+			
+			// run through the list of key-values creating the child nodes for the collection node
+			for( Pair< String, String > keyValue : keyValues )
+			{
+				// grab the key
+				final String key = keyValue.getFirst();
+				
+				// this must match the validation pattern, i.e. that it is a simple collection. if
+				// it doesn't match the simple collection pattern, the forward it to the compound 
+				// collection renderer (CollectionRenderer, this class' parent class)
+				final Matcher leafMatcher = validationPattern.matcher( key );
+				if( leafMatcher.find() )
+				{
+					// we should have list represented by "[ element1, element2, ..., elementN ]". We need to
+					// pull apart the elements.
+					final String valueList = keyValue.getSecond();
+					final Matcher listMatcher = listPattern.matcher( valueList );
+					if( listMatcher.find() )
+					{
+						// create the list of values
+						final List< String > values = parseValueList( valueList );
+						
+						for( String value : values )
+						{
+							// its a leaf, so now we need to figure out what the value is. we know that
+							// it must be a number (integer, double) or a string.
+							final Decorator decorator = getDecorator( value); 
+							final String rawValue = decorator.undecorate( value );
+							final String persistName = decorator.representedClass().getSimpleName();
+							
+							// create the leaf info node and add it to the collection node
+							final InfoNode elementNode = InfoNode.createLeafNode( null, rawValue, persistName, null );
+							collectionNode.addChild( elementNode );
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	/*
+	 * Returns true if all the keys have the form of a flattened list; false otherwise
+	 * @param keyValues The list of key-value pairs of which to check the keys
+	 * @return true if all the keys have the form of a flattened list; false otherwise
+	 */
+	private boolean areAllFlattenedCollections( final List< Pair< String, String > > keyValues )
+	{
+		boolean allFlattened = true;
 		for( Pair< String, String > keyValue : keyValues )
 		{
 			// grab the key
@@ -248,25 +332,42 @@ public class FlatteningCollectionRenderer extends CollectionRenderer {
 			// it doesn't match the simple collection pattern, the forward it to the compound 
 			// collection renderer (CollectionRenderer, this class' parent class)
 			final Matcher leafMatcher = validationPattern.matcher( key );
-			if( leafMatcher.find() )
+			if( !leafMatcher.find() )
 			{
-				// its a leaf, so now we need to figure out what the value is. we know that
-				// it must be a number (integer, double) or a string.
-				final String value = keyValue.getSecond();
-				final Decorator decorator = getDecorator( value ); 
-				final String rawValue = decorator.undecorate( value );
-				final String persistName = decorator.representedClass().getSimpleName();
-				
-				// create the leaf info node and add it to the collection node
-				final InfoNode elementNode = InfoNode.createLeafNode( null, rawValue, persistName, null );
-				collectionNode.addChild( elementNode );
-			}
-			else
-			{
-				// forward to parent
-				super.buildInfoNode( parentNode, keyValues );
+				allFlattened = false;
 			}
 		}
+		return allFlattened;
+	}
+	
+	/*
+	 * Takes a string of the form "[element1, element2, ...., elementN]" and parses it into
+	 * a list of trimmed strings. A list can contain elements that either all strings, or all
+	 * numbers. Strings are represented by surrounding quotes. For example a list of numbers
+	 * could be "[ 1, 3, 4, 7, 9, 11]", and a list of strings "[ "house", "car", "dog", "cat" ]"
+	 * @param valueList The string representation of a list of numbers or a list of strings
+	 * @return A {@link List} of {@link String} that has been tokenized based on the list separator.
+	 */
+	private List< String > parseValueList( final String valueList )
+	{
+		// make a copy of the string
+		String list = new String( valueList );
+		
+		// pull the list begin (default value is "[") and end (default value is "]") string out
+		list = list.replaceAll( "^" + Pattern.quote( listBegin ), "" );
+		list = list.replaceAll( Pattern.quote( listEnd ) + "$", "" );
+
+		// tokenize by the list separator
+		final String[] valueArray = list.split( Pattern.quote( listSeparator ) );
+		
+		// trim each string and add it to the array list
+		final List< String > values = new ArrayList<>();
+		for( String value : valueArray )
+		{
+			values.add( value.trim() );
+		}
+		
+		return values;
 	}
 
 	/*
@@ -276,7 +377,11 @@ public class FlatteningCollectionRenderer extends CollectionRenderer {
 	@Override
 	public boolean isRenderer( final String keyElement )
 	{
-		return validationPattern.matcher( keyElement ).find() || super.isRenderer( keyElement );
+		// because this renderer calls back to its parent, the CollectionRenderer, we claim this to be
+		// the renderer if the key element matches this regular expression or the parent's regular expression
+		final boolean isThisRenderer = validationPattern.matcher( keyElement ).find();
+		final boolean isParentRenderer = super.isRenderer( keyElement ); 
+		return isThisRenderer || isParentRenderer;
 	}
 
 	/*
@@ -286,14 +391,23 @@ public class FlatteningCollectionRenderer extends CollectionRenderer {
 	@Override
 	public String getGroupName( final String key )
 	{
-		final Matcher matcher = decorationPattern.matcher( key );
 		String group = null;
+		
+		// we check to see if the key matches the decorations from this renderer,
+		// and if not, then we call the parent renderer's getGroupName(...) method.
+		// if neither renderers match, then the group will be returned as null
+		final Matcher matcher = decorationPattern.matcher( key );
 		if( matcher.find() )
 		{
 			group = key.substring( 0, matcher.start() );
 		}
+		else
+		{
+			group = super.getGroupName( key );
+		}
 		return group;
 	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.freezedry.persistence.keyvalue.renderers.CollectionRenderer#getCopy()

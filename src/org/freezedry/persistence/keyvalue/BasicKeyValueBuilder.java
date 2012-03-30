@@ -275,7 +275,7 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 			// grab the key and make sure that it matches the group name. at this point it shouldn't
 			// have any decorations (i.e. for collection or map or anything else)
 			final String name = keyValues.get( 0 ).getFirst();
-			if( !groupName.equals( name ) )
+			if( !groupName.equals( getGroupName( name ) ) )
 			{
 				final StringBuffer message = new StringBuffer();
 				message.append( "The group name must match the persist name for a leaf node." + Constants.NEW_LINE );
@@ -296,16 +296,12 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 		// let the recursion begin.
 		else
 		{
-			// make sure the elements are all correct (this may be an unnecessary check)
-//			validiateRootKey( keyValues, getSeparator(), groupName );
-
 			// grab the key from the first key value, and since all keys have the same group
 			// all we need is to grab the first key and use it as a pattern for the remaining
 			// key-value pairs in this group
 			final String rootKey = keyValues.get( 0 ).getFirst();
 			
 			// get the appropriate renderer and ask it to build the info node from that type
-//			getRenderer( rootKey ).buildInfoNode( parentNode, keyValues );
 			final PersistenceRenderer renderer = getRenderer( rootKey );
 			if( renderer != null )
 			{
