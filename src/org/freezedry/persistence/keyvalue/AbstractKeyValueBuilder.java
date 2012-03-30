@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.freezedry.persistence.keyvalue.renderers.CollectionRenderer;
+import org.freezedry.persistence.keyvalue.renderers.FlatteningCollectionRenderer;
 import org.freezedry.persistence.keyvalue.renderers.LeafNodeRenderer;
 import org.freezedry.persistence.keyvalue.renderers.MapRenderer;
 import org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer;
@@ -91,7 +92,8 @@ public abstract class AbstractKeyValueBuilder implements KeyValueBuilder {
 	private Map< Class< ? >, PersistenceRenderer > createDefaultRenderers()
 	{
 		final Map< Class< ? >, PersistenceRenderer > renderers = new HashMap<>();
-		renderers.put( Collection.class, new CollectionRenderer( this ) );
+//		renderers.put( Collection.class, new CollectionRenderer( this ) );
+		renderers.put( Collection.class, new FlatteningCollectionRenderer( this ) );
 		renderers.put( Map.class, new MapRenderer( this ) );
 
 		renderers.put( String.class, new LeafNodeRenderer( this ) );

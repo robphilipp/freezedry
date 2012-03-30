@@ -50,8 +50,8 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 	
 	private static final Logger LOGGER = Logger.getLogger( CollectionRenderer.class );
 
-	private static String OPEN = "[";
-	private static String CLOSE = "]";
+	protected static final String OPEN = "[";
+	protected static final String CLOSE = "]";
 	
 	private final StringDecorator indexDecorator;
 	private final String decorationRegex;
@@ -110,7 +110,7 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 	
 	/**
 	 * Copy constructor
-	 * @param renderer The {@link PersistenceRenderer} to copy
+	 * @param renderer The {@link CollectionRenderer} to copy
 	 */
 	public CollectionRenderer( final CollectionRenderer renderer )
 	{
@@ -195,13 +195,13 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 			if( node.isLeafNode() )
 			{
 				// create the key-value pair and return it
-				final String newKey = createLeafNodeKey( key, infoNode, index );
+				final String newKey = createNodeKey( key, infoNode, index );
 				getPersistenceBuilder().createKeyValuePairs( node, newKey, keyValues, true );
 			}
 			else
 			{
 				// create the key-value pair and return it
-				final String newKey = createLeafNodeKey( key, infoNode, index );
+				final String newKey = createNodeKey( key, infoNode, index );
 				boolean hidePersistName = false;
 				
 				// next we need to check whether the group name for the key is empty. for example,
@@ -228,7 +228,7 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 		}
 	}
 
-	/*
+	/**
 	 * Returns true if we have specified that when the collection element is a compound
 	 * element of the certain types, then we zero out the node's persistence name. For example,
 	 * when we have a {@code List< Map< String, String > >} called {@code listOfMaps}, then for each
@@ -238,7 +238,7 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 	 * @param node The node containing the compound collection element
 	 * @return true if the persistence name of the node should be zeroed out. 
 	 */
-	private boolean isZeroOutPersistName( final InfoNode node )
+	protected boolean isZeroOutPersistName( final InfoNode node )
 	{
 		boolean isZeroOut = false;
 		
@@ -270,22 +270,8 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 	}
 
 	/**
-	 * Creates a key for a leaf node collection. For example, if the persist name for a {@link List} is
-	 * people, which is a <code>{@link List}< {@link String} ></code>, then the key will be {@code people[i]}
-	 * where the {@code i} is the index of the list.
-	 * @param key The current key to which to append the persisted name and decorated index
-	 * @param parentNode The parent node, which holds the name of the field
-	 * @param index The index of the element in the {@link List}
-	 * @return The key
-	 */
-	private String createLeafNodeKey( final String key, final InfoNode parentNode, final int index )
-	{
-		return createNodeKey( key, parentNode, null, index );
-	}
-
-	/*
-	 * Creates a key for a compound node collection. For example, if the persist name for a {@link List} is
-	 * people, which is a <code>{@link List}< {@link Person} ></code>, then the key will be {@code people[i].Person}
+	 * Creates a key for a node collection. For example, if the persist name for a {@link List} is
+	 * {@code people}, which is a <code>{@link List}< {@link Person} ></code>, then the key will be {@code people[i].Person}
 	 * where the {@code i} is the index of the list.
 	 * @param key The current key to which to append the persisted name and decorated index
 	 * @param parentNode The parent node, which holds the name of the field (in this example, "{@code people}")
@@ -293,7 +279,7 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 	 * @param index The index of the element in the {@link List}
 	 * @return The key
 	 */
-	private String createNodeKey( final String key, final InfoNode parentNode, final InfoNode node, final int index )
+	protected final String createNodeKey( final String key, final InfoNode parentNode, final int index )
 	{
 		// grab the key-element separator
 		final String separator = getPersistenceBuilder().getSeparator();
@@ -307,16 +293,7 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 		
 		// decorate the index. for example prepend a "[" and append a "]"
 		newKey += indexDecorator.decorate( index );
-		
-		// if the current node isn't null, and the parent has a persistence name, then add the 
-		// current nodes persistence name. For example, if you have a list of compound objects,
-		// such as 
-		//    List< Person > people;
-		// then this part of the key would look like people[0].Person. etc...
-		if( node != null && parentNode.getPersistName() != null && !parentNode.getPersistName().isEmpty() )
-		{
-			newKey += separator + node.getPersistName();
-		}
+
 		return newKey;
 	}
 	
@@ -498,6 +475,24 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 			group = key.substring( 0, matcher.start() );
 		}
 		return group;
+	}
+	
+	/**
+	 * @return The regular expression string that is used to determine whether an index
+	 * is decorated by this renderer
+	 */
+	protected final String getDecorationRegex()
+	{
+		return decorationRegex;
+	}
+
+	/**
+	 * @return The regular expression string that is used to validate that the a string
+	 * conforms to the this renderer.
+	 */
+	protected final String getValidationRegex()
+	{
+		return validationRegex;
 	}
 
 	/*
