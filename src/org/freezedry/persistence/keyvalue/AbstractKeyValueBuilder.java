@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.freezedry.persistence.keyvalue.renderers.CollectionRenderer;
-import org.freezedry.persistence.keyvalue.renderers.FlatteningCollectionRenderer;
 import org.freezedry.persistence.keyvalue.renderers.LeafNodeRenderer;
 import org.freezedry.persistence.keyvalue.renderers.MapRenderer;
 import org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer;
@@ -153,16 +152,51 @@ public abstract class AbstractKeyValueBuilder implements KeyValueBuilder {
 		return isShowFullKey;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.keyvalue.KeyValueBuilder#setRenderers(java.util.Map)
+	 */
+	@Override
 	public void setRenderers( final Map< Class< ? >, PersistenceRenderer > renderers )
 	{
 		this.renderers = renderers;
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.keyvalue.KeyValueBuilder#putRenderer(java.lang.Class, org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer)
+	 */
+	@Override
+	public PersistenceRenderer putRenderer( final Class< ? > clazz, final PersistenceRenderer renderer )
+	{
+		return renderers.put( clazz, renderer );
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.keyvalue.KeyValueBuilder#removeRenderer(java.lang.Class)
+	 */
+	@Override
+	public PersistenceRenderer removeRenderer( final Class< ? > clazz )
+	{
+		return renderers.remove( clazz );
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.keyvalue.KeyValueBuilder#setArrayRenderer(org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer)
+	 */
+	@Override
 	public void setArrayRenderer( final PersistenceRenderer renderer )
 	{
 		this.arrayRenderer = renderer;
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.keyvalue.KeyValueBuilder#getArrayRenderer()
+	 */
+	@Override
 	public PersistenceRenderer getArrayRenderer()
 	{
 		return arrayRenderer;

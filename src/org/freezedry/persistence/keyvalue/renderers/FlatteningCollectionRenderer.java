@@ -399,13 +399,43 @@ public class FlatteningCollectionRenderer extends CollectionRenderer {
 		final Matcher matcher = decorationPattern.matcher( key );
 		if( matcher.find() )
 		{
-			group = key.substring( 0, matcher.start() );
+			group = getGroup( key.substring( 0, matcher.start() ) );
 		}
 		else
 		{
 			group = super.getGroupName( key );
 		}
 		return group;
+	}
+
+	/*
+	 * Recursive method that further deconstructs to get the raw group name. For example,
+	 * suppose that the collection is matrix[0][], matrix[1][], etc. Then we want to the
+	 * group name to be "matrix", and not have a separate group name for "matrix[0]", 
+	 * "matrix[1]", etc.
+	 * @param key The key from which to pull the groupName
+	 * @return The raw group name
+	 */
+	private String getGroup( final String key )
+	{
+		String groupName = key;
+		String tempName = null;
+		do
+		{
+			// grab the group name from the CollectionRenderer (the parent class)
+			tempName = super.getGroupName( groupName );
+			
+			// if the returned group name is null, or equals the previous call, then we're done
+			// otherwise, set the group name to the new value, and recurse through the collection
+			if( tempName != null && !tempName.equals( groupName ) )
+			{
+				groupName = tempName;
+				tempName = getGroup( groupName );
+			}
+		}
+		while( tempName != null && !tempName.equals( groupName ) );
+		
+		return groupName;
 	}
 	
 	/*

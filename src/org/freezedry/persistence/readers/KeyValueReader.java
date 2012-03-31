@@ -24,6 +24,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -35,6 +36,7 @@ import org.freezedry.persistence.containers.Pair;
 import org.freezedry.persistence.keyvalue.AbstractKeyValueBuilder;
 import org.freezedry.persistence.keyvalue.BasicKeyValueBuilder;
 import org.freezedry.persistence.keyvalue.KeyValueBuilder;
+import org.freezedry.persistence.keyvalue.renderers.FlatteningCollectionRenderer;
 import org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer;
 import org.freezedry.persistence.tests.Division;
 import org.freezedry.persistence.tree.InfoNode;
@@ -126,6 +128,16 @@ public class KeyValueReader implements PersistenceReader {
 		return builder.getSeparator();
 	}
 	
+	/**
+	 * @return the {@link KeyValueBuilder} responsible for creating the key-value pairs 
+	 * from the semantic model, and that is responsible for parsing the key-value pairs into 
+	 * a semantic model.
+	 */
+	public KeyValueBuilder getBuilder()
+	{
+		return builder;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.freezedry.persistence.readers.PersistenceReader#read(java.lang.Class, java.io.Reader)
@@ -205,6 +217,8 @@ public class KeyValueReader implements PersistenceReader {
 		final KeyValueReader reader = new KeyValueReader();
 		reader.setKeyElementSeparator( "." );
 //		reader.setRemoveEmptyTextNodes( false );
+		final KeyValueBuilder builder = reader.getBuilder();
+		builder.putRenderer( Collection.class, new FlatteningCollectionRenderer( builder ) );
 		final InputStream inputStream = new BufferedInputStream( new FileInputStream( "person.txt" ) );
 		final Reader input = new InputStreamReader( inputStream );
 		final InfoNode infoNode = reader.read( Division.class, input );

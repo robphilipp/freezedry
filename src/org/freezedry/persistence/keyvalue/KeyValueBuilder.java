@@ -16,6 +16,7 @@
 package org.freezedry.persistence.keyvalue;
 
 import java.util.List;
+import java.util.Map;
 
 import org.freezedry.persistence.containers.Pair;
 import org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer;
@@ -29,6 +30,42 @@ import org.freezedry.persistence.tree.InfoNode;
  * @author Robert Philipp
  */
 public interface KeyValueBuilder {
+
+	/**
+	 * Sets the mapping of {@link Class}es to their {@link PersistenceRenderer}s.
+	 * @param renderers The mapping of {@link Class}es to their {@link PersistenceRenderer}s.
+	 */
+	void setRenderers( final Map< Class< ? >, PersistenceRenderer > renderers );
+	
+	/**
+	 * Puts an association between a {@link Class} and a {@link PersistenceRenderer} into the mapping.
+	 * This call replaces existing associations, in that case, returning the previous {@link PersistenceRenderer}.
+	 * @param clazz The {@link Class} with which to associate the {@link PersistenceRenderer}
+	 * @param renderer The {@link PersistenceRenderer} to be associated with the specified {@link Class}
+	 * @return the {@link PersistenceRenderer} that was previously associated with the specified {@link Class}
+	 * or null if no association existed.
+	 */
+	PersistenceRenderer putRenderer( final Class< ? > clazz, final PersistenceRenderer renderer );
+	
+	/**
+	 * Removes the {@link Class} from any association with the {@link PersistenceRenderer}. Use this method if you
+	 * think that the specified {@link Class} is above any such undesirable associations.
+	 * @param clazz The {@link Class} to remove
+	 * @return the {@link PersistenceRenderer} that was associated with the specified {@link Class} so that it
+	 * can be dealt with properly, or null if no such association existed, and this was a false accusation.
+	 */
+	PersistenceRenderer removeRenderer( final Class< ? > clazz );
+	
+	/**
+	 * Sets the {@link PersistenceRenderer} to be used for renderering and parsing arrays
+	 * @param renderer The {@link PersistenceRenderer} to be used for renderering and parsing arrays
+	 */
+	void setArrayRenderer( final PersistenceRenderer renderer );
+	
+	/**
+	 * @return the {@link PersistenceRenderer} to be used for renderering and parsing arrays
+	 */
+	PersistenceRenderer getArrayRenderer();
 
 	/**
 	 * The entry point for building the {@link List} of key-value pairs from the semantic model,

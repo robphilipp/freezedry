@@ -22,6 +22,7 @@ import java.io.Writer;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -36,6 +37,7 @@ import org.freezedry.persistence.containers.Pair;
 import org.freezedry.persistence.keyvalue.AbstractKeyValueBuilder;
 import org.freezedry.persistence.keyvalue.BasicKeyValueBuilder;
 import org.freezedry.persistence.keyvalue.KeyValueBuilder;
+import org.freezedry.persistence.keyvalue.renderers.FlatteningCollectionRenderer;
 import org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer;
 import org.freezedry.persistence.tests.Division;
 import org.freezedry.persistence.tests.Person;
@@ -117,6 +119,28 @@ public class KeyValueWriter implements PersistenceWriter {
 	public void setKeyElementSeparator( final String separator )
 	{
 		builder.setSeparator( separator );
+	}
+	
+	/**
+	 * Sets the builder responsible for creating the key-value pairs from the semantic model,
+	 * and that is responsible for parsing the key-value pairs into a semantic model.
+	 * @param builder the {@link KeyValueBuilder} responsible for creating the key-value pairs 
+	 * from the semantic model, and that is responsible for parsing the key-value pairs into 
+	 * a semantic model.
+	 */
+	public void setBuilder( final KeyValueBuilder builder )
+	{
+		this.builder = builder;
+	}
+	
+	/**
+	 * @return the {@link KeyValueBuilder} responsible for creating the key-value pairs 
+	 * from the semantic model, and that is responsible for parsing the key-value pairs into 
+	 * a semantic model.
+	 */
+	public KeyValueBuilder getBuilder()
+	{
+		return builder;
 	}
 	
 	/**
@@ -291,6 +315,8 @@ public class KeyValueWriter implements PersistenceWriter {
 		{
 			final KeyValueWriter writer = new KeyValueWriter();
 //			writer.setShowFullKey( true );
+			final KeyValueBuilder builder = writer.getBuilder();
+			builder.putRenderer( Collection.class, new FlatteningCollectionRenderer( builder ) );
 			writer.setKeyElementSeparator( "." );
 			writer.write( rootNode, printWriter );
 		}
