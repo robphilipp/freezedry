@@ -53,16 +53,8 @@ public class XmlWriter implements PersistenceWriter {
 	
 	public static final String TYPE_ATTRIBUTE = "type";
 	
-	private boolean isDisplayTypeInfo;
-	
-	/**
-	 * Default constructor that defaults to writing type information as attributes into the XML
-	 */
-	public XmlWriter()
-	{
-		isDisplayTypeInfo = true;
-	}
-	
+	private boolean isDisplayTypeInfo = false;
+		
 	/**
 	 * @return true if type information is written to the XML file
 	 */

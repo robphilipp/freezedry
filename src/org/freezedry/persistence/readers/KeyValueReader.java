@@ -95,6 +95,28 @@ public class KeyValueReader implements PersistenceReader {
 	}
 	
 	/**
+	 * @return the {@link KeyValueBuilder} responsible for creating the key-value pairs 
+	 * from the semantic model, and that is responsible for parsing the key-value pairs into 
+	 * a semantic model.
+	 */
+	public KeyValueBuilder getBuilder()
+	{
+		return builder;
+	}
+
+	/**
+	 * Sets the builder responsible for creating the key-value pairs from the semantic model,
+	 * and that is responsible for parsing the key-value pairs into a semantic model.
+	 * @param builder the {@link KeyValueBuilder} responsible for creating the key-value pairs 
+	 * from the semantic model, and that is responsible for parsing the key-value pairs into 
+	 * a semantic model.
+	 */
+	public void setBuilder( final KeyValueBuilder builder )
+	{
+		this.builder = builder;
+	}
+
+	/**
 	 * @param separator The separator between the key and the value. The default value is given by the
 	 * {@link KeyValueWriter#KEY_VALUE_SEPARATOR}.
 	 */
@@ -126,16 +148,6 @@ public class KeyValueReader implements PersistenceReader {
 	public String getKeyElementSeparator()
 	{
 		return builder.getSeparator();
-	}
-	
-	/**
-	 * @return the {@link KeyValueBuilder} responsible for creating the key-value pairs 
-	 * from the semantic model, and that is responsible for parsing the key-value pairs into 
-	 * a semantic model.
-	 */
-	public KeyValueBuilder getBuilder()
-	{
-		return builder;
 	}
 	
 	/*
