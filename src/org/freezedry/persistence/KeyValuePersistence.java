@@ -28,8 +28,8 @@ public class KeyValuePersistence extends AbstractFileBasedPersistence {
 	 */
 	public void setKeyValueBuilder( final KeyValueBuilder builder )
 	{
-		getImplementationSpecificWriter().setBuilder( builder );
-		getImplementationSpecificReader().setBuilder( builder );
+		getPersistenceWriter().setBuilder( builder );
+		getPersistenceReader().setBuilder( builder );
 	}
 	
 	/**
@@ -38,7 +38,7 @@ public class KeyValuePersistence extends AbstractFileBasedPersistence {
 	 */
 	public KeyValueBuilder getKeyValueBuilder()
 	{
-		return getImplementationSpecificWriter().getBuilder();
+		return getPersistenceWriter().getBuilder();
 	}
 	
 	/**
@@ -48,8 +48,8 @@ public class KeyValuePersistence extends AbstractFileBasedPersistence {
 	 */
 	public void setKeySeparator( final String separator )
 	{
-		getImplementationSpecificWriter().setKeyElementSeparator( separator );
-		getImplementationSpecificReader().setKeyElementSeparator( separator );
+		getPersistenceWriter().setKeyElementSeparator( separator );
+		getPersistenceReader().setKeyElementSeparator( separator );
 	}
 	
 	/**
@@ -57,7 +57,7 @@ public class KeyValuePersistence extends AbstractFileBasedPersistence {
 	 */
 	public String getKeySeparator()
 	{
-		return getImplementationSpecificWriter().getKeyElementSeparator();
+		return getPersistenceWriter().getKeyElementSeparator();
 	}
 	
 	/**
@@ -67,8 +67,8 @@ public class KeyValuePersistence extends AbstractFileBasedPersistence {
 	 */
 	public void setKeyValueSeparator( final String separator )
 	{
-		getImplementationSpecificWriter().setKeyValueSeparator( separator );
-		getImplementationSpecificReader().setKeyValueSeparator( separator );
+		getPersistenceWriter().setKeyValueSeparator( separator );
+		getPersistenceReader().setKeyValueSeparator( separator );
 	}
 	
 	/**
@@ -76,7 +76,7 @@ public class KeyValuePersistence extends AbstractFileBasedPersistence {
 	 */
 	public String getKeyValueSeparator()
 	{
-		return getImplementationSpecificWriter().getKeyValueSeparator();
+		return getPersistenceWriter().getKeyValueSeparator();
 	}
 	
 	/*
@@ -84,7 +84,7 @@ public class KeyValuePersistence extends AbstractFileBasedPersistence {
 	 * @see org.freezedry.persistence.AbstractPersistence#getImplementationSpecificWriter()
 	 */
 	@Override
-	protected KeyValueWriter getImplementationSpecificWriter()
+	protected KeyValueWriter getPersistenceWriter()
 	{
 		if( keyValueWriter == null )
 		{
@@ -98,7 +98,7 @@ public class KeyValuePersistence extends AbstractFileBasedPersistence {
 	 * @see org.freezedry.persistence.AbstractPersistence#getImplementationSpecificReader()
 	 */
 	@Override
-	protected KeyValueReader getImplementationSpecificReader()
+	protected KeyValueReader getPersistenceReader()
 	{
 		if( keyValueReader == null )
 		{

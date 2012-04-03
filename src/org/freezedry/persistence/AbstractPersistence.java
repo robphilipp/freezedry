@@ -32,8 +32,8 @@ import org.freezedry.persistence.writers.XmlWriter;
  * 
  * Implementing subclasses must implement two methods:
  * <ul>
- * 	<ol>{@link #getImplementationSpecificReader()}</ol>
- * 	<ol>{@link #getImplementationSpecificWriter()}</ol>
+ * 	<ol>{@link #getPersistenceReader()}</ol>
+ * 	<ol>{@link #getPersistenceWriter()}</ol>
  * </ul>
  * For example, the {@link XmlPersistence} class will return {@link XmlReader} and {@link XmlWriter}
  * objects, respectively. And the {@link JsonPersistence} class will return {@link JsonReader} and {@link JsonWriter}
@@ -80,14 +80,14 @@ public abstract class AbstractPersistence implements Persistence {
 		}
 
 		// write out XML
-		getImplementationSpecificWriter().write( rootNode, writer );
+		getPersistenceWriter().write( rootNode, writer );
 	}
 	
 	/**
 	 * @return the {@link PersistenceWriter} specific to the subclass implementation of the 
 	 * {@link Persistence} interface
 	 */
-	abstract protected PersistenceWriter getImplementationSpecificWriter();
+	abstract protected PersistenceWriter getPersistenceWriter();
 
 	/*
 	 * (non-Javadoc)
@@ -96,7 +96,7 @@ public abstract class AbstractPersistence implements Persistence {
 	@Override
 	public Object read( final Class< ? > clazz, final Reader reader )
 	{
-		final InfoNode rootNode = getImplementationSpecificReader().read( clazz, reader );
+		final InfoNode rootNode = getPersistenceReader().read( clazz, reader );
 		if( LOGGER.isInfoEnabled() )
 		{
 			LOGGER.info( rootNode.simpleTreeToString() );
@@ -109,5 +109,5 @@ public abstract class AbstractPersistence implements Persistence {
 	 * @return the {@link PersistenceReader} specific to the subclass implementation of the 
 	 * {@link Persistence} interface
 	 */
-	abstract protected PersistenceReader getImplementationSpecificReader();
+	abstract protected PersistenceReader getPersistenceReader();
 }

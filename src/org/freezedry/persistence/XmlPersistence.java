@@ -66,7 +66,7 @@ public class XmlPersistence extends AbstractFileBasedPersistence {
 	public void setDisplayTypeInfo( final boolean isDisplay )
 	{
 		this.isDisplayTypeInfo = isDisplay;
-		getImplementationSpecificWriter().setDisplayTypeInfo( isDisplay );
+		getPersistenceWriter().setDisplayTypeInfo( isDisplay );
 	}
 	
 	/**
@@ -81,7 +81,7 @@ public class XmlPersistence extends AbstractFileBasedPersistence {
 	 * Creates the {@link XmlWriter} if it hasn't yet been instantiated, and returns it
 	 * @return the {@link XmlWriter}
 	 */
-	protected XmlWriter getImplementationSpecificWriter()
+	protected XmlWriter getPersistenceWriter()
 	{
 		if( xmlWriter == null )
 		{
@@ -95,7 +95,7 @@ public class XmlPersistence extends AbstractFileBasedPersistence {
 	 * Creates the {@link XmlReader} if it hasn't yet been instantiated, and returns it
 	 * @return the {@link XmlReader}
 	 */
-	protected XmlReader getImplementationSpecificReader()
+	protected XmlReader getPersistenceReader()
 	{
 		if( xmlReader == null )
 		{
