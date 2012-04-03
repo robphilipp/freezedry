@@ -122,6 +122,34 @@ public class KeyValueWriter implements PersistenceWriter {
 	}
 	
 	/**
+	 * @return The separator between the flattened key elements. For example, suppose that a {@code Division} has a {@link List}
+	 * of {@code Person} objects, called {@code people}. The the key for a person's first name may be of the form:
+	 * {@code Division.people.Person[2].firstName}, or {@code Division:people:Person[2]:firstName}. The "{@code .}" and
+	 * the "{@code :}" are separators.
+	 */
+	public String getKeyElementSeparator()
+	{
+		return builder.getSeparator();
+	}
+
+	/**
+	 * @param separator The separator between the key and the value. The default value is given by the
+	 * {@link #KEY_VALUE_SEPARATOR} which has a value of {@value #KEY_VALUE_SEPARATOR}.
+	 */
+	public void setKeyValueSeparator( final String separator )
+	{
+		this.keyValueSeparator = separator;
+	}
+
+	/**
+	 * @return The separator between the key and the value.
+	 */
+	public String getKeyValueSeparator()
+	{
+		return keyValueSeparator;
+	}
+
+	/**
 	 * Sets the builder responsible for creating the key-value pairs from the semantic model,
 	 * and that is responsible for parsing the key-value pairs into a semantic model.
 	 * @param builder the {@link KeyValueBuilder} responsible for creating the key-value pairs 
@@ -141,34 +169,6 @@ public class KeyValueWriter implements PersistenceWriter {
 	public KeyValueBuilder getBuilder()
 	{
 		return builder;
-	}
-	
-	/**
-	 * @return The separator between the flattened key elements. For example, suppose that a {@code Division} has a {@link List}
-	 * of {@code Person} objects, called {@code people}. The the key for a person's first name may be of the form:
-	 * {@code Division.people.Person[2].firstName}, or {@code Division:people:Person[2]:firstName}. The "{@code .}" and
-	 * the "{@code :}" are separators.
-	 */
-	public String getKeyElementSeparator()
-	{
-		return builder.getSeparator();
-	}
-	
-	/**
-	 * @param separator The separator between the key and the value. The default value is given by the
-	 * {@link #KEY_VALUE_SEPARATOR} which has a value of {@value #KEY_VALUE_SEPARATOR}.
-	 */
-	public void setKeyValueSeparator( final String separator )
-	{
-		this.keyValueSeparator = separator;
-	}
-	
-	/**
-	 * @return The separator between the key and the value.
-	 */
-	public String getKeyValueSeparator()
-	{
-		return keyValueSeparator;
 	}
 	
 	/**
