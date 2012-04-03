@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<project name="FreezeDry" default="make_combined_jar" basedir=".">
+<project name="FreezeDry" default="make_release" basedir=".">
 
 	<!-- =====================================================================
 							   S E T T I N G S
@@ -7,7 +7,7 @@
 	<!-- 
 		version information 
 	-->
-	<property name="version" value="0.1.0" />
+	<property name="version" value="0.2.0" />
 
 	<!-- 
 		set global properties for this build
@@ -15,6 +15,7 @@
 	<property name="src" location="src" />
 	<property name="build" location="bin" />
 	<property name="dist" location="dist" />
+	<property name="release" location="FreezeDry_v${version}" />
 	<property name="libs" value="lib" />
 	<property name="docs" value="docs" />
 
@@ -112,15 +113,16 @@
 		
 		builds a jar that contains only the FreezeDry classes 
 	-->
+	<property name="jars" value="jars" />
+	<property name="jar_file" value="${app_name}_${version}.jar" />
 	<target name="make_jar" depends="clean_dist, init, configure_logging" description="build the jar file containing only FreezeDry classes">
 		<echo>***** Building single jar file for ${app_name} *****</echo>
 		<echo>Base Directory: ${basedir}</echo>
 		<echo>Directory containing classes: ${build}</echo>
-		<echo>Directory to contain jar: ${dist}</echo>
+		<echo>Directory to contain jar: ${dist}/${jars}</echo>
 		<echo>Directory contianing external libraries: ${env.JAVA_LIBS}</echo>
 
-		<property name="jar_file" value="FreezeDry_${version}.jar" />
-		<jar destfile="${dist}/${jar_file}">
+		<jar destfile="${dist}/${jars}/${jar_file}">
 			<fileset dir="${build}" includes="**/*.class" />
 			<fileset dir="${build}" includes="${log4j_config}" />			
 
@@ -128,7 +130,7 @@
 				<attribute name="Ant" value="${user.name}" />
 				<!-- Information about the program itself -->
 				<attribute name="Implementation-Vendor" value="Rob Philipp" />
-				<attribute name="Implementation-Title" value="FreezeDry" />
+				<attribute name="Implementation-Title" value="${app_name}" />
 				<attribute name="Implementation-Version" value="${version}" />
 				<!-- Runtime information -->
 				<attribute name="Main-Class" value="org/freezedry/persistence/PersistenceEngine" />
@@ -143,15 +145,15 @@
 		
 		builds a single jar that contains all the dependent jar files 
 	-->
+	<property name="single_jar" value="single_jar" />
 	<target name="make_combined_jar" depends="clean_dist, init, configure_logging" description="build a jar file that contains all the dependent code">
 		<echo>***** Building single jar file for ${app_name} *****</echo>
 		<echo>Base Directory: ${basedir}</echo>
 		<echo>Directory containing classes: ${build}</echo>
-		<echo>Directory to contain jar: ${dist}</echo>
+		<echo>Directory to contain jar: ${dist}/${single_jar}</echo>
 		<echo>Directory contianing external libraries: ${env.JAVA_LIBS}</echo>
 
-		<property name="jar_file" value="FreezeDry_${version}.jar" />
-		<jar destfile="${dist}/${jar_file}">
+		<jar destfile="${dist}/${single_jar}/${jar_file}">
 			<fileset dir="${build}" includes="**/*.class" />
 			<fileset dir="${build}" includes="${log4j_config}" />			
 			<zipfileset src="${java-libs}/${log4j}" excludes="META-INF/*" />
@@ -162,13 +164,56 @@
 				<attribute name="Ant" value="${user.name}" />
 				<!-- Information about the program itself -->
 				<attribute name="Implementation-Vendor" value="Rob Philipp" />
-				<attribute name="Implementation-Title" value="FreezeDry" />
+				<attribute name="Implementation-Title" value="${app_name}" />
 				<attribute name="Implementation-Version" value="${version}" />
 				<!-- Runtime information -->
 				<attribute name="Main-Class" value="org/freezedry/persistence/PersistenceEngine" />
 				<attribute name="Class-Path" value="${internal_class_path}" />
 			</manifest>
 		</jar>
-
+	</target>
+	
+	<!-- 
+		Target: make_release
+		
+		creates the directory with the release code and zip files. calls the dependencies for make the freeze dry jars 
+	-->
+	<property name="release" location="${dist}/${app_name}_v${version}" />
+	<target name="make_release" depends="make_jar, make_combined_jar" description="builds the single and freeze-dry jars and creates the release structure">
+		
+		<property name="rel_src" value="src" />
+	
+		<!-- remove the release directory (FreezeDry_vX.X.X) if it already exists -->
+		<delete dir="${release}" failonerror="false"/>
+		
+		<!-- create the release directory and its subdirectorys: src, single_jar, jars -->
+		<mkdir dir="${release}" />
+		<mkdir dir="${release}/${single_jar}" />
+		<mkdir dir="${release}/${jars}" />
+		<mkdir dir="${release}/${rel_src}" />
+		
+		<!-- copy the log4j configuration files into the appropriate directories -->
+		<copy file="log4j.xml" todir="${release}/${single_jar}" />
+		<copy file="log4j.xml" todir="${release}/${jars}" />
+		<copy file="log4j.xml" todir="${release}/${rel_src}" />
+		
+		<!-- copy the this build file to the release src directory -->
+		<copy file="build.xml" todir="${release}/${rel_src}" />
+		
+		<!-- copy the single jar to the single jar release directory -->
+		<copy file="${dist}/${single_jar}/${jar_file}" todir="${release}/${single_jar}" />
+		<zip destfile="${release}/${single_jar}/${app_name}_${version}.zip" basedir="${release}/${single_jar}" includes="*.*" />
+		
+		<!-- copy the multiple jars to the jars release directory -->
+		<copy file="${dist}/${jars}/${jar_file}" todir="${release}/${jars}" />
+		<copy file="${java-libs}/${junit}" todir="${release}/${jars}" />
+		<copy file="${java-libs}/${log4j}" todir="${release}/${jars}" />
+		<copy file="${java-libs}/${json-libs}/${json}" todir="${release}/${jars}" />
+		<zip destfile="${release}/${jars}/${app_name}_${version}.zip" basedir="${release}/${jars}" includes="*.*" />
+		
+		<!-- copy the soure files into the release source directory, and zip everything up -->
+		<copy todir="${release}/${rel_src}"><fileset dir="${src}" includes="**/*.java" /></copy>
+		<zip destfile="${release}/${rel_src}/${app_name}_src_${version}.zip" basedir="${release}/${rel_src}" includes="**/*.java, **/*.xml" />
+		
 	</target>
 </project>
