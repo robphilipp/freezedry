@@ -188,7 +188,7 @@ public class KeyValuePersistence extends AbstractFileBasedPersistence {
 			// -- OR --
 //			((DateNodeBuilder)engine.getNodeBuilder( Calendar.class )).setOutputDateFormat( "yyyy-MM-dd" );
 			
-			final Division redivision = (Division)persistence.read( Division.class, "person.txt" );
+			final Division redivision = persistence.read( Division.class, "person.txt" );
 			System.out.println( redivision.toString() );
 			
 		}

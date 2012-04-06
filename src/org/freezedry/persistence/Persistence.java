@@ -54,5 +54,5 @@ public interface Persistence {
 	 * @param reader The {@link Reader} from which to read the persisted form of the object
 	 * @return the reconstituted object
 	 */
-	Object read( final Class< ? > clazz, final Reader reader );
+	< T > T read( final Class< T > clazz, final Reader reader );
 }

@@ -94,7 +94,7 @@ public abstract class AbstractPersistence implements Persistence {
 	 * @see org.freezedry.persistence.Persistence#read(java.lang.Class, java.io.Reader)
 	 */
 	@Override
-	public Object read( final Class< ? > clazz, final Reader reader )
+	public < T > T read( final Class< T > clazz, final Reader reader )
 	{
 		final InfoNode rootNode = getPersistenceReader().read( clazz, reader );
 		if( LOGGER.isInfoEnabled() )
@@ -102,7 +102,7 @@ public abstract class AbstractPersistence implements Persistence {
 			LOGGER.info( rootNode.simpleTreeToString() );
 		}
 		
-		return getPersistenceEngine().parseSemanticModel( clazz, rootNode );
+		return clazz.cast( getPersistenceEngine().parseSemanticModel( clazz, rootNode ) );
 	}
 
 	/**

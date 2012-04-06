@@ -171,7 +171,7 @@ public class XmlPersistence extends AbstractFileBasedPersistence {
 			// -- OR --
 //			((DateNodeBuilder)engine.getNodeBuilder( Calendar.class )).setOutputDateFormat( "yyyy-MM-dd" );
 			
-			final Division redivision = (Division)persistence.read( Division.class, "person.xml" );
+			final Division redivision = persistence.read( Division.class, "person.xml" );
 			System.out.println( redivision.toString() );
 			
 		}
