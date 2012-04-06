@@ -21,6 +21,15 @@ a "log4j.xml" configuration file that may be used if you want to use logging.
    0.2.0 also has the directories for individual file downloads.
 
 -----------------------------------------------------------------------------------
+   Changes from version 0.2.0 to version 0.2.1
+-----------------------------------------------------------------------------------
+1. Fixed a small bug in the KeyValuePersistence class. The method to return the 
+   PersistenceBuider returned it from the Writer. By modifying the PersistenceRenderer
+   then, didn't modify it for the PersistenceReader. This was a disconnect. Renamed
+   the method, and now the user must explicitly set both (until I can find a better
+   solution).
+
+-----------------------------------------------------------------------------------
    Changes from version 0.1.0 to version 0.2.0
 -----------------------------------------------------------------------------------
 1. In preparation for DynamoDB persistence, added a key-value reader and writer and 
