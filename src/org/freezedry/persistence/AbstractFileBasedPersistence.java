@@ -72,7 +72,7 @@ public abstract class AbstractFileBasedPersistence extends AbstractPersistence {
 	 * @param fileName The name of the file holding the persisted object
 	 * @return The reconstitued object read from the file 
 	 */
-	public < T > T read( final Class< T > clazz, final String fileName )
+	public < T > T read( final Class< ? extends T > clazz, final String fileName )
 	{
 		Object object = null;
 		try( final InputStream inputStream = new BufferedInputStream( new FileInputStream( fileName ) ) )
