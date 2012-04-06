@@ -36,9 +36,18 @@ public class KeyValuePersistence extends AbstractFileBasedPersistence {
 	 * @return The {@link KeyValueBuilder} used by the writer and reader to create 
 	 * and parse the key-value pairs from the persistence source
 	 */
-	public KeyValueBuilder getKeyValueBuilder()
+	public KeyValueBuilder getKeyValueWriterBuilder()
 	{
 		return getPersistenceWriter().getBuilder();
+	}
+	
+	/**
+	 * @return The {@link KeyValueBuilder} used by the writer and reader to create 
+	 * and parse the key-value pairs from the persistence source
+	 */
+	public KeyValueBuilder getKeyValueReaderBuilder()
+	{
+		return getPersistenceReader().getBuilder();
 	}
 	
 	/**
@@ -165,7 +174,9 @@ public class KeyValuePersistence extends AbstractFileBasedPersistence {
 			
 			final KeyValuePersistence persistence = new KeyValuePersistence();
 			persistence.setKeySeparator( "." );
-//			final KeyValueBuilder builder = persistence.getKeyValueBuilder();
+//			KeyValueBuilder builder = persistence.getKeyValueWriterBuilder();
+//			builder.putRenderer( Collection.class, new FlatteningCollectionRenderer( builder ) );
+//			builder = persistence.getKeyValueReaderBuilder();
 //			builder.putRenderer( Collection.class, new FlatteningCollectionRenderer( builder ) );
 
 			persistence.write( division, "person.txt" );
