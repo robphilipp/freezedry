@@ -162,7 +162,7 @@ need to customize its behavior, or where <b>FreezeDry</b> gets stuck, it will ne
 figure out what you're trying to do, but it isn't perfect. It turns out to be easier to convert a Java object into a 
 persisted state, such as an XML or JSON file, than converting a persisted state into a Java object. Largely this is 
 do to the lossy nature of the persistence. For example, in JSON there isn't an elegant way to add type information to 
-the key. And in XML, you could add an attribute *type* to each element. But that isn't usually considered good form. 
+the key. And in XML, you could add an attribute <em>type</em> to each element. But that isn't usually considered good form. 
 And so in both of these cases, type information is likely lost. And mostly, it is when reconstituting complex objects 
 from persistence where <b>FreezeDry</b> may need help.</p>
 
@@ -194,7 +194,8 @@ manages the <b class="class">PersistenceEngine</b>, and then there is an <b clas
 	<tr><td><b class="class">AbstractFileBasedPersistence</b></td><td>Provides basic file-base read and write methods</td></tr>
 	<tr><td><b class="class">XmlPersistence</b></td><td>Writes Java objects to XML, and reads XML back into Java objects</td></tr>
 	<tr><td><b class="class">JsonPersistence</b></td><td>Writes Java objects to JSON, and reads JSON back into Java objects</td></tr>
-	<tr><td><b class="class">KeyValuePersistence</b></td><td>Writes Java objects to list of key-value pairs, and reads lists of key-value pairs back into Java objects</td></tr>
+	<tr><td><b class="class">KeyValuePersistence</b></td><td>Writes Java objects to list of key-value pairs, and reads lists of
+		key-value pairs back into Java objects</td></tr>
 </table>
 
 <p>Each <b class="class">Persistence</b> class provides access to the <b class="class">PersistenceEngine</b> 
@@ -227,162 +228,277 @@ typically be needed for dealing with that specified persistence form.</p>
 
 <h4 id="persistence_engine"><a href="#toc">The Persistence Engine</a></h4>
 
-When using the <b>FreezeDry</b> persistence framework, you'll mostly be dealing with three classes. The <b class="class">PersistenceEngine</b>, a <b class="class">Reader</b>, and a <b class="class">Writer</b>. The <b class="class">PersistenceEngine</b> is responsible for taking a Java object, and constructing the a tree-like representation of that object called the <b>Semantic Model</b>. It is also responsible for converting the tree-like <b>Semantic Model</b> back into a Java object.
+<p>When using the <b>FreezeDry</b> persistence framework, you'll mostly be dealing with three classes. 
+The <b class="class">PersistenceEngine</b>, a <b class="class">Reader</b>, and a <b class="class">Writer</b>. 
+The <b class="class">PersistenceEngine</b> is responsible for taking a Java object, and constructing the a 
+tree-like representation of that object called the <b>Semantic Model</b>. It is also responsible for converting
+the tree-like <b>Semantic Model</b> back into a Java object.</p>
 
-The <b class="class">PersistenceEngine</b> is responsible for taking objects and their fields into and out of a <b>Semantic Model</b>, but to do so it needs help. Really, the <b class="class">PersistenceEngine</b> doesn't, and shouldn't, know the details of how to convert a particular field into an <b class="class">InfoNode</b> (and back). Rather, it should just know that it can. And the reason it can, is because it manages a set of <b class="class">NodeBuilder</b> objects that do know the details. The <b class="class">PersistenceEngine</b> only knows how a field (based on its class) is mapped to a specified <b class="class">NodeBuilder</b>.
+<p>The <b class="class">PersistenceEngine</b> is responsible for taking objects and their fields into and out of
+a <b>Semantic Model</b>, but to do so it needs help. Really, the <b class="class">PersistenceEngine</b> doesn't,
+and shouldn't, know the details of how to convert a particular field into an <b class="class">InfoNode</b> (and back). 
+Rather, it should just know that it can. And the reason it can, is because it manages a set of <b class="class">NodeBuilder</b> 
+objects that do know the details. The <b class="class">PersistenceEngine</b> only knows how a field (based on its class) 
+is mapped to a specified <b class="class">NodeBuilder</b>.</p>
 
-<h5 id="object_to_semantic_model"><a href="#toc">Object --> Semantic Model</a></h5>
+<h5 id="object_to_semantic_model"><a href="#toc">Object to Semantic Model</a></h5>
 
-To create a semantic model from an object, you use the <b class="class">PersistenceEngine</b> method
+<p>To create a semantic model from an object, you use the <b class="class">PersistenceEngine</b> method:</p>
 
-    :::java
+<pre class="brush: java">
     final InfoNode createSemanticModel( final Object object )
+</pre>
 
-to which you pass the object you wish to persist. Upon such a call, the <b class="class">PersistenceEngine</b>
-will recurse through the object, and for each field construct an <b class="class">InfoNode</b> that holds information about that field. To create the <b class="class">InfoNode</b>, the <b class="class">PersistenceEngine</b> selects a <b class="class">NodeBuilder</b> based on the mapping between the *class* of the objects and their associated <b class="class">NodeBuilder</b>. For example, suppose that during processing, the <b class="class">PersistenceEngine</b> ran across a field was a **List< String >**. In the default case, the <b class="class">PersistenceEngine</b> would look up the <b class="class">List</b> in the mapping, and find that there is an entry for <b class="class">Collection</b>, and recognize that a <b class="class">List</b> is a <b class="class">Collection</b>, and return the <b class="class">CollectionNodeBuilder</b>. Then, when the <b class="class">PersistenceEngine</b> ran across the <b class="class">String</b> element, it would use a <b class="class">StringNodeBuilder</b>.
+<p>to which you pass the object you wish to persist. Upon such a call, the <b class="class">PersistenceEngine</b>
+will recurse through the object, and for each field construct an <b class="class">InfoNode</b> that holds 
+information about that field. To create the <b class="class">InfoNode</b>, the <b class="class">PersistenceEngine</b>
+selects a <b class="class">NodeBuilder</b> based on the mapping between the *class* of the objects and their 
+associated <b class="class">NodeBuilder</b>. For example, suppose that during processing, the 
+<b class="class">PersistenceEngine</b> ran across a field was a <b class="class">List&lt; String &gt;</b>. In the default case, the 
+<b class="class">PersistenceEngine</b> would look up the <b class="class">List</b> in the mapping, and find that 
+there is an entry for <b class="class">Collection</b>, and recognize that a <b class="class">List</b> is a 
+<b class="class">Collection</b>, and return the <b class="class">CollectionNodeBuilder</b>. Then, when the 
+<b class="class">PersistenceEngine</b> ran across the <b class="class">String</b> element, it would use a 
+<b class="class">StringNodeBuilder</b>.</p>
 
-To find out what class is mapped to what <b class="class">NodeBuilder</b> object, you can use the <b class="class">PersistenceEngine</b> method
+<p>To find out what class is mapped to what <b class="class">NodeBuilder</b> object, you can use the <b class="class">PersistenceEngine</b> method</p>
 
-    :::java
-    NodeBuilder getNodeBuilder( final Class< ? > clazz )
+<pre class="brush: java">
+    final NodeBuilder getNodeBuilder( final Class&lt; ? &gt; clazz )
+</pre>
 
-And to adjust the mapping you can use one of the following methods
+<p>And to adjust the mapping you can use one of the following methods</p>
   
-    :::java
-    NodeBuilder addNodeBuilder( final Class< ? > clazz, final NodeBuilder builder )
-    NodeBuilder removeNodeBuilder( final Class< ? > clazz )
+<pre class="brush: java">
+    NodeBuilder addNodeBuilder( final Class&lt; ? &gt; clazz, final NodeBuilder builder )
+    NodeBuilder removeNodeBuilder( final Class&lt; ? &gt; clazz )
+</pre>
 
-<h5 id="semantic_model_to_object"><a href="#toc">Semantic Model --> Object</a></h5>
+<h5 id="semantic_model_to_object"><a href="#toc">Semantic Model to Object</a></h5>
 
-To create an object from the semantic model, you use the <b class="class">PersistenceEngine</b> method
+<p>To create an object from the semantic model, you use the <b class="class">PersistenceEngine</b> method</p>
 
-    :::java
-    Object parseSemanticModel( final Class< ? > clazz, final InfoNode rootNode )
+<pre class="brush: java">
+    Object parseSemanticModel( final Class&lt; ? &gt; clazz, final InfoNode rootNode )
+</pre>
 
-Naturally, you may ask where the *rootNode* comes from. Good question. It comes from the <b class="class">Reader</b> method
+<p>Naturally, you may ask where the <em>rootNode</em> comes from. Good question. It comes from the <b class="class">Reader</b> method</p>
 
-    :::java
-    InfoNode read( final Class< ? > clazz, final InputStream input )
+<pre class="brush: java">
+    InfoNode read( final Class&lt; ? &gt; clazz, final InputStream input )
+</pre>
 
-but more on that later. The key point to remember is that the by handing the <b class="class">PersistenceEngine</b> a valid <b>Semantic Model</b> as represented by the root node of the <b class="class">InfoNode</b> tree, and you also give the <b class="class">PersistenceEngine</b> the *class* that the semantic model represents, you get back an object of that class type. Its as simple as that.
+<p>but more on that later. The key point to remember is that the by handing the <b class="class">PersistenceEngine</b> 
+a valid <b>Semantic Model</b> as represented by the root node of the <b class="class">InfoNode</b> tree, and 
+you also give the <b class="class">PersistenceEngine</b> the *class* that the semantic model represents, you 
+get back an object of that class type. Its as simple as that.</p>
 
 <h4 id="semantic_model"><a href="#toc">Semantic Model</a></h4>
 
-**FreezeDry's** semantic model is a tree structure that is built from <b class="class">InfoNode</b> objects. So if you love recursion, then you'll love the semantic model because it's all about recursion. Powerfully simple and stunningly complex. It just depends whether you're skimming the code or trying to debug it.
+<p><b>FreezeDry's</b> semantic model is a tree structure that is built from <b class="class">InfoNode</b> objects. 
+So if you love recursion, then you'll love the semantic model because it's all about recursion. Powerfully 
+simple and stunningly complex. It just depends whether you're skimming the code or trying to debug it.</p>
 
-The <b class="class">InfoNode</b> tree is a representation of the object with information about the object and all of its data, which may be other objects. When converting from an object to the semantic model, the <b class="class">InfoNode</b> object will by rich with information. The Java object has it all. However, when going from a persisted form to a semantic model to an object, the <b class="class">InfoNode</b> objects may only hold the persisted name of the field, and in some cases the value. In other words, in this case, the <b class="class">InfoNode</b> objects may hold only a sparse amount information.
+<p>The <b class="class">InfoNode</b> tree is a representation of the object with information about the object
+and all of its data, which may be other objects. When converting from an object to the semantic model, 
+the <b class="class">InfoNode</b> object will by rich with information. The Java object has it all. 
+However, when going from a persisted form to a semantic model to an object, the <b class="class">InfoNode</b> 
+objects may only hold the persisted name of the field, and in some cases the value. In other words, 
+in this case, the <b class="class">InfoNode</b> objects may hold only a sparse amount information.</p>
 
-Let's take a look at what information an <b class="class">InfoNode</b> holds, aside from knowing about its parent and its children.
+<p>Let's take a look at what information an <b class="class">InfoNode</b> holds, aside from knowing 
+about its parent and its children.</p>
 
-Field | Type  | Description
-------|-------|------------
-nodeType | NodeType | enum: node is a ROOT, COMPOUND, or LEAF
-fieldName | String | the name of the object's field this node represents
-value | Object | the value of the field (must be a leaf node)
-persistName | String | the persisted name of the field
-clazz | Class< ? > | the class type of the field
-genericParameterTypes | List< Type > | the generic type information of the field
+<table>
+	<tr><th>Field</th><th>Type</th><th>Description</th></tr>
+	<tr><td>nodeType</td><td><b class="class">NodeType</b></td><td>enum: node is a ROOT, COMPOUND, or LEAF</td></tr>
+	<tr><td>fieldName</td><td><b class="class">String</b></td><td>the name of the object's field this node represents</td></tr>
+	<tr><td>value</td><td><b class="class">Object</b></td><td>the value of the field (must be a leaf node)</td></tr>
+	<tr><td>persistName</td><td><b class="class">String</b></td><td>the persisted name of the field</td></tr>
+	<tr><td>clazz</td><td><b class="class">Class&lt; ? &gt;</b></td><td>the class type of the field</td></tr>
+	<tr><td>genericParameterTypes</td><td><b class="class">List&lt; Type &gt;</b></td><td>the generic type information of the field</td></tr>
+</table>
 
-As a note, when creating a semantic model from a persisted form, in many cases leaf nodes may only contain the *persistName* and the *value*. Furthermore, in many cases, the root node and compound nodes may only contain the *persistName*. The <b class="class">PersistenceEngine</b>, in conjuction with the *class*, using a set of default class types for instantiation, and/or field annotations, will figure out the types that it needs to instantiate.
+<p>As a note, when creating a semantic model from a persisted form, in many cases leaf nodes may only contain 
+the <em>persistName</em> and the <em>value</em>. Furthermore, in many cases, the root node and compound nodes 
+may only contain the <em>persistName</em>. The <b class="class">PersistenceEngine</b>, in conjunction with the 
+<em>class</em>, using a set of default class types for instantiation, and/or field annotations, will figure 
+out the types that it needs to instantiate.</p>
 
 <h4 id="node_builders"><a href="#toc">Node Builders</a></h4>
 
-<b class="class">NodeBuilders</b> are responsible for creating an <b class="class">InfoNode</b> from an object or field, and for creating an object or setting a field within an object when given an <b class="class">InfoNode</b>.
+<p><b class="class">NodeBuilders</b> are responsible for creating an <b class="class">InfoNode</b> from an object 
+or field, and for creating an object or setting a field within an object when given an <b class="class">InfoNode</b>.</p>
 
-Recall that the <b class="class">PersistenceEngine</b> creates the semantic model which is composed of <b class="class">InfoNode</b> objects arranged in a tree-like structure. It is the <b class="class">NodeBuilder</b> objects that are responsible for creating <b class="class">InfoNode</b>s from an object and its fields. The <b class="class">PersistenceEngine</b> holds a mapping between the class types and the <b class="class">NodeBuilder</b> to use for creating an <b class="class">InfoNode</b> for that class type.
+<p>Recall that the <b class="class">PersistenceEngine</b> creates the semantic model which is composed of 
+<b class="class">InfoNode</b> objects arranged in a tree-like structure. It is the <b class="class">NodeBuilder</b> 
+objects that are responsible for creating <b class="class">InfoNode</b>s from an object and its fields. The 
+<b class="class">PersistenceEngine</b> holds a mapping between the class types and the <b class="class">NodeBuilder</b> 
+to use for creating an <b class="class">InfoNode</b> for that class type.</p>
 
-Recall that the <b class="class">PersistenceEngine</b> is also responsible for creating an object from a semantic model. When creating an object from the semantic model, the <b class="class">PersistenceEngine</b> also uses the <b class="class">NodeBuilder</b> associated with the type represented by the <b class="class">InfoNode</b>, and in cases when the <b class="class">InfoNode</b> doesn't hold the type information, it finds it from the class itself.
+<p>Recall that the <b class="class">PersistenceEngine</b> is also responsible for creating an object from a 
+semantic model. When creating an object from the semantic model, the <b class="class">PersistenceEngine</b> 
+also uses the <b class="class">NodeBuilder</b> associated with the type represented by the <b class="class">InfoNode</b>, 
+and in cases when the <b class="class">InfoNode</b> doesn't hold the type information, it finds it from the class itself.</p>
 
 <h5 id="node_builder_class_interface"><a href="#toc">NodeBuilder Interface</a></h5>
 
-The <b class="class">NodeBuilder</b> interface has 
+<p>The <b class="class">NodeBuilder</b> interface has</p> 
 
-    :::java
-    InfoNode createInfoNode( Class< ? > containingClass, Object object, String fieldName )
-    Object createObject( final Class< ? > clazz, final InfoNode node )
+<pre class="brush: java">
+    InfoNode createInfoNode( Class&lt; ? &gt; containingClass, Object object, String fieldName )
+    Object createObject( final Class&lt; ? &gt; clazz, final InfoNode node )
     void setPersistenceEngine( final PersistenceEngine engine )
+</pre>
 
-The first two methods are the methods we just mentioned. The first one creates an <b class="class">InfoNode</b> from an object, providing the builder with information about the containing class and the name of the field the object represents within the containing class. The containing class information turns out to be important when dealing with structures such as
+<p>The first two methods are the methods we just mentioned. The first one creates an <b class="class">InfoNode</b> 
+from an object, providing the builder with information about the containing class and the name of the field the 
+object represents within the containing class. The containing class information turns out to be important when 
+dealing with structures such as</p>
     
-    :::java
-    Map< String, Map< String, List< Double > >
-    List< Person >
+<pre class="brush: java">
+    Map&lt; String, Map&lt; String, List&lt; Double &gt; &gt;
+    List&lt; Person &gt;
+</pre>
 
-The second method creates an object from an <b class="class">InfoNode</b> using the class type information specified in the method. In cases where the class type is also specified in the <b class="class">InfoNode</b> the default <b class="class">NodeBuilder</b> implementations will use the most specified of the two specified classes. For example, it would use <b class="class">ArrayList</b> if both <b class="class">ArrayList</b> and <b class="class">List</b> where specified.
+<p>The second method creates an object from an <b class="class">InfoNode</b> using the class type information 
+specified in the method. In cases where the class type is also specified in the <b class="class">InfoNode</b> 
+the default <b class="class">NodeBuilder</b> implementations will use the most specified of the two specified 
+classes. For example, it would use <b class="class">ArrayList</b> if both <b class="class">ArrayList</b> and 
+<b class="class">List</b> where specified.</p>
 
-The third method hands the <b class="class">NodeBuilder</b> a <b class="class">PersistenceEngine</b>. Although this may seem odd at first glance, recall that the construction of the semantic model from an object, and the construction of an object from the semantic model are done recursively. The <b class="class">NodeBuilder</b> and the <b class="class">PersistenceEngine</b> work hand in hand. The <b class="class">PersistenceEngine</b> calls upon the <b class="class">NodeBuilder</b> to create an <b class="class">InfoNode</b> or an object during its recursive descent down the object structure or the semantic model. And the <b class="class">NodeBuilder</b> calls back to the <b class="class">PersistenceEngine</b> to create <b class="class">InfoNode</b>s or objects for compound nodes. For example, suppose that during the persistence of an object, the <b class="class">PesistenceEngine</b> comes across a field that is a **List< Person >**. In this case, it will call the <b class="class">CollectionNodeBuilder</b> to create the an <b class="class">InfoNode</b> representing the <b class="class">List</b>. However, the <b class="class">CollectionNodeBuilder</b> needs to create sub-nodes for each <b class="class">Person</b> element in that list, which it doesn't know how to do. So it calls back to the <b class="class">PersistenceEngine</b> to create an <b class="class">InfoNode</b> for each <b class="class">Person</b> it comes across. And the <b class="class">PersistenceEngine</b> calls the appropriate <b class="class">NodeBuilder</b> to create the <b class="class">InfoNode</b> for <b class="class">Person</b> (or uses default behavior to create a compound <b class="class">InfoNode</b>).
+<p>The third method hands the <b class="class">NodeBuilder</b> a <b class="class">PersistenceEngine</b>. 
+Although this may seem odd at first glance, recall that the construction of the semantic model from an object, 
+and the construction of an object from the semantic model are done recursively. The <b class="class">NodeBuilder</b> 
+and the <b class="class">PersistenceEngine</b> work hand in hand. The <b class="class">PersistenceEngine</b> 
+calls upon the <b class="class">NodeBuilder</b> to create an <b class="class">InfoNode</b> or an object during 
+its recursive descent down the object structure or the semantic model. And the <b class="class">NodeBuilder</b> 
+calls back to the <b class="class">PersistenceEngine</b> to create <b class="class">InfoNode</b>s or objects for 
+compound nodes. For example, suppose that during the persistence of an object, the <b class="class">PesistenceEngine</b> 
+comes across a field that is a <b class="class">List&lt; Person &gt;</b>. In this case, it will call the 
+<b class="class">CollectionNodeBuilder</b> to create the an <b class="class">InfoNode</b> representing the 
+<b class="class">List</b>. However, the <b class="class">CollectionNodeBuilder</b> needs to create sub-nodes for 
+each <b class="class">Person</b> element in that list, which it doesn't know how to do. So it calls back to the 
+<b class="class">PersistenceEngine</b> to create an <b class="class">InfoNode</b> for each <b class="class">Person</b> 
+it comes across. And the <b class="class">PersistenceEngine</b> calls the appropriate <b class="class">NodeBuilder</b> 
+to create the <b class="class">InfoNode</b> for <b class="class">Person</b> (or uses default behavior to create a 
+compound <b class="class">InfoNode</b>).</p>
 
 <h5 id="node_builder_class_abstract"><a href="#toc">AbstractNodeBuilder</a></h5>
 
-The <b class="class">AbstractNodeBuilder</b> implements manages the reference to the <b class="class">PersistenceEngine</b> but also provides a mapping for instantiating objects for which the type is an interface or abstract. For example, suppose that your class looks like this
+<p>The <b class="class">AbstractNodeBuilder</b> implements manages the reference to the <b class="class">PersistenceEngine</b> but also provides a mapping for instantiating objects for which the type is an interface or abstract. For example, suppose that your class looks like this</p>
 
-    :::java
+<pre class="brush: java">
     public class Example {
-        private List< Double > numbers;
+        private List&lt; Double &gt; numbers;
         ...
     }
+</pre>
 
-When attempting to instantiate the field *numbers*, unless the <b class="class">InfoNode</b> has type information that specifies that *numbers* is an <b class="class">ArrayList</b>, the <b class="class">NodeBuilder</b> must rely on some default mechanism to determine what class type to instantiate. The <b class="class">AbstractNodeBuilder</b> provides four methods to deal with this
+<p>When attempting to instantiate the field *numbers*, unless the <b class="class">InfoNode</b> has type information that specifies that *numbers* is an <b class="class">ArrayList</b>, the <b class="class">NodeBuilder</b> must rely on some default mechanism to determine what class type to instantiate. The <b class="class">AbstractNodeBuilder</b> provides four methods to deal with this</p>
 
-    :::java
-    void addInterfaceToClassMapping( Class< ? > interfaceClass, Class< ? > concreteClass )
-    Map< String, String > getInterfaceToClassMapping()
-    Class< ? > getClassForInterface( final Class< ? > clazz )
-    boolean containsInterface( final Class< ? > clazz )
+<pre class="brush: java">
+    /**
+	 * Adds and interface to class mapping used when constructing a collection.
+	 * @param interfaceClass The interface
+	 * @param concreteClass The concrete Class to use to instantiate the specified interface
+	 */
+    void addInterfaceToClassMapping( Class&lt; ? &gt; interfaceClass, Class&lt; ? &gt; concreteClass )
+    
+    /**
+	 * @return The mapping between the interfaces and the concrete classes that will be used.
+	 */
+    Map&lt; String, String &gt; getInterfaceToClassMapping()
 
+    /**
+	 * Returns the concrete class for the specified interface. Or null if it doesn't exist
+	 * @param clazz The interface for which to return the concrete class
+	 * @return the concrete class for the specified interface. Or null if it doesn't exist
+	 */
+    Class&lt; ? &gt; getClassForInterface( final Class&lt; ? &gt; clazz )
+
+    /**
+	 * Returns true if the interface-to-class mapping contains the specified interface; 
+	 * false otherwise
+	 * @param clazz The interface to check
+	 * @return true if the interface-to-class mapping contains the specified interface;
+	 * false otherwise
+	 */
+    boolean containsInterface( final Class&lt; ? &gt; clazz )
+</pre>
 
 <h5 id="available_node_builders"><a href="#toc">Available NodeBuilders</a></h5>
 
-<b>FreezeDry</b> comes with a set of <b class="class">NodeBuilder</b> objects that deal with many of the basic types.
+<p><b>FreezeDry</b> comes with a set of <b class="class">NodeBuilder</b> objects that deal with many of the basic types.</p>
 
-* <b class="class">NodeBuilder</b> is the interface which all implementations must implement
-    * <b class="class">AbstractNodeBuilder</b> contains some basic node-building utilities (see above)
-        * <b class="class">AbstractLeafNodeBuilder</b> deals with primitive types or result in leaf nodes
-            * <b class="class">IntegerNodeBuilder</b> for dealing with <b class="class">Integer</b> and *int*
-            * <b class="class">DoubleNodeBuilder</b> for dealing with <b class="class">Double</b> and *double*
-            * <b class="class">BooleanNodeBuilder</b> for dealing with <b class="class">Boolean</b> and *boolean*
-            * <b class="class">StringNodeBuilder</b> for dealing with <b class="class">String</b>
-            * <b class="class">LongNodeBuilder</b> for dealing with <b class="class">Long</b> and *long*
-            * <b class="class">ShortNodeBuilder</b> for dealing with <b class="class">Short</b> and *short*
-            * <b class="class">DateNodeBuilder</b> for dealing with <b class="class">Calendar</b> dates
-        * <b class="class">CollectionNodeBuilder</b> for dealing with collections such as <b class="class">List</b>, <b class="class">Set</b>, <b class="class">Queue</b>, etc
-        * <b class="class">MapNodeBuilder</b> for dealing with <b class="class">HashMap</b>, <b class="class">LinkedHashMap</b>, etc.
-        * <b class="class">ArrayNodeBuilder</b> for dealing with arrays of objects such as **String[]**, **int[]**, etc
+<ul>
+	<li><b class="class">NodeBuilder</b> is the interface which all implementations must implement</li>
+    <li><b class="class">AbstractNodeBuilder</b> contains some basic node-building utilities (see above)
+      	<ul>
+      		<li><b class="class">AbstractLeafNodeBuilder</b> deals with primitive types or result in leaf nodes
+           	<ul>
+           		<li><b class="class">IntegerNodeBuilder</b> for dealing with <b class="class">Integer</b> and <b class="class">int</b></li>
+	            <li><b class="class">DoubleNodeBuilder</b> for dealing with <b class="class">Double</b> and <b class="class">double</b></li>
+	            <li><b class="class">BooleanNodeBuilder</b> for dealing with <b class="class">Boolean</b> and <b class="class">boolean</b></li>
+	            <li><b class="class">StringNodeBuilder</b> for dealing with <b class="class">String</b></li>
+	            <li><b class="class">LongNodeBuilder</b> for dealing with <b class="class">Long</b> and <b class="class">long</b></li>
+	            <li><b class="class">ShortNodeBuilder</b> for dealing with <b class="class">Short</b> and <b class="class">short</b></li>
+	            <li><b class="class">DateNodeBuilder</b> for dealing with <b class="class">Calendar</b> dates</li>
+	        </ul>
+	     </li>
+          </ul>
+      </li>
+	<li><b class="class">CollectionNodeBuilder</b> for dealing with collections such as <b class="class">List</b>, <b class="class">Set</b>, <b class="class">Queue</b>, etc</li>
+	<li><b class="class">MapNodeBuilder</b> for dealing with <b class="class">HashMap</b>, <b class="class">LinkedHashMap</b>, etc.</li>
+	<li><b class="class">ArrayNodeBuilder</b> for dealing with arrays of objects such as **String[]**, **int[]**, etc</li>
+</ul>
 
 <h4 id="readers_writers"><a href="#toc">Readers and Writers</a></h4>
 
-The <b class="class">PersistenceReader</b> and <b class="class">PersistenceWriter</b> interfaces each define one method.
+<p>The <b class="class">PersistenceReader</b> and <b class="class">PersistenceWriter</b> interfaces each define one method.</p>
 
-    :::java
+<pre class="brush: java">
     public interface PersistenceWriter {	
         void write( final InfoNode rootNode, final java.io.Writer output );
     }
+</pre>
 
-The <b class="class">PersistenceWriter</b> accepts the root <b class="class">InfoNode</b> of the semantic model and a <b class="class">java.io.Writer</b> to which to send the persisted form (such as an XML or JSON file).
+<p>The <b class="class">PersistenceWriter</b> accepts the root <b class="class">InfoNode</b> of the semantic model 
+and a <b class="class">java.io.Writer</b> to which to send the persisted form (such as an XML or JSON file).</p>
 
-    :::java
+<pre class="brush: java">
     public interface PersistenceReader {
-        InfoNode read( final Class< ? > clazz, final java.io.Reader reader );
+        InfoNode read( final Class&lt; ? &gt; clazz, final java.io.Reader reader );
     }
+</pre>
     
-The <b class="class">PersistenceReader</b> accepts an <b class="class">java.io.Reader</b> representing the persisted form (such as an XML or JSON file or stream), a class type that represents the class of the object to create from the persisted form, and returns the semantic model as the root <b class="class">InfoNode</b> of the tree-like structure. Recall that is exactly the semantic model that the <b class="class">PersistenceEngine</b> needs to parse the semantic model into an object.
+<p>The <b class="class">PersistenceReader</b> accepts an <b class="class">java.io.Reader</b> representing the persisted 
+form (such as an XML or JSON file or stream), a class type that represents the class of the object to create from 
+the persisted form, and returns the semantic model as the root <b class="class">InfoNode</b> of the tree-like structure. 
+Recall that is exactly the semantic model that the <b class="class">PersistenceEngine</b> needs to parse the 
+semantic model into an object.</p>
 
-<b>FreezeDry</b> currently provides three <b class="class">PersistenceReaders</b> and three <b class="class">PersistenceWriters</b>.
+<p><b>FreezeDry</b> currently provides three <b class="class">PersistenceReaders</b> and three <b class="class">PersistenceWriters</b>.</p>
 
-Name | Persisted Form | Description
------|----------------|--------------------
-<b class="class">XmlReader</b> | XML | reads from XML sources and produces a semantic model
-<b class="class">XmlWriter</b> | XML | writes an object to an XML persisted form
-<b class="class">JsonReader</b> | JSON | reads from JSON sources and produces a semantic model
-<b class="class">JsonWriter</b> | JSON | writes an object to a JSON persisted form
-<b class="class">KeyValueReader</b> | Key-Values | reads lists of key-value pairs produces a semantic model
-<b class="class">KeyValueWriter</b> | Key-Values | writes an object to a persisted form that is a list of key-value pairs
-
+<table>
+	<tr><th>Name</th><th>Persisted Form</th><th>Description</th></tr>
+	<tr><td><b class="class">XmlReader</b></td><td>XML</td><td>reads from XML sources and produces a semantic model</td></tr>
+	<tr><td><b class="class">XmlWriter</b></td><td>XML</td><td>writes an object to an XML persisted form</td></tr>
+	<tr><td><b class="class">JsonReader</b></td><td>JSON</td><td>reads from JSON sources and produces a semantic model</td></tr>
+	<tr><td><b class="class">JsonWriter</b></td><td>JSON</td><td>writes an object to a JSON persisted form</td></tr>
+	<tr><td><b class="class">KeyValueReader</b></td><td>Key-Values</td><td>reads lists of key-value pairs produces a semantic model</td></tr>
+	<tr><td><b class="class">KeyValueWriter</b></td><td>Key-Values</td><td>writes an object to a persisted form that is a list of key-value pairs</td></tr>
+</table>
+ 
 <h5 id="key_value_reader_writer"><a href="#toc">Key-Value Readers and Writers</a></h5>
 
-Because XML and JSON are well-documented standards, I won't discuss them here. But the Key-Value readers and writers require a description. Effectively, the lists of key-value pairs are flattened versions of a Java object, and the readers and writers can handle quite complex objects straight out of the box. For example, the output below shows what the <b class="class">Division</b> object (standard <b>FreezeDry</b> example) looks like when persisted in a key-value form.
+<p>Because XML and JSON are well-documented standards, I won't discuss them here. But the Key-Value readers and 
+writers require a description. Effectively, the lists of key-value pairs are flattened versions of a Java object, 
+and the readers and writers can handle quite complex objects straight out of the box. For example, the output 
+below shows what the <b class="class">Division</b> object (standard <b>FreezeDry</b> example) looks like when 
+persisted in a key-value form.</p>
 
-    :::text
+<pre class="brush: java">
     Division.people[0].Person.givenName = "Johnny"
     Division.people[0].Person.familyName = "Hernandez"
     Division.people[0].Person.age = 13
@@ -427,104 +543,156 @@ Because XML and JSON are well-documented standards, I won't discuss them here. B
     Division.personMap{"pretty"}.givenName = "Mendez"
     Division.personMap{"pretty"}.familyName = "Ginder"
     Division.personMap{"pretty"}.age = 23
-    
+</pre>
+
 <h6>Keys and Values</h6>
 
-Notice that each line has a key, followed by a separator ("="), and then followed by a value. The values in this example are simple. The keys may appear a bit complex. Notice that each key is composed of elements, which are separated by a ".".
+<p>Notice that each line has a key, followed by a separator ("="), and then followed by a value. 
+The values in this example are simple. The keys may appear a bit complex. Notice that each key is 
+composed of elements, which are separated by a ".".</p>
 
-Separator Name | Description
----------------|---------------------
-Key Separator | Separates the elements of the key
-Key-Value Separator | Separates the key from the value
+<table>
+	<tr><th>Separator Name</th><th>Description</th></tr>
+	<tr><td>Key Separator</td><td>Separates the elements of the key</td></tr>
+	<tr><td>Key-Value Separator</td><td>Separates the key from the value</td></tr>
+</table>
 
-Both of these separators can be specified through code.
+<p>Both of these separators can be specified through code.</p>
 
-The elements of the key are determined by how they appear in the class. For example, notice the "*Division.carNames*" near the bottom of the key-value pair list. The "<b class="class">Division</b>" is the class that is being persisted. And "*carNames*" is a field in that class, which happens to be a **List< String >**. The "\[0\]", "\[1\]", and "\[2\]" are the indexes of the element in the list, and are generated by a <b class="class">PersistenceRenderer</b> that uses a <b class="class">Decorator</b>. Similarly, at the bottom of the list of key-value pairs, you may notice "*Division.personMap*". As the name suggests, "*personMap*" is a **Map< String, Person >**.
+<p>The elements of the key are determined by how they appear in the class. For example, notice the 
+"<em>Division.carNames</em>" near the bottom of the key-value pair list. The "<b class="class">Division</b>" 
+is the class that is being persisted. And "<em>carNames</em>" is a field in that class, which happens to be a 
+<b class="class">List&lt; String &gt;</b>. The "[0]", "[1]", and "[2]" are the indexes of the element in 
+the list, and are generated by a <b class="class">PersistenceRenderer</b> that uses a <b class="class">Decorator</b>. 
+Similarly, at the bottom of the list of key-value pairs, you may notice "<em>Division.personMap</em>". As the name 
+suggests, "<em>personMap</em>" is a <b class="class">Map&lt; String, Person &gt;</b>.</p>
 
 <h6>Renderers</h6>
 
-<b class="class">Renderer</b>s are responsible for expressing the objects they render as key-value pairs. And, at the same time, they are responsible for parsing the key-value pairs that adhere to their format, back into an object. For example, in the above text, near the bottom, notice the three key-value pairs that start with "*Division.carNames*". The <b class="class">CollectionRenderer</b> knows how to take a collection (List, Set, Queue, etc) and renderer into key-value pairs (and how to parse the key-values back into a collection). As another example, the keys beginning "*Division.personMap*" found at the bottom of the list of key-value pairs, represent a **Map< String, Person >** and therefore use a <b class="class">MapRenderer</b> to create these key-value pairs.
+<p><b class="class">Renderer</b>s are responsible for expressing the objects they render as key-value pairs. 
+And, at the same time, they are responsible for parsing the key-value pairs that adhere to their format, 
+back into an object. For example, in the above text, near the bottom, notice the three key-value pairs 
+that start with "<em>Division.carNames</em>". The <b class="class">CollectionRenderer</b> knows how to 
+take a collection (List, Set, Queue, etc) and renderer into key-value pairs (and how to parse the key-values 
+back into a collection). As another example, the keys beginning "<em>Division.personMap</em>" found at the bottom of 
+the list of key-value pairs, represent a <b class="class">Map&lt; String, Person &gt;</b> and therefore use a 
+<b class="class">MapRenderer</b> to create these key-value pairs.</p>
 
-Each <b class="class">PersistenceRenderer</b> also provides a method **isRenderer(...)** that returns true if the key-string passed to it matches the format of something that it renderers. <b>FreezeDry</b> provides the following renderers:
+<p>Each <b class="class">PersistenceRenderer</b> also provides a method <b>isRenderer(...)</b> that returns 
+true if the key-string passed to it matches the format of something that it renderers. 
+<b>FreezeDry</b> provides the following renderers:</p>
 
-Name | Description
------|--------------
-PersistenceRenderer | Interface defining what a persistence renderer must have
-AbstractPersistenceRenderer | Manages the *KeyValueBuilder* and the mapping between the types and the *Decorator*s. Also provides some come utilities needed by the renderers.
-LeafNodeRenderer | Renders simple leaf nodes
-MapRenderer | Used to render Maps
-CollectionRenderer | Used for rendering Collections
-FlatteningCollectionRenderer | Renders simple Collections as a single line value, and uses the <b class="class">CollectionRenderer</b> to deal with Collections of non-leaf type object (i.e. things that aren't strings or numbers)
+<table>
+	<tr><th>Name</th><th>Description</th></tr>
+	<tr><td><b class="class">PersistenceRenderer</b></td><td>Interface defining what a persistence renderer must have</td></tr>
+	<tr><td><b class="class">AbstractPersistenceRenderer</b></td><td>Manages the *KeyValueBuilder* and the mapping between the types and the *Decorator*s. Also provides some come utilities needed by the renderers.</td></tr>
+	<tr><td><b class="class">LeafNodeRenderer</b></td><td>Renders simple leaf nodes</td></tr>
+	<tr><td><b class="class">MapRenderer</b></td><td>Used to render Maps</td></tr>
+	<tr><td><b class="class">CollectionRenderer</b></td><td>Used for rendering Collections</td></tr>
+	<tr><td><b class="class">FlatteningCollectionRenderer</b></td><td>Renders simple Collections as a single line value, and uses the <b class="class">CollectionRenderer</b> to deal with Collections of non-leaf type object (i.e. things that aren't strings or numbers)</td></tr>
+</table>
 
 <h6>Decorators</h6>
 
-You may also notice that strings are surrounded by quotes, integers don't have decimals, and that doubles only show 3 decimal places. These decorations and formatting are achieved by <b class="class">Decorator</b>s. <b class="class">Decorator</b>s also provide an **isDecorated(...)** method that returns true if the string it is passed is decorated (matches its pattern) by that decorator. And if the string is decorated by that decorator, it can "undecorate" it as well.
+<p>You may also notice that strings are surrounded by quotes, integers don't have decimals, and 
+that doubles only show 3 decimal places. These decorations and formatting are achieved by 
+<b class="class">Decorator</b>s. <b class="class">Decorator</b>s also provide an <b>isDecorated(...)</b> 
+method that returns true if the string it is passed is decorated (matches its pattern) by that 
+decorator. And if the string is decorated by that decorator, it can "undecorate" it as well.</p>
 
-<b>FreezeDry</b> provides the following out of the box:
+<p><b>FreezeDry</b> provides the following out of the box:</p>
 
-Name | Description
------|------------
-Decorator | Interface defining what a Decorator is.
-StringDecorator | By default surrounds a string with quotes. The opening string and closing string can be specified. For example, an index has an opening string "\[" and a closing string of "\]".
-IntegerDecorator | Formats and parses integers
-DoubleDecorator | Formats and parse floating point numbers. By default has 3 digits to the right of the decimal point. The format can be adjusted.
-BooleanDecorator | Formats parses booleans.
+<table>
+	<tr><th>Name</th><th>Description</th></tr>
+	<tr><td><b class="class">Decorator</b></td><td>Interface defining what a Decorator is.</td></tr>
+	<tr><td><b class="class">StringDecorator</b></td><td>By default surrounds a string with quotes. The opening string and closing string can be specified. For example, an index has an opening string "\[" and a closing string of "\]".</td></tr>
+	<tr><td><b class="class">IntegerDecorator</b></td><td>Formats and parses integers</td></tr>
+	<tr><td><b class="class">DoubleDecorator</b></td><td>Formats and parse floating point numbers. By default has 3 digits to the right of the decimal point. The format can be adjusted.</td></tr>
+	<tr><td><b class="class">BooleanDecorator</b></td><td>Formats parses booleans.</td></tr>
+</table>
 
 <h4 id="annotations"><a href="#toc">Annotations</a></h4>
 
-In some cases you may want to change the way an object or field are persisted. For example,
-you may want to persist a field using a specified name instead of its field name. The code below shows a snippet of the <b class="class">Person</b> class. Notice the annotation above the *familyName* field. This annotation tells the <b class="class">PersistenceEngine</b> two things. First, when creating the semantic model, set the *persistName* as the specified persistence name. Depending on the implementation of the <b class="class">Writer</b> interface, the *familyName* field would then be persisted as *LastName*. Second, when creating an object from the semantic model, if the semantic model has a *persistName* specified, it will find the field with the associated annotation and set that field. In this case, if the <b class="class">InfoNode</b> has a persistence name of *LastName*, the *familyName* field will be set.
+<p>In some cases you may want to change the way an object or field are persisted. For example,
+you may want to persist a field using a specified name instead of its field name. The code below 
+shows a snippet of the <b class="class">Person</b> class. Notice the annotation above the 
+<em>familyName</em> field. This annotation tells the <b class="class">PersistenceEngine</b> two things. 
+First, when creating the semantic model, set the <em>persistName</em> as the specified persistence name. 
+Depending on the implementation of the <b class="class">Writer</b> interface, the <em>familyName</em> field 
+would then be persisted as <em>LastName</em>. Second, when creating an object from the semantic model, 
+if the semantic model has a *persistName* specified, it will find the field with the associated annotation 
+and set that field. In this case, if the <b class="class">InfoNode</b> has a persistence name of <em>LastName</em>, 
+the <em>familyName</em> field will be set.</p>
 
-    :::java
+<pre class="brush: java">
     public class Person {
         ...
         @Persist( persistenceName = "LastName" )
         private String familyName;
         ...
     }
+</pre>
 
-"But", you may wonder, "didn't you say that often when reading a persisted form into the semantic model, only the persistence name and value are specified?" And, you may question further, "Doesn't that mean that I always have to annotate the class I want to persist?" Now you're starting to get angry, "That sucks!". Well, slow down. If the <b class="class">InfoNode</b> doesn't have a *fieldName* specified, then it will look for a *<b>field</b>* with the specified persistence name. In this way, the default behavior is to use the persistence name as the field name. But, now, you can easily override its name.
+<p>"But", you may wonder, "didn't you say that often when reading a persisted form into the semantic model, 
+only the persistence name and value are specified?" And, you may question further, "Doesn't that mean that 
+I always have to annotate the class I want to persist?" Now you're starting to get angry, "That sucks!". 
+Well, slow down. If the <b class="class">InfoNode</b> doesn't have a <em>fieldName</em> specified, then it will look for 
+a <b>field</b> with the specified persistence name. In this way, the default behavior is to use the persistence name as the 
+field name. But, now, you can easily override its name.</p>
 
-Let me back up a bit and explain the design related to annotations. There are two types of annotations used in <b>FreezeDry</b>. The first type is the *built-in* annotation <b class="class">Persist</b>. And the second type are *custom* annotations that are specific to a <b class="class">NodeBuilder</b>.
+<p>Let me back up a bit and explain the design related to annotations. There are two types of annotations used in 
+<b>FreezeDry</b>. The first type is the <em>built-in</em> annotation <b class="class">Persist</b>. And the second type 
+are <em>custom</em> annotations that are specific to a <b class="class">NodeBuilder</b>.</p>
 
 <h5 id="built_in_annotations"><a href="#toc">Built-In Annotations</a></h5>
 
-This is used by the persistence engine, and is meant to represent common types of customizations that one would want to perform across all objects. Such as the specifying a name for the persisted field. The other customization is the class type to use to instantiate the field. As you recall, if we have a field that is of type **Map&lt; String, String &gt;**, then we may want to override the common behavior of <b>FreezeDry</b> that would instantiate this field as a **LinkedHashMap< String, String >**, and instead instantiate the field as a more simple **HashMap< String, String >**.
+<p>This is used by the persistence engine, and is meant to represent common types of customizations that one would want 
+to perform across all objects. Such as the specifying a name for the persisted field. The other customization is the 
+class type to use to instantiate the field. As you recall, if we have a field that is of type <b class="class">Map&lt; String, String &gt;</b>, 
+then we may want to override the common behavior of <b>FreezeDry</b> that would instantiate this field as a 
+<b class="class">LinkedHashMap&lt; String, String &gt;</b>, and instead instantiate the field as a more simple 
+<b class="class">HashMap&lt; String, String &gt;</b>.</p>
 
-
-    :::java
+<pre class="brush: java">
     public class Person {
         ...
         @Persist( instantiateAs = HashMap.class, persistenceName = "BuddyList" )
-        private Map< String, String > friends;
+        private Map&lt; String, String &gt; friends;
         ...
     }
+</pre>
 
 The <b class="class">Persist</b> annotation is shown below.
 
-    :::java
+<pre class="brush: java">
     @Retention( RetentionPolicy.RUNTIME )
     @Target( { ElementType.TYPE, ElementType.FIELD } )
     public @interface Persist {
         String persistenceName() default "";
-        Class< ? > instantiateAs() default Null.class;
+        Class&lt; ? &gt; instantiateAs() default Null.class;
         public static class Null { } 
     }
+</pre>
 
-Notice that the retention policy states that the annotation is available at run-time, and that the targets are types and fields.
+<p>Notice that the retention policy states that the annotation is available at run-time, and that the targets are types and fields.</p>
 
 <h5 id="custom_annotations"><a href="#toc">Custom Annotations</a></h5>
 
-Custom annotations, the "second type", are intended to work hand-in-hand with a specific <b class="class">NodeBuilder</b>. The idea is that when a <b class="class">NodeBuilder</b> is creating an <b class="class">InfoNode</b> from an object or field, or when the <b class="class">NodeBuilder</b> is creating an object or setting a field based on an <b class="class">InfoNode</b>, the annotation for that type is customizes its behavior. So the rule is that for each <b class="class">NodeBuilder</b> you implement, you should create an annotation if you want to customize its behavior from the class file of the object you wish to persist or reconstitute.
+<p>Custom annotations, the "second type", are intended to work hand-in-hand with a specific <b class="class">NodeBuilder</b>. 
+The idea is that when a <b class="class">NodeBuilder</b> is creating an <b class="class">InfoNode</b> from an object or field, 
+or when the <b class="class">NodeBuilder</b> is creating an object or setting a field based on an <b class="class">InfoNode</b>, 
+the annotation for that type is customizes its behavior. So the rule is that for each <b class="class">NodeBuilder</b> you implement, 
+you should create an annotation if you want to customize its behavior from the class file of the object you wish to persist or reconstitute.</p>
 
-The following custom annotations are already available within <b>FreezeDry</b>.
+<p>The following custom annotations are already available within <b>FreezeDry</b>.</p>
 
-Annotation | NodeBuilder | Customizations
------------|-------------|----------------
-PeristCollection | CollectionNodeBuilder | elementPersistName, elementType
-PersistMap | MapNodeBuilder | entryPersistName, keyPersistName, keyType, valuePersistName, valueType
-PersistArray | ArrayNodeBuilder | elementPersistName, elementType
-PersistDate | DateNodeBuilder | value (represents the format)
+<table>
+	<tr><th>Annotation</th><th>NodeBuilder</th><th>Customizations</th></tr>
+	<tr><td>PeristCollection</td><td><b class="class">CollectionNodeBuilder</b></td><td>elementPersistName, elementType</td></tr>
+	<tr><td>PersistMap</td><td><b class="class">MapNodeBuilder</b></td><td>entryPersistName, keyPersistName, keyType, valuePersistName, valueType</td></tr>
+	<tr><td>PersistArray</td><td><b class="class">ArrayNodeBuilder</b></td><td>elementPersistName, elementType</td></tr>
+	<tr><td>PersistDate</td><td><b class="class">DateNodeBuilder</b></td><td>value (represents the format)</td></tr>
+</table>
 
 <h2 id="whats_new"><a href="#toc">What's New</a></h2>
 
