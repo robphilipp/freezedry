@@ -3,6 +3,15 @@
 <head>
 	<meta charset=utf-8>
 	<link rel="stylesheet" type="text/css" href="freezedry.css"/>
+
+	<!-- Code Syntax Highlighting -->
+	<script type="text/javascript" src="scripts/syntax_highlight/shCore.js"></script>
+	<script type="text/javascript" src="scripts/syntax_highlight/shBrushJava.js"></script>
+	<script type="text/javascript" src="scripts/syntax_highlight/shBrushXml.js"></script>
+	
+	<link rel="stylesheet" type="text/css" href="scripts/syntax_highlight/shCore.css" />
+	<link rel="stylesheet" type="text/css" href="scripts/syntax_highlight/shThemeEclipse.css" />
+
 	<title>FreezeDry</title>
 </head>
 
@@ -31,14 +40,16 @@ JSON, or lists of key-value pairs. And then incredibly, from that persisted form
 back to drinking my beer!"</p>  
 
 <p>Well now. FreezeDry is really simple to use, right out of the box. Look. Here's how simple it is to persist an object to XML:</p>
-<p class="code">
+
+<pre class="brush: java">
     new XmlPersistence().write( division, "person.xml" );
-</p>
+</pre>
 
 <p>And then to reconstitute the object from XML:</p>
-<p class="code">
+
+<pre class="brush: java">
     Division division = new XmlPersistence().read( Division.class, "person.xml" );
-</p>
+</pre>
 
 <p>FreezeDry provides a few interesting and useful features. And, of course it isn't for everyone.
 Nope. It's not. But the thing works right out of the box. If you need to persist an object and you don't care
@@ -49,10 +60,18 @@ make simple customizations with annotations, and more complex customizations thr
 you are a developer, right, not a config file junkie. So FreezeDry let's you do what you love: write code!</p>
 
 <p>To learn more about <b>FreezeDry</b>, its structure, how to modify the way objects are persisted, and what
-comes with the current version, please see the <a href="overview/index.html">[Overview]</a></p>
+comes with the current version, please see the <a href="overview_guide.html">[Overview]</a></p>
 </article>
 
 <footer>
 </footer>
 </body>
+
+<!-- Finally, to actually run the highlighter, you need to include this JS on your page -->
+<script type="text/javascript">
+SyntaxHighlighter.defaults['gutter'] = false;
+SyntaxHighlighter.defaults['toolbar'] = false;
+    SyntaxHighlighter.all()
+</script>
+
 </html>
