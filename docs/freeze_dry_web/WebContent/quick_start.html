@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+<head>
+	<meta charset=utf-8>
+	<link rel="stylesheet" type="text/css" href="freezedry.css"/>
+
+	<!-- Code Syntax Highlighting -->
+	<script type="text/javascript" src="scripts/syntax_highlight/shCore.js"></script>
+	<script type="text/javascript" src="scripts/syntax_highlight/shBrushJava.js"></script>
+	<script type="text/javascript" src="scripts/syntax_highlight/shBrushXml.js"></script>
+	
+	<link rel="stylesheet" type="text/css" href="scripts/syntax_highlight/shCore.css" />
+	<link rel="stylesheet" type="text/css" href="scripts/syntax_highlight/shThemeEclipse.css" />
+
+	<title>FreezeDry Quick Start</title>
+</head>
+</head>
+<body>
+
+<header>
+	<img src="images/web_banner.png">
+</header>
+
+<nav>
+	<a href="index.html">Home</a> |
+	<a href="overview_guide.html">Overview</a> | 
+	<a href="javadocs/index.html" target="tab">Java Docs</a> |
+	<a href="https://sourceforge.net/p/freezedried/code/" target="tab">Code (hg)</a> |
+	<a href="https://sourceforge.net/projects/freezedried/files/" target="tab">Downloads</a> |
+	<a href="https://sourceforge.net/p/freezedried/wiki/Home/" target="tab">Wiki</a> |
+	<a href="https://sourceforge.net/p/freezedried/tickets/" target="tab">Tickets</a> |
+	<a href="https://sourceforge.net/p/freezedried/discussion/" target="tab">Discussion</a>
+</nav>
+
+<div id="toc">
+<p class="overview_toc">Contents</p>
+	<ul class="overview_toc_list">
+		<li><a href="#quick_start">Quick Start</a>
+			<ul class="overview_toc_list">
+				<li><a href="#downloading">Downloading</a></li>
+				<li><a href="#building">Building</a></li>
+				<li><a href="#running">Running Examples</a></li>
+			</ul>
+	</ul>
+</div>
+
+<article>
+
+<h2 id="quick_start">Quickstart</h2>
+
+<p>This quickstart guide will describe how to:</p>
+
+<ul>
+	<li>Download the source code and dependent JAR files</li>
+	<li>Build the source code into class files and into a JAR</li>
+	<li>Run the example code</li>
+	<li>Make minor modifications to the code</li>
+</ul>
+
+<p>See the User Guide for a detailed description of the code, how to extend it, and determining the best approach 
+for extending <b>FreezeDry</b> based on your needs.</p>
+
+<h3 id="downloading"><a href="#quick_start">Downloading</a></h3>
+
+<p>You have several options for using <b>FreezeDry</b>. You can</p>
+
+<ul>
+	<li>Download the source code from the <a href="https://sourceforge.net/p/freezedried/code">Mecurial Repository</a></li>
+	<li>Download the <a href="https://sourceforge.net/projects/freezedried/files/FreezeDry/src/">source code</a> as a zip 
+		file, and grab the two XML files as well.</li>
+	<li>Download a <a href="https://sourceforge.net/projects/freezedried/files/FreezeDry/single_jar">single JAR</a> 
+		containing <b>FreezeDry</b> and all its dependencies</li>
+	<li>Download a <a href="https://sourceforge.net/projects/freezedried/files/FreezeDry/jars/">set individual 
+		of JAR files</a> containing <b>FreezeDry</b> and its dependencies</li>
+</ul>
+
+<h4 id="downloading_hg"><a href="#quick_start">hg</a></h4>
+<p>The Mercurial repo has everything you'll need to build and run the example <b>FreezeDry</b> code. 
+It also contains a sample <b>log4j</b> XML configuration file, and a <b>Ant</b> <em>build.xml</em> file that can 
+be used to create a single JAR containing the dependencies, or a single JAR without the dependencies.</p>
+
+<h4 id="downloading_zip"><a href="#quick_start">Zip File</a></h4>
+<p>The zip file contains all the Java source code, but not the sample <b>log4j</b> XML configuration file, and 
+a <b>Ant</b> <em>build.xml</em> file. These are, however, located in the same folder, and can be downloaded separately.</p>
+
+<h4 id="downloading_single_jar"><a href="#quick_start">Single JAR</a></h4>
+<p>The single JAR file contains the <b>FreezeDry</b> JAR, and all the dependent JAR files wrapped into one 
+convenient JAR file. No need to worry about the dependencies.</p>
+
+<h4 id="downloading_multiple_jar"><a href="#quick_start">Set of Individual JAR Files</a></h4>
+<p>In some cases you may want a JAR containing only the <b>FreezeDry</b> code. And for convenience, we've 
+placed the the dependent JAR files in that same folder for download.</p>
+
+<h3 id="building"><a href="#quick_start">Building</a></h3>
+
+<h4 id="building_java_version"><a href="#quick_start">Java Version</a></h4>
+<p><b>FreezeDry</b> is built on the latest and greatest 
+<a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">Java version 7</a>. It relies on 
+features were made available in Java 7. If you're using the Mac OSX, you'll need to get the 
+<a href="http://jdk7.java.net/macportpreview/">developer preview</a> until the full version is made available.</p>
+
+<h4 id="building_dev_env"><a href="#quick_start">Dev Environments</a></h4>
+<p>There are a variety of freely-available <em>integrated development environments</em> (IDE). I prefer 
+<a href="http://www.eclipse.org/downloads/">Eclipse</a>. Or you can use 
+<a href="http://netbeans.org/downloads/">NetBeans</a>. Or you can rough it and use the command line and vi. 
+Whatever works for you. In this section I'll walk you through setting up in Eclipse. 
+But in both of these examples, I'll use the downloaded source code. You can also import the hg repo directly 
+into Eclipse or NetBeans, but the set up is more involved, and so I won't describe that here.</p>
+
+<p>Before discussing the IDE I will assume that you have downloaded the source code and the JAR files upon 
+which <b>FreezeDry</b> depends.</p> 
+
+<h4 id="building_eclipse"><a href="#quick_start">Eclipse</a></h4>
+<p>To start with Eclipse, we'll create a new Java project in Eclipse, import the downloaded code, set the JVM, 
+set the build paths, and then run the sample code.</p>
+
+<h5 id="building_eclipse_create_proj"><a href="#quick_start">Create Eclipse Java Project</a></h5>
+<p>Once you have Eclipse fired-up, create a new Java project <b>(File &rarr; New &rarr; Java Project)</b>. 
+If you don't see the "Java Project" menu item, make sure that you are in the <b>Java Perspective</b>.</p>
+
+<img src="images/new_java_project_start.png"/>
+
+<p>Eclipse will present you with a "New Project Screen" that looks like the screen shot shown above. 
+There are a few things to note.</p>
+
+<ul>
+	<li>Set the <em>Project Name</em> to "MyFirstFreezeDry", or something of your choosing.</li>
+	<li>Make sure that the execution environment is set to the latest version of Java 7. So you'll 
+		see something like "JavaSE-1.7". If you don't have Java 7 installed, see the 
+		<a href="Quickstart/#java_version">Java Version</a> section.</li>
+	<li>Click "Next &gt;", select the "Libraries" tab, and Eclipse will present you with a screen as shown below.
+</ul>
+
+<img src="images/new_java_proj_libs.png"/>
+
+<p>Click on the "Add External JARs..." button and add the JAR files shown in the screen shot:</p>
+
+<ul>
+	<li>json-yyyyMMdd.jar</li>
+	<li>junit-4.8.1.jar</li>
+	<li>log4j-1.2.15.jar</li>
+</ul>
+
+<p>Then click on the "Finish" button to create the project. Next we'll add the source code.</p>
+
+<h5 id="building_eclipse_add_src_code"><a href="#quick_start">Adding Source Code</a></h5>
+
+<p>To add the source code to your project, copy the downloaded source code, starting with the "org" 
+directory into the "src" directory of your Eclipse project. Then copy the "log4j.xml" file into the 
+top-level directory of your new project.</p>
+
+<h5 id="building_eclipse_create_jar"><a href="#quick_start">Creating a JAR File</a></h5>
+
+<p><b>FreezeDry</b> comes with an <em>Ant</em> build-file named "build.xml". Pretty original, huh? In any case, 
+place the "build.xml" file into the same directory where you placed the "log4j.xml" configuration file.</p>
+
+<p>Next open the "Ant View" in Eclipse and add <em>build.xml</em> (click on the little ant with a plus side just 
+to its left.). Upon which, you should see the something similar to the screenshot below.</p>
+
+<img src="images/ant_view.png" />
+
+<p>Notice the <em>target</em> in blue text named "make_combined_jar [default]". Double-clicking on this target will 
+build a single JAR containing all the dependent JARs.</p>
+
+<p>The <em>target</em> just below it named "make_jar" builds a JAR file that contains only the <b>FreezeDry</b> code.</p>
+
+<h3 id="running"><a href="#quick_start">Running the Example Code</a></h3>
+
+<p>To run the example code, open the <b class="class">PersistenceEngine</b> class file in the project. You'll 
+notice that it has a <b>main( ... )</b> method. That is the method to run for the example. Simply click on Eclipse's 
+debug or run icon, or right click on the <b class="class">PersistenceEngine</b> in the <b>Project Explorer</b> window, 
+and select "Run As &rarr; Java Application" or "Debug As &rarr; Java Application" from the popup menu.</p>
+
+<p>The example code does the following:</p>
+
+<ul>
+	<li>Creates a <b class="class">Division</b> class that could represent the division in a company, and then 
+		adds a few people (<b class="class">Person</b>). It also adds some friends to one of the people, sets a 
+		birth date, and adds a few additional things to make a complex object structure.</li> 
+	<li>Creates and uses the <b class="class">PersistenceEngine</b> to create a semantic model of the 
+		<b class="class">Division</b> object it just created.</li>
+	<li>Prints the semantic model to the console.</li>
+	<li>Creates an XML file ("person.xml") and a JSON file ("person.json") containing the division.</li>
+	<li>Creates an XML file reader uses it to create a semantic model from the "person.xml" file.</li>
+	<li>Reconstructs the <b class="class">Division</b> object from the semantic model.</li>
+	<li>Prints the reconstructed object to the console.</li>
+	<li>Creates an JSON file reader uses it to create a semantic model from the "person.json" file.</li>
+	<li>Reconstructs the <b class="class">Division</b> object from the semantic model.</li>
+	<li>Prints the reconstructed object to the console.</li>
+</ul>
+
+<p>That's it.</p>
+
+</article>
+</body>
+
+<!-- Finally, to actually run the highlighter, you need to include this JS on your page -->
+<script type="text/javascript">
+SyntaxHighlighter.defaults['gutter'] = false;
+SyntaxHighlighter.defaults['toolbar'] = false;
+    SyntaxHighlighter.all()
+</script>
+
+</html>
