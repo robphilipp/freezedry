@@ -155,12 +155,12 @@ by implementing a custom node builder, or by implementing a custom reader and wr
 	<li>A <b>Semantic Model</b> composed of <b class="class">InfoNode</b> objects, each of which hold information 
 		about a particular field within the object that is to be persisted or reconstituted.</li>
 	<li>A set of <b class="class">NodeBuilder</b> classes that hold detailed information about how to convert a 
-		particular Java *Class* between an object and an <b class="class">InfoNode</b>.</li>
+		particular Java <b class="class">Class</b> between an object and an <b class="class">InfoNode</b>.</li>
 	<li>A set of <b class="class">PersistenceWriter</b> classes, each of which take a <b>Semantic Model</b> and 
 		convert it to its persisted form.</li>
 	<li>A set <b class="class">PersistenceReader</b> classes, each of which read from the persisted form and 
 		convert it to a <b>Semantic Model</b>.</li>
-	<li>And optionally, *annotations* that provide custom instructions to the <b class="class">PersistenceEngine</b> 
+	<li>And optionally, <em>annotations</em> that provide custom instructions to the <b class="class">PersistenceEngine</b> 
 		for converting between Java objects and the <b>Semantic Model</b>.</li>
 </ul>
 
