@@ -24,6 +24,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -96,6 +97,10 @@ import org.xml.sax.SAXException;
  * the type ({@link Class}) of each element. Or as another example, the {@link PersistDateAs} annotation allows
  * you to define the format with which a date is persisted.
  * 
+ * By default, class constants (i.e. static final fields) are not persisted. Use the {@link #setPersistClassConstants(boolean)}
+ * to change the default behavior. Note that class constants are not set when reconstructing the class from the persisted
+ * form. In other words, the class constants always take their value from the class source code value.
+ * 
  * @see InfoNode
  * @see NodeBuilder
  * @see PersistenceWriter
@@ -110,6 +115,7 @@ public class PersistenceEngine {
 	
 	private final Map< Class< ? >, NodeBuilder > nodeBuilders;
 	private NodeBuilder genaralArrayNodeBuilder;
+	private boolean isPersistClassConstants = false;
 	
 	/**
 	 * Constructs a {@link PersistenceEngine} with the default {@link InfoNode} info node builders
@@ -153,6 +159,16 @@ public class PersistenceEngine {
 		
 		// 
 		return builders;
+	}
+	
+	/**
+	 * When set to {@link #isPersistClassConstants} is set true then class constants (i.e. static final fields)
+	 * are persisted. Otherwise, no node is created for class constants
+	 * @param isPersistClassConstants True to persist class constants; false otherwise
+	 */
+	public void setPersistClassConstants( final boolean isPersistClassConstants )
+	{
+		this.isPersistClassConstants = isPersistClassConstants;
 	}
 	
 	/**
@@ -327,6 +343,13 @@ public class PersistenceEngine {
 		final List< Field > fields = Arrays.asList( clazz.getDeclaredFields() );
 		for( final Field field : fields )
 		{
+			// if the field is a class constant (i.e. static final) then don't add the node
+			final int modifiers = field.getModifiers();
+			if( Modifier.isFinal( modifiers ) && Modifier.isStatic( modifiers ) && !isPersistClassConstants )
+			{
+				continue;
+			}
+			
 			try
 			{
 				// make sure that we can access the field
@@ -471,18 +494,52 @@ public class PersistenceEngine {
 		Object object = null;
 		try
 		{
-			object = rootClass.newInstance();
+			// TODO allow no arg constructors to be called
+			// find the constructor, and if it exists, then use it to create a new instance
+//			final Constructor< ? >[] constructors = rootClass.getConstructors();
+//			if( constructors.length > 0 )
+//			{
+//				object = constructors[ 0 ].newInstance( (Object[])null );
+//			}
+//			else
+//			{
+				object = rootClass.newInstance();
+//			}
 		}
-		catch( InstantiationException | IllegalAccessException e )
+		catch( IllegalAccessException e )
 		{
 			final StringBuffer message = new StringBuffer();
-			message.append( "Attempted to instantiate object from Class:" + Constants.NEW_LINE );
+			message.append( "Failed to instantiate object from Class. Either the Class or the" + Constants.NEW_LINE );
+			message.append( "nullary constructor were not available." + Constants.NEW_LINE );
 			message.append( "  Specified Class Name: " + clazz.getName() + Constants.NEW_LINE );
-			message.append( "  Most Specified Class Name: " + rootClass.getName() + Constants.NEW_LINE );
+			message.append( "  Most Specific Class Name: " + rootClass.getName() + Constants.NEW_LINE );
 			message.append( "  InfoNode: " + rootNode.getClass().getName() + Constants.NEW_LINE );
-			LOGGER.error( message.toString() );
+			LOGGER.error( message.toString(), e );
 			throw new IllegalStateException( message.toString(), e );
 		}
+		catch( InstantiationException e )
+		{
+			final StringBuffer message = new StringBuffer();
+			message.append( "Failed to instantiate object from Class. This Class represents an " + Constants.NEW_LINE );
+			message.append( "abstract class, an interface, an array class, a primitive type, or " + Constants.NEW_LINE );
+			message.append( "void; or the class has no nullary constructor; or the instantiation " + Constants.NEW_LINE );
+			message.append( "failed for some other reason." + Constants.NEW_LINE );
+			message.append( "  Specified Class Name: " + clazz.getName() + Constants.NEW_LINE );
+			message.append( "  Most Specific Class Name: " + rootClass.getName() + Constants.NEW_LINE );
+			message.append( "  InfoNode: " + rootNode.getClass().getName() + Constants.NEW_LINE );
+			LOGGER.error( message.toString(), e );
+			throw new IllegalStateException( message.toString(), e );
+		}
+//		catch( IllegalArgumentException e )
+//		{
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//		catch( InvocationTargetException e )
+//		{
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		
 		// calls buildObject
 		buildObject( object, rootNode );
@@ -561,22 +618,45 @@ public class PersistenceEngine {
 				// set the field to be accessible (override the accessor)
 				field.setAccessible( true );
 	
-				// set the fields value
-				field.set( object, newObject );
+				// if the field has a "static final" modifier, then we don't set the field
+				// because it is a class constant
+				final int modifiers = field.getModifiers();
+				try
+				{
+					if( Modifier.isStatic( modifiers ) && Modifier.isFinal( modifiers ) )
+					{
+						if( LOGGER.isInfoEnabled() )
+						{
+							final StringBuffer message = new StringBuffer();
+							message.append( "Ignoring field because it has \"static final\" modifiers:" + Constants.NEW_LINE );
+							message.append( "  Containing Class: " + object.getClass().getName() + Constants.NEW_LINE );
+							message.append( "  Field Name: " + fieldName + Constants.NEW_LINE );
+							message.append( "  Field Modifiers: " + Modifier.toString( modifiers ) + Constants.NEW_LINE );
+							LOGGER.info( message.toString() );
+						}
+					}
+					else
+					{
+						// set the fields value
+						field.set( object, newObject );
+					}
+				}
+				catch( IllegalAccessException e )
+				{
+					final StringBuffer message = new StringBuffer();
+					message.append( "Attempted to perform an invalid operation on field:" + Constants.NEW_LINE );
+					message.append( "  Field Name: " + fieldName + Constants.NEW_LINE );
+					message.append( "  Field Modifiers: " + Modifier.toString( field.getModifiers() ) + Constants.NEW_LINE );
+					message.append( "  Containing Class: " + object.getClass().getName() + Constants.NEW_LINE );
+					LOGGER.error( message.toString(), e );
+					throw new IllegalStateException( message.toString(), e );
+				}
+
 			}
 			catch( NoSuchFieldException e )
 			{
 				final StringBuffer message = new StringBuffer();
 				message.append( "Attempted to retrieve field for an invalid field name:" + Constants.NEW_LINE );
-				message.append( "  Field Name: " + fieldName + Constants.NEW_LINE );
-				message.append( "  Containing Class: " + object.getClass().getName() + Constants.NEW_LINE );
-				LOGGER.error( message.toString() );
-				throw new IllegalStateException( message.toString(), e );
-			}
-			catch( IllegalAccessException e )
-			{
-				final StringBuffer message = new StringBuffer();
-				message.append( "Attempted to perform an invalid operation on field:" + Constants.NEW_LINE );
 				message.append( "  Field Name: " + fieldName + Constants.NEW_LINE );
 				message.append( "  Containing Class: " + object.getClass().getName() + Constants.NEW_LINE );
 				LOGGER.error( message.toString() );
@@ -629,7 +709,7 @@ public class PersistenceEngine {
 				message.append( "  Class Name: " + clazz.getName() + Constants.NEW_LINE );
 				message.append( "  Builder: " + builder.getClass().getName() + Constants.NEW_LINE );
 				message.append( "  InfoNode: " + currentNode.toString() + Constants.NEW_LINE );
-				LOGGER.error( message.toString() );
+				LOGGER.error( message.toString(), e );
 				throw new IllegalStateException( message.toString(), e );
 			}
 		}
