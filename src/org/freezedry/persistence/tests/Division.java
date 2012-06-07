@@ -41,11 +41,7 @@ public class Division {
 	private Map< String, Person > personMap;
 	
 	private List< Map< String, String > > listOfMaps;
-	
-	public Division()
-	{
-	}
-	
+		
 	public void addPerson( final Person person )
 	{
 		if( people == null )

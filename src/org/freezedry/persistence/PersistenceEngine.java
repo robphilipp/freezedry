@@ -23,7 +23,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -100,6 +102,12 @@ import org.xml.sax.SAXException;
  * By default, class constants (i.e. static final fields) are not persisted. Use the {@link #setPersistClassConstants(boolean)}
  * to change the default behavior. Note that class constants are not set when reconstructing the class from the persisted
  * form. In other words, the class constants always take their value from the class source code value.
+ * 
+ * When parsing the semantic model, this class will attempt to instantiate an object of the specified class by calling the 
+ * constructor with the smallest number of arguments. If a no-argument constructor exists, then that is what will be called.
+ * Constructors that have arguments will be passed null objects, and then the fields will be set reflectively through the 
+ * {@link Field#set(Object, Object)} method. This means that if the constructor performs checks against null, you will have 
+ * a problem. (TODO allow passing default values to the constructor so that the instantiation passes its checks).
  * 
  * @see InfoNode
  * @see NodeBuilder
@@ -487,6 +495,26 @@ public class PersistenceEngine {
 	 */
 	public Object parseSemanticModel( final Class< ? > clazz, final InfoNode rootNode )
 	{
+		// instantiate the object and build it recursively
+		final Object object = instantiate( clazz, rootNode );
+		buildObject( object, rootNode );
+		
+		return object;
+	}
+	
+	/*
+	 * Instantiates an object of the specified class by calling the constructor with the smallest
+	 * number of arguments. If a no-arg constructor exists, then that is what will be called. Constructors
+	 * that have arguments will be passed null objects, and then the fields will be set reflectively
+	 * through the {@link Field#set(Object, Object)} method. This means that if the constructor performs
+	 * checks against null, you will have a problem. 
+	 * @param clazz The {@link Class} to instantiate 
+	 * @param rootNode The root {@link InfoNode} of the semantic tree containing the information about the
+	 * class to instantiate
+	 * @return The instantiated object.
+	 */
+	private Object instantiate( final Class< ? > clazz, final InfoNode rootNode )
+	{
 		// grab the Class for the root node based on the specified class and the root node
 		final Class< ? > rootClass = ReflectionUtils.getMostSpecificClass( clazz, rootNode );
 		
@@ -494,17 +522,45 @@ public class PersistenceEngine {
 		Object object = null;
 		try
 		{
-			// TODO allow no arg constructors to be called
 			// find the constructor, and if it exists, then use it to create a new instance
-//			final Constructor< ? >[] constructors = rootClass.getConstructors();
-//			if( constructors.length > 0 )
-//			{
-//				object = constructors[ 0 ].newInstance( (Object[])null );
-//			}
-//			else
-//			{
+			// grab the constructors for the class. find the constructor with the smallest
+			// number of arguments, and create dummy arguments, and call the newInstance method
+			// on that constructor (the fields will get set with the appropriate values)
+			final Constructor< ? >[] constructors = rootClass.getConstructors();
+			if( constructors.length > 0 )
+			{
+				// set the minimum number of constructor params to the largest possible
+				int minNumParams = Integer.MAX_VALUE;
+				
+				// create the constructor reference and the list of arguments associated
+				// with the constuctor that has the smallest number of parameters
+				Constructor< ? > minParamConstructor = null;
+				Class< ? >[] minParamTypes = null;
+				
+				// search for the constructor with the smallest number of parameters and store
+				// it and the parameter types
+				for( Constructor< ? > constructor : constructors )
+				{
+					final Class< ? >[] paramTypes = constructor.getParameterTypes();
+					if( paramTypes.length < minNumParams )
+					{
+						minNumParams = paramTypes.length;
+						minParamConstructor = constructor;
+						minParamTypes = paramTypes;
+					}
+				}
+				
+				// create the parameter array (use default values that will get overriden
+				// during the object creation anyway)
+				final Object[] params = createConstructorParameters( minParamTypes );
+				
+				// create the new instance using the constructor and its default parameters
+				object = minParamConstructor.newInstance( params );
+			}
+			else
+			{
 				object = rootClass.newInstance();
-//			}
+			}
 		}
 		catch( IllegalAccessException e )
 		{
@@ -517,7 +573,7 @@ public class PersistenceEngine {
 			LOGGER.error( message.toString(), e );
 			throw new IllegalStateException( message.toString(), e );
 		}
-		catch( InstantiationException e )
+		catch( InstantiationException | InvocationTargetException e )
 		{
 			final StringBuffer message = new StringBuffer();
 			message.append( "Failed to instantiate object from Class. This Class represents an " + Constants.NEW_LINE );
@@ -530,21 +586,67 @@ public class PersistenceEngine {
 			LOGGER.error( message.toString(), e );
 			throw new IllegalStateException( message.toString(), e );
 		}
-//		catch( IllegalArgumentException e )
-//		{
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		catch( InvocationTargetException e )
-//		{
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-		
-		// calls buildObject
-		buildObject( object, rootNode );
 		
 		return object;
+	}
+	
+	/**
+	 * 
+	 * @param paramTypes
+	 * @return
+	 */
+	private Object[] createConstructorParameters( final Class< ? >[] paramTypes )
+	{
+		final Object[] params = new Object[ paramTypes.length ];
+		for( int i = 0; i < paramTypes.length; ++i )
+		{
+			final Class< ? > type = paramTypes[ i ];
+			if( type.isPrimitive() )
+			{
+				if( type == Integer.TYPE )
+				{
+					params[ i ] = new Integer( 0 );
+				}
+				if( type == Long.TYPE )
+				{
+					params[ i ] = new Long( 0 );
+				}
+				if( type == Short.TYPE )
+				{
+					params[ i ] = new Short( Short.MAX_VALUE );
+				}
+				
+				if( type == Double.TYPE )
+				{
+					params[ i ] = new Double( 0.0 );
+				}
+				if( type == Float.TYPE )
+				{
+					params[ i ] = new Float( 0.0 );
+				}
+				
+				if( type == Boolean.TYPE )
+				{
+					params[ i ] = new Boolean( true );
+				}
+				
+				if( type == Byte.TYPE )
+				{
+					params[ i ] = new Byte( Byte.MAX_VALUE );
+				}
+				
+				if( type == Character.TYPE )
+				{
+					params[ i ] = new Character( '0' );
+				}
+			}
+			else
+			{
+				params[ i ] = type.cast( null );
+			}
+		}
+		
+		return params;
 	}
 	
 	/*
@@ -750,20 +852,9 @@ public class PersistenceEngine {
 		}
 		else
 		{
-			try
-			{
-				// create the new object and then build it recursively
-				final Object newObject = clazz.newInstance();
-				object = buildObject( newObject, currentNode );
-			}
-			catch( InstantiationException | IllegalAccessException e )
-			{
-				final StringBuffer message = new StringBuffer();
-				message.append( "Attempted to instantiate object from Class:" + Constants.NEW_LINE );
-				message.append( "  Class Name: " + clazz.getName() + Constants.NEW_LINE );
-				LOGGER.error( message.toString() );
-				throw new IllegalStateException( message.toString(), e );
-			}
+			// create the new object and then build it recursively
+			final Object newObject = instantiate( clazz, currentNode );
+			object = buildObject( newObject, currentNode );
 		}
 		return object;
 	}
