@@ -19,6 +19,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
@@ -52,17 +54,28 @@ public class JsonWriter implements PersistenceWriter {
 		Pair< String, JSONObject > keyValue = null;
 		try
 		{
-			// build (recursively) the JSON object contained by the the class represented in the root node
-			keyValue = buildJsonObject( rootNode );
-			
-			// write the JSON string to the output stream. the JSON string has uses the 
-			// persistence name of the root node as the key, and the value is the JSON object
-			// that we just created
-			new JSONWriter( output )
-				.object()
-					.key( keyValue.getFirst() )
-					.value( keyValue.getSecond() )
-				.endObject();
+//			if( rootNode.hasChildren() )
+//			{
+				// build (recursively) the JSON object contained by the the class represented in the root node
+				keyValue = buildJsonObject( rootNode );
+				
+				// write the JSON string to the output stream. the JSON string has uses the 
+				// persistence name of the root node as the key, and the value is the JSON object
+				// that we just created
+				new JSONWriter( output )
+					.object()
+						.key( keyValue.getFirst() )
+						.value( keyValue.getSecond() )
+					.endObject();
+//			}
+//			else
+//			{
+//				new JSONWriter( output )
+//					.object()
+//						.key( rootNode.getPersistName() )
+//						.value( rootNode.getValue() )
+//					.endObject();
+//			}
 		}
 		catch( JSONException e )
 		{
@@ -93,13 +106,15 @@ public class JsonWriter implements PersistenceWriter {
 	 */
 	private Pair< String, JSONObject >  buildJsonObject( final InfoNode rootNode )
 	{
-		// create the JSON object representation of the semantic model
-		final JSONObject jsonObject = new JSONObject();
+		// grab the root key
 		final String rootKey = rootNode.getPersistName();
 		
+		// create the JSON object representation of the semantic model
+		final JSONObject jsonObject = new JSONObject();
+			
 		// recursively build the JSON object form the semantic model
 		buildJsonObject( rootNode, jsonObject );
-		
+
 		// return the key and json object as a pair
 		return new Pair< String, JSONObject >( rootKey, jsonObject );
 	}

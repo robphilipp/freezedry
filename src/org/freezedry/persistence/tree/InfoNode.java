@@ -457,7 +457,7 @@ public class InfoNode implements Copyable< InfoNode > {
 	 */
 	public boolean hasChildren()
 	{
-		return children.size() == 0;
+		return children.size() > 0;
 	}
 	
 	/**

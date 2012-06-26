@@ -47,6 +47,7 @@ import org.freezedry.persistence.annotations.PersistCollection;
 import org.freezedry.persistence.annotations.PersistDateAs;
 import org.freezedry.persistence.builders.ArrayNodeBuilder;
 import org.freezedry.persistence.builders.BooleanNodeBuilder;
+import org.freezedry.persistence.builders.CharacterNodeBuilder;
 import org.freezedry.persistence.builders.CollectionNodeBuilder;
 import org.freezedry.persistence.builders.DateNodeBuilder;
 import org.freezedry.persistence.builders.DoubleNodeBuilder;
@@ -121,9 +122,13 @@ public class PersistenceEngine {
 	
 	private static final Logger LOGGER = Logger.getLogger( PersistenceEngine.class );
 	
+	private static final Map< Class< ? >, Object > PRIMITIVE_TYPES = createPrimitives();
+	
 	private final Map< Class< ? >, NodeBuilder > nodeBuilders;
 	private NodeBuilder genaralArrayNodeBuilder;
 	private boolean isPersistClassConstants = false;
+	
+	private final Map< Class< ? >, Object > defaultInstances;
 	
 	/**
 	 * Constructs a {@link PersistenceEngine} with the default {@link InfoNode} info node builders
@@ -132,6 +137,7 @@ public class PersistenceEngine {
 	{
 		this.nodeBuilders = createDefaultNodeBuilders();
 		this.genaralArrayNodeBuilder = new ArrayNodeBuilder( this );
+		this.defaultInstances = createDefaultInstances();
 	}
 	
 	/*
@@ -148,12 +154,14 @@ public class PersistenceEngine {
 		builders.put( Long.TYPE, new LongNodeBuilder( this ) );
 		builders.put( Short.TYPE, new ShortNodeBuilder( this ) );
 		builders.put( Boolean.TYPE, new BooleanNodeBuilder( this ) );
+		builders.put( Character.TYPE, new CharacterNodeBuilder( this ) );
 		
 		builders.put( Integer.class, new IntegerNodeBuilder( this ) );
 		builders.put( Double.class, new DoubleNodeBuilder( this ) );
 		builders.put( Long.class, new LongNodeBuilder( this ) );
 		builders.put( Short.class, new ShortNodeBuilder( this ) );
 		builders.put( Boolean.class, new BooleanNodeBuilder( this ) );
+		builders.put( Character.class, new CharacterNodeBuilder( this ) );
 		builders.put( String.class, new StringNodeBuilder( this ) );
 		
 		// other leaf nodes
@@ -167,6 +175,38 @@ public class PersistenceEngine {
 		
 		// 
 		return builders;
+	}
+	
+	/*
+	 * @return a map containing a primitive type and the wrapper object used to represent that primitive type
+	 */
+	private static Map< Class< ? >, Object > createPrimitives()
+	{
+		final Map< Class< ? >, Object > primitives = new HashMap<>();
+		primitives.put( Integer.TYPE, new Integer( 0 ) );
+		primitives.put( Long.TYPE, new Long( 0 ) );
+		primitives.put( Short.TYPE, new Short( Short.MAX_VALUE ) );
+		primitives.put( Double.TYPE, new Double( 0.0 ) );
+		primitives.put( Float.TYPE, new Float( 0.0 ) );
+		primitives.put( Boolean.TYPE, new Boolean( true ) );
+		primitives.put( Byte.TYPE, new Byte( Byte.MAX_VALUE ) );
+		primitives.put( Character.TYPE, new Character( '0' ) );
+		return primitives;
+	}
+	
+	private static Map< Class< ? >, Object > createDefaultInstances()
+	{
+		final Map< Class< ? >, Object > defaults = new HashMap<>();
+		defaults.putAll( createPrimitives() );
+		defaults.put( Integer.class, new Integer( 0 ) );
+		defaults.put( Long.class, new Long( 0 ) );
+		defaults.put( Short.class, new Short( Short.MAX_VALUE ) );
+		defaults.put( Double.class, new Double( 0.0 ) );
+		defaults.put( Float.class, new Float( 0.0 ) );
+		defaults.put( Boolean.class, new Boolean( true ) );
+		defaults.put( Byte.class, new Byte( Byte.MAX_VALUE ) );
+		defaults.put( Character.class, new Character( '0' ) );
+		return defaults;
 	}
 	
 	/**
@@ -226,6 +266,16 @@ public class PersistenceEngine {
 	}
 
 	/**
+	 * 
+	 * @param clazz
+	 * @return
+	 */
+	private boolean containsDefaultInstance( final Class< ? > clazz )
+	{
+		return ( getDefaultInstance( clazz ) != null );
+	}
+
+	/**
 	 * Finds the {@link NodeBuilder} associated with the class. If the specified class
 	 * doesn't have a info node builder, then it searches for the closest parent class (inheritance)
 	 * and returns that. In this case, it adds an entry to the info node builders map for the
@@ -236,7 +286,17 @@ public class PersistenceEngine {
 	 */
 	public NodeBuilder getNodeBuilder( final Class< ? > clazz )
 	{
-		return ReflectionUtils.getItemOrAncestor( clazz, nodeBuilders );
+		return ReflectionUtils.getItemOrAncestorCopyable( clazz, nodeBuilders );
+	}
+	
+	/**
+	 * 
+	 * @param clazz
+	 * @return
+	 */
+	private Object getDefaultInstance( final Class< ? > clazz )
+	{
+		return ReflectionUtils.getItemOrAncestor( clazz, defaultInstances );
 	}
 
 	/**
@@ -321,6 +381,45 @@ public class PersistenceEngine {
 	 */
 	public final InfoNode createSemanticModel( final Object object )
 	{
+//		// create the root node of the tree, which holds the information about the
+//		// object we are being asked to persist.
+//		final Class< ? > clazz = object.getClass();
+////		final InfoNode rootNode = InfoNode.createRootNode( clazz.getSimpleName(), clazz );
+//		InfoNode rootNode = null;
+//		
+//		// if the object is a leaf node as determined by the node builders, then we want
+//		// to use the node builders to construct this node
+//		final NodeBuilder builder = getNodeBuilder( clazz );
+//		if( builder != null )
+//		{
+//			try
+//			{
+//				rootNode = builder.createInfoNode( clazz, object, clazz.getName() );
+//			}
+//			catch( ReflectiveOperationException e )
+//			{
+//				final StringBuffer message = new StringBuffer();
+//				message.append( "Node Builder failed to create InfoNode:" + Constants.NEW_LINE );
+//				message.append( "  Builder: " + builder.getClass().getName() + Constants.NEW_LINE );
+//				message.append( "  Containing Class Name: " + clazz.getName() + Constants.NEW_LINE );
+//				message.append( "  Object: " + clazz.getName() + Constants.NEW_LINE );
+//				message.append( "  Field Name: " + clazz.getName() + Constants.NEW_LINE );
+//				LOGGER.error( message.toString() );
+//				throw new IllegalStateException( message.toString(), e );
+//			}
+//		}
+//		else
+//		{
+//			rootNode = InfoNode.createRootNode( clazz.getSimpleName(), clazz );
+//
+//			// run through the methods building up the semantic model, which is a tree
+//			// that holds the information about each element in a node. the node information
+//			// is a complete set of information needed to persist and reconstruct an object
+//			addNodes( rootNode, object );
+//		}
+//		// return the root node of the tree
+//		return rootNode;
+
 		// create the root node of the tree, which holds the information about the
 		// object we are being asked to persist.
 		final Class< ? > clazz = object.getClass();
@@ -344,10 +443,12 @@ public class PersistenceEngine {
 	 */
 	private InfoNode addNodes( final InfoNode currentNode, final Object object )
 	{
+		// grab the object's type
+		final Class< ? > clazz = object.getClass();
+		
 		// run through the fields associated with object's Class< ? >, create the nodes for
 		// each field, and add that node to the current node. recall that this is a recursive
 		// algorithm where createNode(...) may call this method recursively.
-		final Class< ? > clazz = object.getClass();
 		final List< Field > fields = Arrays.asList( clazz.getDeclaredFields() );
 		for( final Field field : fields )
 		{
@@ -495,6 +596,37 @@ public class PersistenceEngine {
 	 */
 	public Object parseSemanticModel( final Class< ? > clazz, final InfoNode rootNode )
 	{
+//		Object object = null;
+//		
+//		// if the object is a leaf node as determined by the node builders, then we want
+//		// to use the node builders to construct this node
+//		final NodeBuilder builder = getNodeBuilder( clazz );
+//		if( builder != null )
+//		{
+//			try
+//			{
+//				object = builder.createObject( clazz, clazz, rootNode );
+//			}
+//			catch( ReflectiveOperationException e )
+//			{
+//				final StringBuffer message = new StringBuffer();
+//				message.append( "Node Builder failed to create InfoNode:" + Constants.NEW_LINE );
+//				message.append( "  Builder: " + builder.getClass().getName() + Constants.NEW_LINE );
+//				message.append( "  Containing Class Name: " + clazz.getName() + Constants.NEW_LINE );
+//				message.append( "  Object: " + clazz.getName() + Constants.NEW_LINE );
+//				message.append( "  Field Name: " + clazz.getName() + Constants.NEW_LINE );
+//				LOGGER.error( message.toString() );
+//				throw new IllegalStateException( message.toString(), e );
+//			}
+//		}
+//		else
+//		{
+//			// instantiate the object and build it recursively
+//			object = instantiate( clazz, rootNode );
+//			buildObject( object, rootNode );
+//		}		
+//		return object;
+		
 		// instantiate the object and build it recursively
 		final Object object = instantiate( clazz, rootNode );
 		buildObject( object, rootNode );
@@ -527,7 +659,12 @@ public class PersistenceEngine {
 			// number of arguments, and create dummy arguments, and call the newInstance method
 			// on that constructor (the fields will get set with the appropriate values)
 			final Constructor< ? >[] constructors = rootClass.getConstructors();
-			if( constructors.length > 0 )
+			Object instance = null;
+			if( ( instance = getDefaultInstance( clazz ) ) != null )
+			{
+				object = instance;
+			}
+			else if( constructors.length > 0 )
 			{
 				// set the minimum number of constructor params to the largest possible
 				int minNumParams = Integer.MAX_VALUE;
@@ -590,10 +727,12 @@ public class PersistenceEngine {
 		return object;
 	}
 	
-	/**
-	 * 
-	 * @param paramTypes
-	 * @return
+	/*
+	 * Creates an array of default parameters for the constructor. If the arguments
+	 * are primitives, the creates the object of the correct type, otherwise, simply
+	 * type casts the null.
+	 * @param paramTypes The {@link Class} for constructor parameters  
+	 * @return an {@link Object} array containing the default parameters for the constructor 
 	 */
 	private Object[] createConstructorParameters( final Class< ? >[] paramTypes )
 	{
@@ -603,42 +742,7 @@ public class PersistenceEngine {
 			final Class< ? > type = paramTypes[ i ];
 			if( type.isPrimitive() )
 			{
-				if( type == Integer.TYPE )
-				{
-					params[ i ] = new Integer( 0 );
-				}
-				if( type == Long.TYPE )
-				{
-					params[ i ] = new Long( 0 );
-				}
-				if( type == Short.TYPE )
-				{
-					params[ i ] = new Short( Short.MAX_VALUE );
-				}
-				
-				if( type == Double.TYPE )
-				{
-					params[ i ] = new Double( 0.0 );
-				}
-				if( type == Float.TYPE )
-				{
-					params[ i ] = new Float( 0.0 );
-				}
-				
-				if( type == Boolean.TYPE )
-				{
-					params[ i ] = new Boolean( true );
-				}
-				
-				if( type == Byte.TYPE )
-				{
-					params[ i ] = new Byte( Byte.MAX_VALUE );
-				}
-				
-				if( type == Character.TYPE )
-				{
-					params[ i ] = new Character( '0' );
-				}
+				params[ i ] = PRIMITIVE_TYPES.get( type );
 			}
 			else
 			{

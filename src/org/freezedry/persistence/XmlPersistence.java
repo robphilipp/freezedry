@@ -109,6 +109,22 @@ public class XmlPersistence extends AbstractFileBasedPersistence {
 		try
 		{
 			DOMConfigurator.configure( "log4j.xml" );
+			
+			XmlPersistence persist = new XmlPersistence();
+			persist.setDisplayTypeInfo( true );
+			persist.write( "this is a test", "test.xml" );
+//			persist.write( new Double( 3.14 ), "test.xml" );
+//			final List< Double > list = new ArrayList<>( Arrays.asList( 3.14, 2.7, 111.11 ) );
+//			persist.write( list, "test.xml" );
+			
+			System.out.println( "Read: " + persist.read( String.class, "test.xml" ) );
+//			System.out.println( "Read: " + persist.read( Double.class, "test.xml" ) );
+//			final List< Double > relist = persist.read( ArrayList.class, "test.xml" );
+//			for( Double item : relist )
+//			{
+//				System.out.println( "Read: " + item );
+//			}
+			System.exit( 0 );
 	
 			// create the object to persist
 			final Division division = new Division();

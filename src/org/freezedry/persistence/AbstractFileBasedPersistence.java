@@ -70,7 +70,7 @@ public abstract class AbstractFileBasedPersistence extends AbstractPersistence {
 	 * class as the template for the object
 	 * @param clazz The {@link Class} from which to create the object from its persisted form
 	 * @param fileName The name of the file holding the persisted object
-	 * @return The reconstitued object read from the file 
+	 * @return The reconstituted object read from the file 
 	 */
 	public < T > T read( final Class< ? extends T > clazz, final String fileName )
 	{

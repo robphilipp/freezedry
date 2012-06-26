@@ -97,7 +97,7 @@ public class JsonReader implements PersistenceReader {
 		// grab the value and deal with one of the three possibilities:
 		// 1. the value is a json object and therefore has name-value pairs
 		// 2. the value is a json array and therefore has elements
-		// 3. the value is neither, and therefore is a simple value 
+		// 3. the value is neither, and therefore is a simple value
 		// In the first two cases, we build out the remainder of the nodes recursively. In
 		// the third case, we set in the value and class in root node and we're done.
 		final Object value = JsonUtils.getValue( jsonObject, rootNode.getPersistName() );
@@ -109,6 +109,10 @@ public class JsonReader implements PersistenceReader {
 		{
 			buildInfoNode( (JSONArray)value, clazz.getSimpleName(), rootNode );
 		}
+//		else if( jsonObject.length() == 1 )
+//		{
+//			rootNode.setValue( value );
+//		}
 		else
 		{
 			final StringBuffer message = new StringBuffer();

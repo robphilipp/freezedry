@@ -209,7 +209,7 @@ public abstract class AbstractKeyValueBuilder implements KeyValueBuilder {
 	@Override
 	public PersistenceRenderer getRenderer( final Class< ? > clazz )
 	{
-		return ReflectionUtils.getItemOrAncestor( clazz, renderers );
+		return ReflectionUtils.getItemOrAncestorCopyable( clazz, renderers );
 	}
 	
 	/**

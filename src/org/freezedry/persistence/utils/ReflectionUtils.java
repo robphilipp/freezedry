@@ -525,7 +525,7 @@ public class ReflectionUtils {
 	 * @param clazz The {@link Class} for which to find a item
 	 * @return the item associated with the specified {@link Class}
 	 */
-	public static < T extends Copyable< T > > T getItemOrAncestor( final Class< ? > clazz, final Map< Class< ? >, T > items )
+	public static < T extends Copyable< T > > T getItemOrAncestorCopyable( final Class< ? > clazz, final Map< Class< ? >, T > items )
 	{
 		// simplest case is that the info node builders map has an entry for the class
 		T item = items.get( clazz );
@@ -555,6 +555,50 @@ public class ReflectionUtils {
 				final Class< ? > closestParent = hierarchy.getFirstValue();
 				item = items.get( closestParent );
 				items.put( clazz, item.getCopy() );
+			}
+		}
+		return item;
+	}
+
+	/**
+	 * Finds the item associated with the specified {@link Class}. If the specified class
+	 * doesn't have an associated item, then it searches for the closest parent class (inheritance)
+	 * and returns that. In this case, it adds an entry to the items map for the
+	 * specified class associating it with the returned item (performance speed-up for
+	 * subsequent calls).
+	 * @param clazz The {@link Class} for which to find a item
+	 * @return the item associated with the specified {@link Class}
+	 */
+	public static < T > T getItemOrAncestor( final Class< ? > clazz, final Map< Class< ? >, T > items )
+	{
+		// simplest case is that the info node builders map has an entry for the class
+		T item = items.get( clazz );
+		
+		// if the item didn't have a direct entry, work our way up the inheritance
+		// hierarchy, and find the enclosed parent class, assigning it to the associated class
+		if( item == null )
+		{
+			// run through the available info node builders holding the distance (number of levels in the
+			// inheritance hierarchy) they are from the specified class
+			final IntegerOrderedSeries< Class< ? > > hierarchy = new IntegerOrderedSeries<>();
+			for( Map.Entry< Class< ? >, T > entry : items.entrySet() )
+			{
+				final Class< ? > targetClass = entry.getKey();
+				final int level = ReflectionUtils.calculateClassDistance( clazz, targetClass );
+				if( level > -1 )
+				{
+					hierarchy.add( level, targetClass );
+				}
+			}
+			
+			// if one or more parent classes were found, then take the first one,
+			// which is the closest one, grab its info node builder, and add an entry for the
+			// specified class to the associated info node builder for faster subsequent look-ups
+			if( !hierarchy.isEmpty() )
+			{
+				final Class< ? > closestParent = hierarchy.getFirstValue();
+				item = items.get( closestParent );
+				items.put( clazz, item );
 			}
 		}
 		return item;

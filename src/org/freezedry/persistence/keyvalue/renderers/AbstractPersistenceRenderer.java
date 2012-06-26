@@ -143,7 +143,7 @@ public abstract class AbstractPersistenceRenderer implements PersistenceRenderer
 	 */
 	public Decorator getDecorator( final Class< ? > clazz )
 	{
-		return ReflectionUtils.getItemOrAncestor( clazz, decorators );
+		return ReflectionUtils.getItemOrAncestorCopyable( clazz, decorators );
 	}
 	
 	/**
