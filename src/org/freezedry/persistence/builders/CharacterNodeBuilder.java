@@ -2,6 +2,7 @@ package org.freezedry.persistence.builders;
 
 import org.freezedry.persistence.PersistenceEngine;
 import org.freezedry.persistence.tree.InfoNode;
+import org.freezedry.persistence.utils.Constants;
 
 public class CharacterNodeBuilder extends AbstractLeafNodeBuilder {
 
@@ -37,10 +38,26 @@ public class CharacterNodeBuilder extends AbstractLeafNodeBuilder {
 	 * @see org.freezedry.persistence.builders.infonodes.NodeBuilder#createObject(java.lang.Class, org.freezedry.persistence.tree.nodes.InfoNode)
 	 */
 	@Override
-	public String createObject( final Class< ? > containingClass, final Class< ? > clazz, final InfoNode node )
+	public Character createObject( final Class< ? > containingClass, final Class< ? > clazz, final InfoNode node )
 	{
-		final Object valueString = node.getValue();
-		return valueString.toString();
+		// grab the node's value, which should be a string
+		final String value = (String)node.getValue();
+		
+		// the string should only have 1 character, but may at times have zero chars, which 
+		// represents a space. So we'll start it out as a space, and update/check accordingly
+		Character character = ' ';
+		if( value.length() == 1 )
+		{
+			character = value.charAt( 0 );
+		}
+		else if( value.length() > 1 )
+		{
+			final StringBuffer message = new StringBuffer();
+			message.append( "The value in the info node must be a character." + Constants.NEW_LINE );
+			message.append( "  InfoNode value: " + node.getValue() + Constants.NEW_LINE );
+			throw new IllegalArgumentException( message.toString() );
+		}
+		return character;
 	}
 
 	/*

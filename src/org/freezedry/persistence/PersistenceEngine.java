@@ -265,16 +265,6 @@ public class PersistenceEngine {
 		return contains;
 	}
 
-//	/**
-//	 * 
-//	 * @param clazz
-//	 * @return
-//	 */
-//	private boolean containsDefaultInstance( final Class< ? > clazz )
-//	{
-//		return ( getDefaultInstance( clazz ) != null );
-//	}
-
 	/**
 	 * Finds the {@link NodeBuilder} associated with the class. If the specified class
 	 * doesn't have a info node builder, then it searches for the closest parent class (inheritance)
@@ -381,45 +371,6 @@ public class PersistenceEngine {
 	 */
 	public final InfoNode createSemanticModel( final Object object )
 	{
-//		// create the root node of the tree, which holds the information about the
-//		// object we are being asked to persist.
-//		final Class< ? > clazz = object.getClass();
-////		final InfoNode rootNode = InfoNode.createRootNode( clazz.getSimpleName(), clazz );
-//		InfoNode rootNode = null;
-//		
-//		// if the object is a leaf node as determined by the node builders, then we want
-//		// to use the node builders to construct this node
-//		final NodeBuilder builder = getNodeBuilder( clazz );
-//		if( builder != null )
-//		{
-//			try
-//			{
-//				rootNode = builder.createInfoNode( clazz, object, clazz.getName() );
-//			}
-//			catch( ReflectiveOperationException e )
-//			{
-//				final StringBuffer message = new StringBuffer();
-//				message.append( "Node Builder failed to create InfoNode:" + Constants.NEW_LINE );
-//				message.append( "  Builder: " + builder.getClass().getName() + Constants.NEW_LINE );
-//				message.append( "  Containing Class Name: " + clazz.getName() + Constants.NEW_LINE );
-//				message.append( "  Object: " + clazz.getName() + Constants.NEW_LINE );
-//				message.append( "  Field Name: " + clazz.getName() + Constants.NEW_LINE );
-//				LOGGER.error( message.toString() );
-//				throw new IllegalStateException( message.toString(), e );
-//			}
-//		}
-//		else
-//		{
-//			rootNode = InfoNode.createRootNode( clazz.getSimpleName(), clazz );
-//
-//			// run through the methods building up the semantic model, which is a tree
-//			// that holds the information about each element in a node. the node information
-//			// is a complete set of information needed to persist and reconstruct an object
-//			addNodes( rootNode, object );
-//		}
-//		// return the root node of the tree
-//		return rootNode;
-
 		// create the root node of the tree, which holds the information about the
 		// object we are being asked to persist.
 		final Class< ? > clazz = object.getClass();
@@ -596,37 +547,6 @@ public class PersistenceEngine {
 	 */
 	public Object parseSemanticModel( final Class< ? > clazz, final InfoNode rootNode )
 	{
-//		Object object = null;
-//		
-//		// if the object is a leaf node as determined by the node builders, then we want
-//		// to use the node builders to construct this node
-//		final NodeBuilder builder = getNodeBuilder( clazz );
-//		if( builder != null )
-//		{
-//			try
-//			{
-//				object = builder.createObject( clazz, clazz, rootNode );
-//			}
-//			catch( ReflectiveOperationException e )
-//			{
-//				final StringBuffer message = new StringBuffer();
-//				message.append( "Node Builder failed to create InfoNode:" + Constants.NEW_LINE );
-//				message.append( "  Builder: " + builder.getClass().getName() + Constants.NEW_LINE );
-//				message.append( "  Containing Class Name: " + clazz.getName() + Constants.NEW_LINE );
-//				message.append( "  Object: " + clazz.getName() + Constants.NEW_LINE );
-//				message.append( "  Field Name: " + clazz.getName() + Constants.NEW_LINE );
-//				LOGGER.error( message.toString() );
-//				throw new IllegalStateException( message.toString(), e );
-//			}
-//		}
-//		else
-//		{
-//			// instantiate the object and build it recursively
-//			object = instantiate( clazz, rootNode );
-//			buildObject( object, rootNode );
-//		}		
-//		return object;
-		
 		// instantiate the object and build it recursively
 		final Object object = instantiate( clazz, rootNode );
 		buildObject( object, rootNode );

@@ -109,10 +109,6 @@ public class JsonReader implements PersistenceReader {
 		{
 			buildInfoNode( (JSONArray)value, clazz.getSimpleName(), rootNode );
 		}
-//		else if( jsonObject.length() == 1 )
-//		{
-//			rootNode.setValue( value );
-//		}
 		else
 		{
 			final StringBuffer message = new StringBuffer();

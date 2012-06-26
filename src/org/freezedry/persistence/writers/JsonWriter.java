@@ -52,28 +52,17 @@ public class JsonWriter implements PersistenceWriter {
 		Pair< String, JSONObject > keyValue = null;
 		try
 		{
-//			if( rootNode.hasChildren() )
-//			{
-				// build (recursively) the JSON object contained by the the class represented in the root node
-				keyValue = buildJsonObject( rootNode );
-				
-				// write the JSON string to the output stream. the JSON string has uses the 
-				// persistence name of the root node as the key, and the value is the JSON object
-				// that we just created
-				new JSONWriter( output )
-					.object()
-						.key( keyValue.getFirst() )
-						.value( keyValue.getSecond() )
-					.endObject();
-//			}
-//			else
-//			{
-//				new JSONWriter( output )
-//					.object()
-//						.key( rootNode.getPersistName() )
-//						.value( rootNode.getValue() )
-//					.endObject();
-//			}
+			// build (recursively) the JSON object contained by the the class represented in the root node
+			keyValue = buildJsonObject( rootNode );
+			
+			// write the JSON string to the output stream. the JSON string has uses the 
+			// persistence name of the root node as the key, and the value is the JSON object
+			// that we just created
+			new JSONWriter( output )
+				.object()
+					.key( keyValue.getFirst() )
+					.value( keyValue.getSecond() )
+				.endObject();
 		}
 		catch( JSONException e )
 		{
