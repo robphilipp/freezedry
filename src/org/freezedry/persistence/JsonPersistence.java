@@ -51,17 +51,20 @@ public class JsonPersistence extends AbstractFileBasedPersistence {
 		{
 			DOMConfigurator.configure( "log4j.xml" );
 	
-			JsonPersistence persist = new JsonPersistence();
-//			persist.write( "this is a test", "test.json" );
-//			persist.write( new Double( 3.14 ), "test.json" );
-			final List< Double > list = new ArrayList<>();
-			list.addAll( Arrays.asList( 3.14, 2.7, 111.11 ) );
-			persist.write( list, "test.json" );
-			
-//			System.out.println( "Read: " + persist.read( String.class, "test.json" ) );
-//			System.out.println( "Read: " + persist.read( Double.class, "test.json" ) );
-			System.out.println( "Read: " + persist.read( ArrayList.class, "test.json" ) );
-			System.exit( 0 );
+//			JsonPersistence persist = new JsonPersistence();
+////			persist.write( "this is a test", "test.json" );
+////			persist.write( new Double( 3.14 ), "test.json" );
+//			final List< Double > list = new ArrayList<>( Arrays.asList( 3.14, 2.7, 111.11 ) );
+//			persist.write( list, "test.json" );
+//			
+////			System.out.println( "Read: " + persist.read( String.class, "test.json" ) );
+////			System.out.println( "Read: " + persist.read( Double.class, "test.json" ) );
+//			final List< ? > relist = persist.read( ArrayList.class, "test.json" );
+//			for( Object item : relist )
+//			{
+//				System.out.println( "Read: " + item );
+//			}
+//			System.exit( 0 );
 
 			// create the object to persist
 			final Division division = new Division();

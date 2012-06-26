@@ -265,15 +265,15 @@ public class PersistenceEngine {
 		return contains;
 	}
 
-	/**
-	 * 
-	 * @param clazz
-	 * @return
-	 */
-	private boolean containsDefaultInstance( final Class< ? > clazz )
-	{
-		return ( getDefaultInstance( clazz ) != null );
-	}
+//	/**
+//	 * 
+//	 * @param clazz
+//	 * @return
+//	 */
+//	private boolean containsDefaultInstance( final Class< ? > clazz )
+//	{
+//		return ( getDefaultInstance( clazz ) != null );
+//	}
 
 	/**
 	 * Finds the {@link NodeBuilder} associated with the class. If the specified class
