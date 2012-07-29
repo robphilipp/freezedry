@@ -709,8 +709,9 @@ file in the file download area. Most updates will contain bug fixes and minor co
 <h4>Version 0.2.2 (from version 0.2.1)</h4>
 <ol>
 	<li>Removed the restriction that the persisted class requires a no-arg constructor.</li>
-	<li>Fixed bug the prevented Java types (String, Charecter, Double, etc for which the getClassloader() call
-		would return null) from being persisted as the top level element.</li>
+	<li>Fixed bug the prevented Java types (<b class="class">String</b>, <b class="class">Character</b>, 
+		<b class="class">Double</b>, etc for which the <b class="class">Class.getClassloader()</b> call
+		would return <b class="class">null</b>) from being persisted as the top level element.</li>
 	<li>Added a Char/char node builded (was missing before, oversight).</li>
 	<li>Updated code so that "static final" fields are persisted by default, and are never 
    		set based on the persisted value (if the value is persisted). static final fields
