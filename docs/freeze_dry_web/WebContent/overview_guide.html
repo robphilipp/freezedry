@@ -707,13 +707,6 @@ you should create an annotation if you want to customize its behavior from the c
 file in the file download area. Most updates will contain bug fixes and minor code refactoring.</p>
 
 <h4>Version 0.2.2 (from version 0.2.1)</h4>
-1. Removed the restriction that the persisted class requires a no-arg constructor.
-2. Fixed bug the prevented Java types from being persisted as the top level element.
-3. Added a Char/char node builded (was missing before, oversight)
-4. Updated code so that "static final" fields are persisted by default, and are never 
-   set based on the persisted value (if the value is persisted). static final fields
-   take their value from the class' source code.	
-5. Small bug fixes.
 <ol>
 	<li>Removed the restriction that the persisted class requires a no-arg constructor.</li>
 	<li>Fixed bug the prevented Java types (String, Charecter, Double, etc for which the getClassloader() call
