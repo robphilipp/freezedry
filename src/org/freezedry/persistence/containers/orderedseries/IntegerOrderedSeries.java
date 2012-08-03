@@ -17,7 +17,6 @@ package org.freezedry.persistence.containers.orderedseries;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.freezedry.persistence.utils.Require;
@@ -316,50 +315,50 @@ public class IntegerOrderedSeries< V > extends TaggedOrderedSeries< Integer, V >
 		return map;
 	}
 	
-	/**
-	 * Creates a {@link IntegerOrderedSeries} from a {@link Map}. The keys in the ordered series will be sorted
-	 * based on the key's natural integer ordering. The elements in the ordered series are the associated values 
-	 * from the {@link Map}.
-	 * @param <K> The key type
-	 * @param <E> The element type
-	 * @param map The {@link Map} to be converted into a {@link IntegerOrderedSeries}
-	 * @return a {@link IntegerOrderedSeries} from a {@link Map}. The keys in the ordered series will be sorted
-	 * based on the key's natural integer ordering. The elements in the ordered series are the associated values 
-	 * from the {@link Map}.
-	 */
-	public static < E > IntegerOrderedSeries< E > fromMap( final Map< Integer, E > map )
-	{
-		final IntegerOrderedSeries< E > series = new IntegerOrderedSeries< E >( map.size() );
-		for( Map.Entry< Integer, E > entry : map.entrySet() )
-		{
-			series.add( entry.getKey(), entry.getValue() );
-		}
-		return series;
-	}
-
-	/**
-	 * Creates a {@link IntegerOrderedSeries} from two lists. The first list holds the keys to the ordered
-	 * series. The second list holds the elements of the series. The two lists must have the same size.
-	 * @param <E> The element type
-	 * @param keys The keys to the list
-	 * @param elements The elements of the list
-	 * @return A {@link IntegerOrderedSeries} constructed from the two specified lists
-	 */
-	public static < E > IntegerOrderedSeries< E > fromLists( final List< Integer > keys, final List< E > elements )
-	{
-		Require.equalSize( keys, elements );
-		
-		final IntegerOrderedSeries< E > series = new IntegerOrderedSeries< E >( keys.size() );
-		
-		final Iterator< Integer > keyIter = keys.iterator();
-		final Iterator< E > elemIter = elements.iterator();
-		while( keyIter.hasNext() && elemIter.hasNext() )
-		{
-			series.add( keyIter.next(), elemIter.next() );
-		}
-		
-		return series;
-	}
+//	/**
+//	 * Creates a {@link IntegerOrderedSeries} from a {@link Map}. The keys in the ordered series will be sorted
+//	 * based on the key's natural integer ordering. The elements in the ordered series are the associated values 
+//	 * from the {@link Map}.
+//	 * @param <K> The key type
+//	 * @param <E> The element type
+//	 * @param map The {@link Map} to be converted into a {@link IntegerOrderedSeries}
+//	 * @return a {@link IntegerOrderedSeries} from a {@link Map}. The keys in the ordered series will be sorted
+//	 * based on the key's natural integer ordering. The elements in the ordered series are the associated values 
+//	 * from the {@link Map}.
+//	 */
+//	public static < E > IntegerOrderedSeries< E > fromMap( final Map< Integer, E > map )
+//	{
+//		final IntegerOrderedSeries< E > series = new IntegerOrderedSeries< E >( map.size() );
+//		for( Map.Entry< Integer, E > entry : map.entrySet() )
+//		{
+//			series.add( entry.getKey(), entry.getValue() );
+//		}
+//		return series;
+//	}
+//
+//	/**
+//	 * Creates a {@link IntegerOrderedSeries} from two lists. The first list holds the keys to the ordered
+//	 * series. The second list holds the elements of the series. The two lists must have the same size.
+//	 * @param <E> The element type
+//	 * @param keys The keys to the list
+//	 * @param elements The elements of the list
+//	 * @return A {@link IntegerOrderedSeries} constructed from the two specified lists
+//	 */
+//	public static < E > IntegerOrderedSeries< E > fromLists( final List< Integer > keys, final List< E > elements )
+//	{
+//		Require.equalSize( keys, elements );
+//		
+//		final IntegerOrderedSeries< E > series = new IntegerOrderedSeries< E >( keys.size() );
+//		
+//		final Iterator< Integer > keyIter = keys.iterator();
+//		final Iterator< E > elemIter = elements.iterator();
+//		while( keyIter.hasNext() && elemIter.hasNext() )
+//		{
+//			series.add( keyIter.next(), elemIter.next() );
+//		}
+//		
+//		return series;
+//	}
 
 	/**
 	 * Converts an IntegerOrderedSeries to a BasicOrderedSeries

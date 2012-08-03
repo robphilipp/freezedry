@@ -261,9 +261,8 @@ public class JsonReader implements PersistenceReader {
 		// parse the source json string into a json object
 		String source = null;
 		JSONObject jsonObject = null;
-		try
+		try( final Scanner scanner = new Scanner( input ) )
 		{
-			final Scanner scanner = new Scanner( input );
 			source = scanner.useDelimiter( "\\A" ).next();
 		
 			jsonObject = new JSONObject( source );
