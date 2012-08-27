@@ -118,7 +118,7 @@ public class XmlReader implements PersistenceReader {
 			final StringBuffer message = new StringBuffer();
 			message.append( "Unable to parse the input stream into a DOM document (root node):" + Constants.NEW_LINE );
 			message.append( "  Class Name: " + clazz.getName() );
-			LOGGER.error( message.toString() );
+			LOGGER.error( message.toString(), e );
 			throw new IllegalStateException( message.toString(), e );
 		}
 		
@@ -143,26 +143,6 @@ public class XmlReader implements PersistenceReader {
 	 */
 	public static InfoNode buildInfoNode( final Class< ? > rootClass, final Document document ) 
 	{
-//		// grab the document's root element
-//		final Node rootNode = getRootDomNode( document );
-//		
-//		// create the root info node from the document's root element
-//		final InfoNode rootInfoNode = createRootInfoNode( rootClass, rootNode );
-//		
-//		// if the root node has text content, then it has a value, which means that it shouldn't
-//		// have any other nodes
-//		if( !rootNode.hasChildNodes() )
-//		{
-//			final String value = rootNode.getTextContent();
-//			rootInfoNode.setValue( value );
-//		}
-//		else
-//		{
-//			// recursively build out the InfoNode tree from the DOM tree
-//			buildInfoNode( rootNode, rootInfoNode );
-//		}
-//		return rootInfoNode;
-
 		// grab the document's root element
 		final Node rootNode = getRootDomNode( document );
 		
