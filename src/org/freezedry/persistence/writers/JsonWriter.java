@@ -203,7 +203,9 @@ public class JsonWriter implements PersistenceWriter {
 	
 			final PersistenceEngine engine = new PersistenceEngine();
 			
-			final InfoNode rootNode = engine.createSemanticModel( division );
+//			final InfoNode rootNode = engine.createSemanticModel( division );
+			final int[] test = new int[] { 3, 1, 4, 1, 5, 9, 2, 6, 5, 3 };
+			final InfoNode rootNode = engine.createSemanticModel( test );
 			System.out.println( rootNode.treeToString() );
 	
 			

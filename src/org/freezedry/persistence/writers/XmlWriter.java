@@ -33,7 +33,6 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.freezedry.persistence.PersistenceEngine;
-import org.freezedry.persistence.tests.Division;
 import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.Constants;
 import org.freezedry.persistence.utils.DomUtils;
@@ -198,16 +197,34 @@ public class XmlWriter implements PersistenceWriter {
 	{
 		DOMConfigurator.configure( "log4j.xml" );
 
-		final Division division = new Division();
+//		final Division division = new Division();
+//		final PersistenceEngine engine = new PersistenceEngine();
+//		final InfoNode rootNode = engine.createSemanticModel( division );
+//		System.out.println( rootNode.treeToString() );
+//
+//		try( final PrintWriter printWriter = new PrintWriter( new FileWriter( "person.xml" ) ) )
+//		{
+//			final XmlWriter writer = new XmlWriter();
+//			// uncomment this to prevent type information to be written to XML
+////			writer.setDisplayTypeInfo( false );
+//			writer.write( rootNode, printWriter );
+//		}
+//		catch( IOException e )
+//		{
+//			e.printStackTrace();
+//		}
+		
+//		final int[] test = new int[] { 3, 1, 4, 1, 5, 9, 2, 6, 5, 3 };
+		final int[][] test = new int[][] { { 3, 1 }, { 4, 1 }, { 5, 9 }, { 2, 6 }, { 5, 3 } };
 		final PersistenceEngine engine = new PersistenceEngine();
-		final InfoNode rootNode = engine.createSemanticModel( division );
+		final InfoNode rootNode = engine.createSemanticModel( test );
 		System.out.println( rootNode.treeToString() );
 
-		try( final PrintWriter printWriter = new PrintWriter( new FileWriter( "person.xml" ) ) )
+		try( final PrintWriter printWriter = new PrintWriter( new FileWriter( "test.xml" ) ) )
 		{
 			final XmlWriter writer = new XmlWriter();
 			// uncomment this to prevent type information to be written to XML
-//			writer.setDisplayTypeInfo( false );
+			writer.setDisplayTypeInfo( true );
 			writer.write( rootNode, printWriter );
 		}
 		catch( IOException e )

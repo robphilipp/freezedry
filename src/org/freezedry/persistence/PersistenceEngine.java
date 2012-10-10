@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -125,7 +126,7 @@ public class PersistenceEngine {
 	private static final Map< Class< ? >, Object > PRIMITIVE_TYPES = createPrimitives();
 	
 	private final Map< Class< ? >, NodeBuilder > nodeBuilders;
-	private NodeBuilder genaralArrayNodeBuilder;
+	private ArrayNodeBuilder genaralArrayNodeBuilder;
 	private boolean isPersistClassConstants = false;
 	
 	private final Map< Class< ? >, Object > defaultInstances;
@@ -258,7 +259,10 @@ public class PersistenceEngine {
 		boolean contains = false;
 		try
 		{
-			contains = ReflectionUtils.hasNodeBuilderAnnotation( clazz, fieldName );
+			if( clazz != null )
+			{
+				contains = ReflectionUtils.hasNodeBuilderAnnotation( clazz, fieldName );
+			}
 		}
 		catch( IllegalArgumentException e ) {}	// swallow the exception
 		
@@ -311,7 +315,7 @@ public class PersistenceEngine {
 	 * @param builder The default {@link NodeBuilder} to use for arrays for which a specific {@link NodeBuilder}
 	 * hasn't been specified.
 	 */
-	public void setGeneralArrayNodeBuilder( final NodeBuilder builder )
+	public void setGeneralArrayNodeBuilder( final ArrayNodeBuilder builder )
 	{
 		this.genaralArrayNodeBuilder = builder;
 	}
@@ -374,13 +378,38 @@ public class PersistenceEngine {
 		// create the root node of the tree, which holds the information about the
 		// object we are being asked to persist.
 		final Class< ? > clazz = object.getClass();
-		final InfoNode rootNode = InfoNode.createRootNode( clazz.getSimpleName(), clazz );
 		
-		// run through the methods building up the semantic model, which is a tree
-		// that holds the information about each element in a node. the node information
-		// is a complete set of information needed to persist and reconstruct an object
-		addNodes( rootNode, object );
-
+		InfoNode rootNode = null;
+		
+		// if the object is an array of one or more dimensions, then we need to replace the
+		// "[]" which the array suffix (by default = "Array"). Then we use the array node
+		// builder to create the semantic model.
+		if( clazz.isArray() )
+		{
+			final String persistName = clazz.getSimpleName().replaceAll( "\\[\\]", genaralArrayNodeBuilder.getCompoundArrayNameSuffix() );
+			try
+			{
+				rootNode = genaralArrayNodeBuilder.createInfoNode( null, object, persistName );
+			}
+			catch( ReflectiveOperationException e )
+			{
+				final StringBuffer message = new StringBuffer();
+				message.append( "Error building the root node" + Constants.NEW_LINE );
+				message.append( "  Class: " + clazz.getName() );
+				LOGGER.error( message.toString(), e );
+				throw new IllegalArgumentException( message.toString(), e );
+			}
+		}
+		else
+		{
+			rootNode = InfoNode.createRootNode( clazz.getSimpleName(), clazz );
+			
+			// run through the methods building up the semantic model, which is a tree
+			// that holds the information about each element in a node. the node information
+			// is a complete set of information needed to persist and reconstruct an object
+			addNodes( rootNode, object );
+		}
+		
 		// return the root node of the tree
 		return rootNode;
 	}
@@ -547,9 +576,29 @@ public class PersistenceEngine {
 	 */
 	public Object parseSemanticModel( final Class< ? > clazz, final InfoNode rootNode )
 	{
-		// instantiate the object and build it recursively
-		final Object object = instantiate( clazz, rootNode );
-		buildObject( object, rootNode );
+		Object object = null;
+		
+		if( clazz.isArray() )
+		{
+			try
+			{
+				object = genaralArrayNodeBuilder.createObject( null, clazz, rootNode );
+			}
+			catch( ReflectiveOperationException e )
+			{
+				final StringBuffer message = new StringBuffer();
+				message.append( "Error creating object" + Constants.NEW_LINE );
+				message.append( "  Class: " + clazz.getName() );
+				LOGGER.error( message.toString(), e );
+				throw new IllegalArgumentException( message.toString(), e );
+			}
+		}
+		else
+		{
+			// instantiate the object and build it recursively
+			object = instantiate( clazz, rootNode );
+			buildObject( object, rootNode );
+		}
 		
 		return object;
 	}
@@ -613,6 +662,11 @@ public class PersistenceEngine {
 				
 				// create the new instance using the constructor and its default parameters
 				object = minParamConstructor.newInstance( params );
+			}
+			else if( rootClass.isArray() )
+			{
+				final Class< ? > componentType = rootClass.getComponentType();
+				object = Array.newInstance( componentType, rootNode.getChildCount() );
 			}
 			else
 			{
@@ -810,7 +864,10 @@ public class PersistenceEngine {
 		if( fieldName == null )
 		{
 			final String persistName = currentNode.getPersistName();
-			fieldName = ReflectionUtils.getFieldNameForPersistenceName( containingClass, persistName );
+			if( containingClass != null )
+			{
+				fieldName = ReflectionUtils.getFieldNameForPersistenceName( containingClass, persistName );
+			}
 			if( fieldName == null )
 			{
 				fieldName = persistName;

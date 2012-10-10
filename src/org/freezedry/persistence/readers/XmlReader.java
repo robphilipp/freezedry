@@ -29,7 +29,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.freezedry.persistence.PersistenceEngine;
-import org.freezedry.persistence.tests.Division;
 import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.Constants;
 import org.freezedry.persistence.utils.DomUtils;
@@ -173,7 +172,7 @@ public class XmlReader implements PersistenceReader {
 			infoNode.addChild( newInfoNode );
 		}
 	}
-	
+
 	/*
 	 * Creates the {@link InfoNode} from the information available in the DOM node
 	 * @param domNode The DOM node from which to create the {@link InfoNode}
@@ -196,7 +195,7 @@ public class XmlReader implements PersistenceReader {
 				final String typeName = attributeNode.getNodeValue();
 				try
 				{
-					type = Class.forName( typeName );
+					type = getClassForName( typeName );
 				}
 				catch( ClassNotFoundException e )
 				{
@@ -205,7 +204,7 @@ public class XmlReader implements PersistenceReader {
 					message.append( "  Type Name: " + typeName + Constants.NEW_LINE );
 					message.append( "  Persist Name: " + persistName + Constants.NEW_LINE );
 					LOGGER.error( message.toString() );
-					throw new IllegalStateException( message.toString() );
+					throw new IllegalStateException( message.toString(), e );
 				}
 			}
 		}
@@ -254,6 +253,54 @@ public class XmlReader implements PersistenceReader {
 		}
 		
 		return infoNode;
+	}
+	
+	/**
+	 * Returns the class (including for primitives) for the specified name
+	 * @param typeName The name of the type (can be primitives)
+	 * @return the class (including for primitives) for the specified name
+	 * @throws ClassNotFoundException
+	 */
+	private static Class< ? > getClassForName( final String typeName ) throws ClassNotFoundException
+	{
+		// int types
+		if( typeName.equals( Integer.TYPE.getName() ) )
+		{
+			return Integer.TYPE;
+		}
+		if( typeName.equals( Short.TYPE.getName() ) )
+		{
+			return Short.TYPE;
+		}
+		if( typeName.equals( Long.TYPE.getName() ) )
+		{
+			return Long.TYPE;
+		}
+
+		// floating point types
+		if( typeName.equals( Float.TYPE.getName() ) )
+		{
+			return Float.TYPE;
+		}
+		if( typeName.equals( Double.TYPE.getName() ) )
+		{
+			return Double.TYPE;
+		}
+		
+		// ...and the rest
+		if( typeName.equals( Byte.TYPE.getName() ) )
+		{
+			return Byte.TYPE;
+		}
+		if( typeName.equals( Character.TYPE.getName() ) )
+		{
+			return Character.TYPE;
+		}
+		if( typeName.equals( Boolean.TYPE.getName() ) )
+		{
+			return Boolean.TYPE;
+		}
+		return Class.forName( typeName );
 	}
 	
 	/*
@@ -334,15 +381,26 @@ public class XmlReader implements PersistenceReader {
 	{
 		DOMConfigurator.configure( "log4j.xml" );
 		
+//		final XmlReader reader = new XmlReader();
+////		reader.setRemoveEmptyTextNodes( false );
+//		final InputStream inputStream = new BufferedInputStream( new FileInputStream( "person.xml" ) );
+//		final Reader input = new InputStreamReader( inputStream );
+//		final InfoNode infoNode = reader.read( Division.class, input );
+//		System.out.println( infoNode.simpleTreeToString() );
+//		
+//		final PersistenceEngine engine = new PersistenceEngine();
+//		final Object reperson = engine.parseSemanticModel( Division.class, infoNode );
+//		System.out.println( reperson );
+		
 		final XmlReader reader = new XmlReader();
 //		reader.setRemoveEmptyTextNodes( false );
-		final InputStream inputStream = new BufferedInputStream( new FileInputStream( "person.xml" ) );
+		final InputStream inputStream = new BufferedInputStream( new FileInputStream( "test.xml" ) );
 		final Reader input = new InputStreamReader( inputStream );
-		final InfoNode infoNode = reader.read( Division.class, input );
+		final InfoNode infoNode = reader.read( int[][].class, input );
 		System.out.println( infoNode.simpleTreeToString() );
 		
 		final PersistenceEngine engine = new PersistenceEngine();
-		final Object reperson = engine.parseSemanticModel( Division.class, infoNode );
+		final Object reperson = engine.parseSemanticModel( int[][].class, infoNode );
 		System.out.println( reperson );
 	}
 }

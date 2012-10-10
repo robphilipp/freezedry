@@ -144,21 +144,24 @@ public class ArrayNodeBuilder extends AbstractNodeBuilder {
 		// factories for registered node generators for the Class< ? > of the object)
 		final Class< ? > clazz = object.getClass();
 
-		// create a compound node that holds the child nodes that form
-		// the element of the List. For each child element, call this
-		// method recursively to create the appropriate node.
+		// create a compound node that holds the child nodes that form the element of the List. For each child element, call this
+		// method recursively to create the appropriate node. If the containing class is null (i.e. for int[], String[], etc) then
+		// we use the specified field name.
 		String persistName = null;
-		try
+		if( containingClass != null )
 		{
-			persistName = ReflectionUtils.getPersistenceName( containingClass.getDeclaredField( fieldName ) );
-		}
-		catch( ReflectiveOperationException e )
-		{
-			final StringBuffer message = new StringBuffer();
-			message.append( "Field not found in containing class:" + Constants.NEW_LINE );
-			message.append( "  Containing class: " + containingClass.getName() + Constants.NEW_LINE );
-			message.append( "  Field name: " + fieldName + Constants.NEW_LINE );
-			LOGGER.warn( message.toString(), e );
+			try
+			{
+				persistName = ReflectionUtils.getPersistenceName( containingClass.getDeclaredField( fieldName ) );
+			}
+			catch( ReflectiveOperationException e )
+			{
+				final StringBuffer message = new StringBuffer();
+				message.append( "Field not found in containing class:" + Constants.NEW_LINE );
+				message.append( "  Containing class: " + containingClass.getName() + Constants.NEW_LINE );
+				message.append( "  Field name: " + fieldName + Constants.NEW_LINE );
+				LOGGER.warn( message.toString(), e );
+			}
 		}
 		if( persistName == null || persistName.isEmpty() )
 		{
@@ -171,7 +174,14 @@ public class ArrayNodeBuilder extends AbstractNodeBuilder {
 		String elementPersistName = null;
 		try
 		{
-			final PersistArray arrayAnnotation = containingClass.getDeclaredField( fieldName ).getAnnotation( PersistArray.class );
+			// grab the array annotation if the containing class isn't null. If the containing class is null,
+			// then later in the code we set the name for which to persist the elements to the classes simple
+			// name with the compound array name suffix
+			PersistArray arrayAnnotation = null;
+			if( containingClass != null )
+			{
+				arrayAnnotation = containingClass.getDeclaredField( fieldName ).getAnnotation( PersistArray.class );
+			}
 			if( arrayAnnotation != null && !arrayAnnotation.elementPersistName().isEmpty() )
 			{
 				elementPersistName = arrayAnnotation.elementPersistName();
@@ -191,12 +201,11 @@ public class ArrayNodeBuilder extends AbstractNodeBuilder {
 		for( int i = 0; i < Array.getLength( object ); ++i )
 		{
 			// grab the element of the array
-			final Object element = Array.get( object, i );
+			final Class< ? > elementClazz = object.getClass().getComponentType();
 			
 			String name;
 			if( elementPersistName == null )
 			{
-				final Class< ? > elementClazz = element.getClass();
 				name = elementClazz.getSimpleName();
 				if( elementClazz.isArray() )
 				{
@@ -207,7 +216,17 @@ public class ArrayNodeBuilder extends AbstractNodeBuilder {
 			{
 				name = elementPersistName;
 			}
-			node.addChild( createNode( clazz, element, name ) );
+			
+			// grab the element and create the node. however, because the element may be a primitive
+			// we need to set the node's class type to the actual element node. if we don't do this
+			// then, for example, all ints will become Integers and if we ask for the type to be 
+			// set within the node, the type will be incorrect
+			final Object element = Array.get( object, i );
+			final InfoNode elementNode = createNode( clazz, element, name );
+			elementNode.setClazz( elementClazz );
+			
+			// add the new node as a child to the parent
+			node.addChild( elementNode );
 		}
 		
 		return node;
@@ -259,8 +278,16 @@ public class ArrayNodeBuilder extends AbstractNodeBuilder {
 		int index = 0;
 		for( InfoNode element : node.getChildren() ) 
 		{
-			// set the value into the array
-			final Object object = buildObject( containingClass, clazz.getComponentType(), null, element, node );
+			Object object = null;
+			if( element.getClazz() != null && element.getClazz().isArray() )
+			{
+				object = createObject( containingClass, element.getClazz(), element );
+			}
+			else
+			{
+				// set the value into the array
+				object = buildObject( containingClass, clazz.getComponentType(), null, element, node );
+			}
 			Array.set( collection, index, object );
 			
 			// increment the index counter
