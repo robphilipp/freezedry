@@ -7,7 +7,7 @@
 	<!-- 
 		version information 
 	-->
-	<property name="version" value="0.2.2" />
+	<property name="version" value="0.2.3" />
 
 	<!-- 
 		set global properties for this build

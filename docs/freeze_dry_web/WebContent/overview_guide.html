@@ -706,6 +706,17 @@ you should create an annotation if you want to customize its behavior from the c
 <p>This section describes the larger changes. More detailed changes can be found in the README 
 file in the file download area. Most updates will contain bug fixes and minor code refactoring.</p>
 
+<h4>Version 0.2.3 (from version 0.2.2)</h4>
+<p>Mainly provided fixes that allow FreezeDry to be use more effectively as a serialization engine. Mostly this work
+was done for the <a href="http://diffusive.sourceforge.net">Diffusive</a> project.</p>
+<ol>
+    <li>Provided the capability to persist arrays as top level objects. For example, if you would like to directly persist
+        an <b class="class">int[][]</b> (i.e. not a field in some other class) you can now do this.</li>
+    <li>Fixed a minor issue where primitive types were being automatically wrapped in their Java types when specifying
+        their names as a type attribute or as the element names. For example, a <b class="class">double</b> element
+        had its type attribute or name set to <b class="class">Double</b> instead of <b class="class">double</b>.</li>
+</ol>
+
 <h4>Version 0.2.2 (from version 0.2.1)</h4>
 <ol>
 	<li>Removed the restriction that the persisted class requires a no-arg constructor.</li>
