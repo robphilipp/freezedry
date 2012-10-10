@@ -224,7 +224,7 @@ public class XmlWriter implements PersistenceWriter {
 		{
 			final XmlWriter writer = new XmlWriter();
 			// uncomment this to prevent type information to be written to XML
-			writer.setDisplayTypeInfo( true );
+//			writer.setDisplayTypeInfo( true );
 			writer.write( rootNode, printWriter );
 		}
 		catch( IOException e )

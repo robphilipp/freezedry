@@ -29,7 +29,6 @@ import java.util.Scanner;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.freezedry.persistence.PersistenceEngine;
-import org.freezedry.persistence.tests.Division;
 import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.Constants;
 import org.freezedry.persistence.utils.JsonUtils;
@@ -347,14 +346,25 @@ public class JsonReader implements PersistenceReader {
 	{
 		DOMConfigurator.configure( "log4j.xml" );
 		
-		final InputStream inputStream = new BufferedInputStream( new FileInputStream( "person.json" ) );
+//		final InputStream inputStream = new BufferedInputStream( new FileInputStream( "person.json" ) );
+//		final Reader input = new InputStreamReader( inputStream );
+//		final JsonReader reader = new JsonReader();
+//		final InfoNode infoNode = reader.read( Division.class, input );
+//		System.out.println( infoNode.simpleTreeToString() );
+//		
+//		final PersistenceEngine engine = new PersistenceEngine();
+//		final Object reperson = engine.parseSemanticModel( Division.class, infoNode );
+//		System.out.println( reperson );
+		
+		final InputStream inputStream = new BufferedInputStream( new FileInputStream( "test.json" ) );
 		final Reader input = new InputStreamReader( inputStream );
 		final JsonReader reader = new JsonReader();
-		final InfoNode infoNode = reader.read( Division.class, input );
+		final Class< ? > inputClazz = int[].class;
+		final InfoNode infoNode = reader.read( inputClazz, input );
 		System.out.println( infoNode.simpleTreeToString() );
 		
 		final PersistenceEngine engine = new PersistenceEngine();
-		final Object reperson = engine.parseSemanticModel( Division.class, infoNode );
+		final Object reperson = engine.parseSemanticModel( inputClazz, infoNode );
 		System.out.println( reperson );
 	}
 

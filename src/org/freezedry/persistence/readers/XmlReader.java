@@ -393,14 +393,15 @@ public class XmlReader implements PersistenceReader {
 //		System.out.println( reperson );
 		
 		final XmlReader reader = new XmlReader();
+		final Class< ? > inputClazz = int[][].class;
 //		reader.setRemoveEmptyTextNodes( false );
 		final InputStream inputStream = new BufferedInputStream( new FileInputStream( "test.xml" ) );
 		final Reader input = new InputStreamReader( inputStream );
-		final InfoNode infoNode = reader.read( int[][].class, input );
+		final InfoNode infoNode = reader.read( inputClazz, input );
 		System.out.println( infoNode.simpleTreeToString() );
 		
 		final PersistenceEngine engine = new PersistenceEngine();
-		final Object reperson = engine.parseSemanticModel( int[][].class, infoNode );
+		final Object reperson = engine.parseSemanticModel( inputClazz, infoNode );
 		System.out.println( reperson );
 	}
 }
