@@ -5,10 +5,26 @@
 	<link rel="stylesheet" type="text/css" href="freezedry.css"/>
 
 	<!-- Code Syntax Highlighting -->
-	<script type="text/javascript" src="scripts/syntax_highlight/shCore.js"></script>
-	<script type="text/javascript" src="scripts/syntax_highlight/shBrushJava.js"></script>
-	<script type="text/javascript" src="scripts/syntax_highlight/shBrushXml.js"></script>
-	
+	<script src="scripts/syntax_highlight/shCore.js"></script>
+	<script src="scripts/syntax_highlight/shBrushJava.js"></script>
+	<script src="scripts/syntax_highlight/shBrushXml.js"></script>
+
+    <script src="scripts/toc-creator.js"></script>
+
+    <script src="scripts/mootools-core-1.4.5.js" ></script>
+    <script>
+        window.addEvent( 'domready', function() {
+            // syntax highlighting for the code
+            SyntaxHighlighter.defaults['gutter'] = false;
+            SyntaxHighlighter.defaults['toolbar'] = false;
+            SyntaxHighlighter.all();
+
+            // create the table of contents
+            createToc( "Contents" );
+        }, false );
+    </script>
+
+
 	<link rel="stylesheet" type="text/css" href="scripts/syntax_highlight/shCore.css" />
 	<link rel="stylesheet" type="text/css" href="scripts/syntax_highlight/shThemeEclipse.css" />
 
@@ -17,7 +33,7 @@
 
 <body>
 
-<header>
+<header id="top">
 	<img src="images/web_banner.png">
 </header>
 
@@ -32,28 +48,9 @@
 	<a href="https://sourceforge.net/p/freezedried/discussion/" target="tab">Discussion</a>
 </nav>
 
-<div id="toc">
-<p class="overview_toc">Contents</p>
-	<ul class="overview_toc_list">
-		<li><a href="#overview">Overview</a></li>
-		<li><a href="#whats_new">What's New</a></li>
-		<li><a href="#landscape">Landscape</a>
-			<ul class="overview_toc_list">
-				<li><a href="#persistence">Persistence</a></li>
-				<li><a href="#behavior_mod">Behavior Modification</a></li>
-				<li><a href="#persistence_engine">Persistence Engine</a></li>
-				<li><a href="#semantic_model">Semantic Model</a></li>
-				<li><a href="#node_builders">Node Builders</a></li>
-				<li><a href="#readers_writers">Readers and Writers</a></li>
-				<li><a href="#annotations">Annotations</a></li>
-			</ul>
-		</li>
-	</ul>
-</div>
-
 <article>
 
-<h2 id="overview"><a href="#overview">Overview</a></h2>
+<h2 id="overview"><a href="#top">Overview</a></h2>
 
 <p><b>FreezeDry</b> provides an easy mechanism for converting Java objects into a persisted
 form and then back again. And there is no need for creating binding files.</p>
@@ -144,7 +141,7 @@ by implementing a custom node builder, or by implementing a custom reader and wr
 
 <p>In the next sections we will describe <b>FreezeDry</b>s design.</p>
 
-<h2 id="landscape"><a href="#overview">FreezeDry Landscape</a></h2>
+<h2 id="landscape"><a href="#top">FreezeDry Landscape</a></h2>
 
 <p>At a high level, <b>FreezeDry</b> has is composed of:</p>
 
@@ -173,7 +170,7 @@ the key. And in XML, you could add an attribute <em>type</em> to each element. B
 And so in both of these cases, type information is likely lost. And mostly, it is when reconstituting complex objects 
 from persistence where <b>FreezeDry</b> may need help.</p>
 
-<h4 id="persistence"><a href="#overview">Persistence</a></h4>
+<h4 id="persistence"><a href="#top">Persistence</a></h4>
 
 <p><b>FreezeDry</b> provides an easy way to persist Java objects to XML, JSON, and lists of key-value pairs. And to be 
 useful, it also provides an easy way to reconstitute objects from their persisted form. As shown above, you can write 
@@ -220,7 +217,7 @@ typically be needed for dealing with that specified persistence form.</p>
 		and between the key and the values.</td></tr>
 </table>
 
-<h4 id="behavior_mod"><a href="#overview">Behavior Modification</a></h4>
+<h4 id="behavior_mod"><a href="#top">Behavior Modification</a></h4>
 
 <p><b>FreezeDry</b>'s behavior can be modified in a number ways. The four typical approaches to modifying its behavior are:</p>
 
@@ -233,7 +230,7 @@ typically be needed for dealing with that specified persistence form.</p>
 		 and the <em>Semantic Model</em>, or extending existing <b class="class">Reader</b> or <b class="class">Writer</b> classes.</li>
 </ul>
 
-<h4 id="persistence_engine"><a href="#overview">The Persistence Engine</a></h4>
+<h4 id="persistence_engine"><a href="#top">The Persistence Engine</a></h4>
 
 <p>When using the <b>FreezeDry</b> persistence framework, you'll mostly be dealing with three classes. 
 The <b class="class">PersistenceEngine</b>, a <b class="class">Reader</b>, and a <b class="class">Writer</b>. 
@@ -248,7 +245,7 @@ Rather, it should just know that it can. And the reason it can, is because it ma
 objects that do know the details. The <b class="class">PersistenceEngine</b> only knows how a field (based on its class) 
 is mapped to a specified <b class="class">NodeBuilder</b>.</p>
 
-<h5 id="object_to_semantic_model"><a href="#overview">Object to Semantic Model</a></h5>
+<h5 id="object_to_semantic_model"><a href="#top">Object to Semantic Model</a></h5>
 
 <p>To create a semantic model from an object, you use the <b class="class">PersistenceEngine</b> method:</p>
 
@@ -281,7 +278,7 @@ there is an entry for <b class="class">Collection</b>, and recognize that a <b c
     NodeBuilder removeNodeBuilder( final Class&lt; ? &gt; clazz )
 </pre>
 
-<h5 id="semantic_model_to_object"><a href="#overview">Semantic Model to Object</a></h5>
+<h5 id="semantic_model_to_object"><a href="#top">Semantic Model to Object</a></h5>
 
 <p>To create an object from the semantic model, you use the <b class="class">PersistenceEngine</b> method</p>
 
@@ -300,7 +297,7 @@ a valid <b>Semantic Model</b> as represented by the root node of the <b class="c
 you also give the <b class="class">PersistenceEngine</b> the *class* that the semantic model represents, you 
 get back an object of that class type. Its as simple as that.</p>
 
-<h4 id="semantic_model"><a href="#overview">Semantic Model</a></h4>
+<h4 id="semantic_model"><a href="#top">Semantic Model</a></h4>
 
 <p><b>FreezeDry's</b> semantic model is a tree structure that is built from <b class="class">InfoNode</b> objects. 
 So if you love recursion, then you'll love the semantic model because it's all about recursion. Powerfully 
@@ -332,7 +329,7 @@ may only contain the <em>persistName</em>. The <b class="class">PersistenceEngin
 <em>class</em>, using a set of default class types for instantiation, and/or field annotations, will figure 
 out the types that it needs to instantiate.</p>
 
-<h4 id="node_builders"><a href="#overview">Node Builders</a></h4>
+<h4 id="node_builders"><a href="#top">Node Builders</a></h4>
 
 <p><b class="class">NodeBuilders</b> are responsible for creating an <b class="class">InfoNode</b> from an object 
 or field, and for creating an object or setting a field within an object when given an <b class="class">InfoNode</b>.</p>
@@ -348,7 +345,7 @@ semantic model. When creating an object from the semantic model, the <b class="c
 also uses the <b class="class">NodeBuilder</b> associated with the type represented by the <b class="class">InfoNode</b>, 
 and in cases when the <b class="class">InfoNode</b> doesn't hold the type information, it finds it from the class itself.</p>
 
-<h5 id="node_builder_class_interface"><a href="#overview">NodeBuilder Interface</a></h5>
+<h5 id="node_builder_class_interface"><a href="#top">NodeBuilder Interface</a></h5>
 
 <p>The <b class="class">NodeBuilder</b> interface has</p> 
 
@@ -391,7 +388,7 @@ it comes across. And the <b class="class">PersistenceEngine</b> calls the approp
 to create the <b class="class">InfoNode</b> for <b class="class">Person</b> (or uses default behavior to create a 
 compound <b class="class">InfoNode</b>).</p>
 
-<h5 id="node_builder_class_abstract"><a href="#overview">AbstractNodeBuilder</a></h5>
+<h5 id="node_builder_class_abstract"><a href="#top">AbstractNodeBuilder</a></h5>
 
 <p>The <b class="class">AbstractNodeBuilder</b> implements manages the reference to the <b class="class">PersistenceEngine</b> but also provides a mapping for instantiating objects for which the type is an interface or abstract. For example, suppose that your class looks like this</p>
 
@@ -434,7 +431,7 @@ compound <b class="class">InfoNode</b>).</p>
     boolean containsInterface( final Class&lt; ? &gt; clazz )
 </pre>
 
-<h5 id="available_node_builders"><a href="#overview">Available NodeBuilders</a></h5>
+<h5 id="available_node_builders"><a href="#top">Available NodeBuilders</a></h5>
 
 <p><b>FreezeDry</b> comes with a set of <b class="class">NodeBuilder</b> objects that deal with many of the basic types.</p>
 
@@ -460,7 +457,7 @@ compound <b class="class">InfoNode</b>).</p>
 	<li><b class="class">ArrayNodeBuilder</b> for dealing with arrays of objects such as **String[]**, **int[]**, etc</li>
 </ul>
 
-<h4 id="readers_writers"><a href="#overview">Readers and Writers</a></h4>
+<h4 id="readers_writers"><a href="#top">Readers and Writers</a></h4>
 
 <p>The <b class="class">PersistenceReader</b> and <b class="class">PersistenceWriter</b> interfaces each define one method.</p>
 
@@ -497,7 +494,7 @@ semantic model into an object.</p>
 	<tr><td><b class="class">KeyValueWriter</b></td><td>Key-Values</td><td>writes an object to a persisted form that is a list of key-value pairs</td></tr>
 </table>
  
-<h5 id="key_value_reader_writer"><a href="#overview">Key-Value Readers and Writers</a></h5>
+<h5 id="key_value_reader_writer"><a href="#top">Key-Value Readers and Writers</a></h5>
 
 <p>Because XML and JSON are well-documented standards, I won't discuss them here. But the Key-Value readers and 
 writers require a description. Effectively, the lists of key-value pairs are flattened versions of a Java object, 
@@ -618,7 +615,7 @@ decorator. And if the string is decorated by that decorator, it can "undecorate"
 	<tr><td><b class="class">BooleanDecorator</b></td><td>Formats parses booleans.</td></tr>
 </table>
 
-<h4 id="annotations"><a href="#overview">Annotations</a></h4>
+<h4 id="annotations"><a href="#top">Annotations</a></h4>
 
 <p>In some cases you may want to change the way an object or field are persisted. For example,
 you may want to persist a field using a specified name instead of its field name. The code below 
@@ -651,7 +648,7 @@ field name. But, now, you can easily override its name.</p>
 <b>FreezeDry</b>. The first type is the <em>built-in</em> annotation <b class="class">Persist</b>. And the second type 
 are <em>custom</em> annotations that are specific to a <b class="class">NodeBuilder</b>.</p>
 
-<h5 id="built_in_annotations"><a href="#overview">Built-In Annotations</a></h5>
+<h5 id="built_in_annotations"><a href="#top">Built-In Annotations</a></h5>
 
 <p>This is used by the persistence engine, and is meant to represent common types of customizations that one would want 
 to perform across all objects. Such as the specifying a name for the persisted field. The other customization is the 
@@ -683,7 +680,7 @@ The <b class="class">Persist</b> annotation is shown below.
 
 <p>Notice that the retention policy states that the annotation is available at run-time, and that the targets are types and fields.</p>
 
-<h5 id="custom_annotations"><a href="#overview">Custom Annotations</a></h5>
+<h5 id="custom_annotations"><a href="#top">Custom Annotations</a></h5>
 
 <p>Custom annotations, the "second type", are intended to work hand-in-hand with a specific <b class="class">NodeBuilder</b>. 
 The idea is that when a <b class="class">NodeBuilder</b> is creating an <b class="class">InfoNode</b> from an object or field, 
@@ -701,7 +698,7 @@ you should create an annotation if you want to customize its behavior from the c
 	<tr><td>PersistDate</td><td><b class="class">DateNodeBuilder</b></td><td>value (represents the format)</td></tr>
 </table>
 
-<h2 id="whats_new"><a href="#overview">What's New</a></h2>
+<h2 id="whats_new"><a href="#top">What's New</a></h2>
 
 <p>This section describes the larger changes. More detailed changes can be found in the README 
 file in the file download area. Most updates will contain bug fixes and minor code refactoring.</p>
@@ -769,11 +766,6 @@ was done for the <a href="http://diffusive.sourceforge.net">Diffusive</a> projec
 
 </article>
  
-<!-- Finally, to actually run the highlighter, you need to include this JS on your page -->
-<script type="text/javascript">
-SyntaxHighlighter.defaults['gutter'] = false;
-SyntaxHighlighter.defaults['toolbar'] = false;
-    SyntaxHighlighter.all()
-</script>
+</body>
 
 </html>
