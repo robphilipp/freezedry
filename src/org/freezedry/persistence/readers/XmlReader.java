@@ -142,17 +142,51 @@ public class XmlReader implements PersistenceReader {
 	 */
 	public static InfoNode buildInfoNode( final Class< ? > rootClass, final Document document ) 
 	{
-		// grab the document's root element
-		final Node rootNode = getRootDomNode( document );
-		
-		// create the root info node from the document's root element
-		final InfoNode rootInfoNode = createRootInfoNode( rootClass, rootNode );
-		
-		// recursively build out the InfoNode tree from the DOM tree
-		buildInfoNode( rootNode, rootInfoNode );
+		InfoNode rootInfoNode = null;
+//		if( hosOnlyTextChildNodes( document ) )
+//		{
+//			rootInfoNode = InfoNode.createRootNode( rootClass.getSimpleName(), rootClass );
+//			
+//			final Node textNode = document.getChildNodes().item( 0 );
+//			if( textNode.getNodeType() != Node.TEXT_NODE )
+//			{
+//				final StringBuffer message = new StringBuffer();
+//				message.append( "Error: the only child node should be a text node." );
+//				LOGGER.error( message.toString() );
+//				throw new IllegalStateException( message.toString() );
+//			}
+//			rootInfoNode.setValue( textNode.getNodeValue() );
+//		}
+//		else
+//		{
+			// grab the document's root element
+			final Node rootNode = getRootDomNode( document );
+			
+			// create the root info node from the document's root element
+			rootInfoNode = createRootInfoNode( rootClass, rootNode );
+			
+			// recursively build out the InfoNode tree from the DOM tree
+			buildInfoNode( rootNode, rootInfoNode );
+//		}
 		
 		return rootInfoNode;
 	}
+	
+//	private static boolean hosOnlyTextChildNodes( final Document document )
+//	{
+//		boolean hasChildren = false;
+//		final NodeList nodes = document.getChildNodes();
+//		for( int i = 0; i < nodes.getLength(); ++i  )
+//		{
+//			final short nodeType = nodes.item( i ).getNodeType();
+//			if( nodeType == Node.DOCUMENT_NODE || nodeType == Node.DOCUMENT_FRAGMENT_NODE )//|| nodeType == Node.ELEMENT_NODE )
+//			{
+//				hasChildren = true;
+//				break;
+//			}
+//		}
+//		return !hasChildren;
+//	}
 
 	/*
 	 * Recursive algorithm for building the {@link InfoNode} from the DOM tree

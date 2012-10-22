@@ -107,17 +107,29 @@ public class CollectionNodeBuilder extends AbstractNodeBuilder {
 		// the element of the Collection. For each child element, call this
 		// method recursively to create the appropriate node.
 		String persistName = null;
-		try
+		String elementPersistName = null;
+		if( containingClass != null )
 		{
-			persistName = ReflectionUtils.getPersistenceName( containingClass.getDeclaredField( fieldName ) );
-		}
-		catch( ReflectiveOperationException e )
-		{
-			final StringBuffer message = new StringBuffer();
-			message.append( "Field not found in containing class:" + Constants.NEW_LINE );
-			message.append( "  Containing class: " + containingClass.getName() + Constants.NEW_LINE );
-			message.append( "  Field name: " + fieldName + Constants.NEW_LINE );
-			LOGGER.info( message.toString() );
+			try
+			{
+				// grab the persistence name from any annotations to the field
+				persistName = ReflectionUtils.getPersistenceName( containingClass.getDeclaredField( fieldName ) );
+
+				// check the annotations to see of the collection elements have been given a name
+				final PersistCollection collectionAnnotation = containingClass.getDeclaredField( fieldName ).getAnnotation( PersistCollection.class );
+				if( collectionAnnotation != null && !collectionAnnotation.elementPersistName().isEmpty() )
+				{
+					elementPersistName = collectionAnnotation.elementPersistName();
+				}
+			}
+			catch( ReflectiveOperationException e )
+			{
+				final StringBuffer message = new StringBuffer();
+				message.append( "Field not found in containing class:" + Constants.NEW_LINE );
+				message.append( "  Containing class: " + containingClass.getName() + Constants.NEW_LINE );
+				message.append( "  Field name: " + fieldName + Constants.NEW_LINE );
+				LOGGER.info( message.toString() );
+			}
 		}
 		if( persistName == null || persistName.isEmpty() )
 		{
@@ -127,23 +139,23 @@ public class CollectionNodeBuilder extends AbstractNodeBuilder {
 		
 		// grab the annotations for this field and see if the persist name is specified
 		// does the class have a @PersistCollection( elementPersistName = "xxxx" )
-		String elementPersistName = null;
-		try
-		{
-			final PersistCollection collectionAnnotation = containingClass.getDeclaredField( fieldName ).getAnnotation( PersistCollection.class );
-			if( collectionAnnotation != null && !collectionAnnotation.elementPersistName().isEmpty() )
-			{
-				elementPersistName = collectionAnnotation.elementPersistName();
-			}
-		}
-		catch( ReflectiveOperationException e )
-		{
-			final StringBuffer message = new StringBuffer();
-			message.append( "Field not found in containing class:" + Constants.NEW_LINE );
-			message.append( "  Containing class: " + containingClass.getName() + Constants.NEW_LINE );
-			message.append( "  Field name: " + fieldName + Constants.NEW_LINE );
-			LOGGER.info( message.toString() );
-		}
+//		String elementPersistName = null;
+//		try
+//		{
+//			final PersistCollection collectionAnnotation = containingClass.getDeclaredField( fieldName ).getAnnotation( PersistCollection.class );
+//			if( collectionAnnotation != null && !collectionAnnotation.elementPersistName().isEmpty() )
+//			{
+//				elementPersistName = collectionAnnotation.elementPersistName();
+//			}
+//		}
+//		catch( ReflectiveOperationException e )
+//		{
+//			final StringBuffer message = new StringBuffer();
+//			message.append( "Field not found in containing class:" + Constants.NEW_LINE );
+//			message.append( "  Containing class: " + containingClass.getName() + Constants.NEW_LINE );
+//			message.append( "  Field name: " + fieldName + Constants.NEW_LINE );
+//			LOGGER.info( message.toString() );
+//		}
 		
 		// run through the Collection elements, recursively calling createNode(...) to create
 		// the appropriate node which to add to the newly created compound node.

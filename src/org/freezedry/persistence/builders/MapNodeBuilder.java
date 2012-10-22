@@ -89,17 +89,20 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 		// the element of the List. For each child element, call this
 		// method recursively to create the appropriate node.
 		String persistName = null;
-		try
+		if( containingClass != null )
 		{
-			persistName = ReflectionUtils.getPersistenceName( containingClass.getDeclaredField( fieldName ) );
-		}
-		catch( ReflectiveOperationException e )
-		{
-			final StringBuffer message = new StringBuffer();
-			message.append( "Field not found in containing class:" + Constants.NEW_LINE );
-			message.append( "  Containing class: " + containingClass.getName() + Constants.NEW_LINE );
-			message.append( "  Field name: " + fieldName + Constants.NEW_LINE );
-			LOGGER.info( message.toString() );
+			try
+			{
+				persistName = ReflectionUtils.getPersistenceName( containingClass.getDeclaredField( fieldName ) );
+			}
+			catch( ReflectiveOperationException e )
+			{
+				final StringBuffer message = new StringBuffer();
+				message.append( "Field not found in containing class:" + Constants.NEW_LINE );
+				message.append( "  Containing class: " + containingClass.getName() + Constants.NEW_LINE );
+				message.append( "  Field name: " + fieldName + Constants.NEW_LINE );
+				LOGGER.info( message.toString() );
+			}
 		}
 		if( persistName == null || persistName.isEmpty() )
 		{

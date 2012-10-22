@@ -189,9 +189,19 @@ public class DateNodeBuilder extends AbstractLeafNodeBuilder {
 		// grab the class for the object to persist
 		final Class< ? > clazz = object.getClass();
 		
-		// grab the persistence name if the annotation @Persist( persistName = "xxxx" ) is specified,
-		// and if the leaf is part of another class (such as a collection) it will return the field name
-		final String persistName = ReflectionUtils.getPersistenceName( containingClass, fieldName );
+		// when the containing class is null, then class is the root node of the semantic model, and therefore
+		// there won't be a field name to with a annotation containing the persist name.
+		String persistName = null;
+		if( containingClass != null )
+		{
+			// grab the persistence name if the annotation @Persist( persistName = "xxxx" ) is specified,
+			// and if the leaf is part of another class (such as a collection) it will return the field name
+			persistName = ReflectionUtils.getPersistenceName( containingClass, fieldName );
+		}
+		if( persistName == null || persistName.isEmpty() )
+		{
+			persistName = fieldName;
+		}
 
 		// grab any date formatting information that may be present in and annotation
 		String dateFormat = outputDateFormat;

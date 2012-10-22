@@ -38,6 +38,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -124,6 +125,7 @@ public class PersistenceEngine {
 	private static final Logger LOGGER = Logger.getLogger( PersistenceEngine.class );
 	
 	private static final Map< Class< ? >, Object > PRIMITIVE_TYPES = createPrimitives();
+	private static final Set< Class< ? > > NON_ROOT_OBJECTS = nonRootObjects();
 	
 	private final Map< Class< ? >, NodeBuilder > nodeBuilders;
 	private ArrayNodeBuilder genaralArrayNodeBuilder;
@@ -195,6 +197,31 @@ public class PersistenceEngine {
 		return primitives;
 	}
 	
+	/**
+	 * @return a {@link Set} containing the primitive type wrapper objects and {@link String}. These
+	 * are the objects that can't be root objects
+	 */
+	private static Set< Class< ? > > nonRootObjects()
+	{
+		final Set< Class< ? > > primitives = new HashSet<>();
+		primitives.add( Integer.class );
+		primitives.add( Long.class );
+		primitives.add( Short.class );
+		primitives.add( Double.class );
+		primitives.add( Float.class );
+		primitives.add( Boolean.class );
+		primitives.add( Byte.class );
+		primitives.add( Character.class );
+		primitives.add( String.class );
+		
+		// add the primitives as well
+		primitives.addAll( PRIMITIVE_TYPES.keySet() );
+		return primitives;
+	}
+	
+	/**
+	 * @return a map containing a primitive type and the wrapper object used to represent that primitive type
+	 */
 	private static Map< Class< ? >, Object > createDefaultInstances()
 	{
 		final Map< Class< ? >, Object > defaults = new HashMap<>();
@@ -281,6 +308,37 @@ public class PersistenceEngine {
 	public NodeBuilder getNodeBuilder( final Class< ? > clazz )
 	{
 		return ReflectionUtils.getItemOrAncestorCopyable( clazz, nodeBuilders );
+	}
+	
+	/**
+	 * Returns true if the specified {@link Class} is in the {@link #NON_ROOT_OBJECTS} {@link Set} 
+	 * @param clazz The {@link Class} to find in the {@link #NON_ROOT_OBJECTS} {@link Set}
+	 * @return true if the {@link Class} is a non-root object (i.e. an object that shouldn't be a
+	 * root element in the semantic model.
+	 */
+	public boolean isNonRootObject( final Class< ? > clazz )
+	{
+		boolean isNonRootObject = false;
+		if( NON_ROOT_OBJECTS.contains( clazz ) )
+		{
+			isNonRootObject = true;
+		}
+		else
+		{
+			for( Class< ? > element : NON_ROOT_OBJECTS )
+			{
+				if( ReflectionUtils.calculateClassDistance( clazz, element ) > -1 )
+				{
+					isNonRootObject = true;
+					
+					// add the value for faster look-up next time
+					NON_ROOT_OBJECTS.add( clazz );
+					
+					break;
+				}
+			}
+		}
+		return isNonRootObject;
 	}
 	
 	/**
@@ -400,6 +458,22 @@ public class PersistenceEngine {
 				throw new IllegalArgumentException( message.toString(), e );
 			}
 		}
+//		// if the override node builders contains a node builder for this specific class, then we'll use it
+//		else if( containsNodeBuilder( clazz ) && !isNonRootObject( clazz ) )
+//		{
+//			try
+//			{
+//				rootNode = getNodeBuilder( clazz ).createInfoNode( null, object, clazz.getSimpleName() );
+//			}
+//			catch( ReflectiveOperationException e )
+//			{
+//				final StringBuffer message = new StringBuffer();
+//				message.append( "Error building the root node" + Constants.NEW_LINE );
+//				message.append( "  Class: " + clazz.getName() );
+//				LOGGER.error( message.toString(), e );
+//				throw new IllegalArgumentException( message.toString(), e );
+//			}
+//		}
 		else
 		{
 			rootNode = InfoNode.createRootNode( clazz.getSimpleName(), clazz );
@@ -593,6 +667,23 @@ public class PersistenceEngine {
 				throw new IllegalArgumentException( message.toString(), e );
 			}
 		}
+//		// TODO issue with the generic type of the list
+//		// if the override node builders contains a node builder for this specific class, then we'll use it
+//		else if( containsNodeBuilder( clazz ) && !isNonRootObject( clazz ) )
+//		{
+//			try
+//			{
+//				object = getNodeBuilder( clazz ).createObject( null, clazz, rootNode );
+//			}
+//			catch( ReflectiveOperationException e )
+//			{
+//				final StringBuffer message = new StringBuffer();
+//				message.append( "Error creating object" + Constants.NEW_LINE );
+//				message.append( "  Class: " + clazz.getName() );
+//				LOGGER.error( message.toString(), e );
+//				throw new IllegalArgumentException( message.toString(), e );
+//			}
+//		}
 		else
 		{
 			// instantiate the object and build it recursively

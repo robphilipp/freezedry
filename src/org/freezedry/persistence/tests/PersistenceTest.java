@@ -1,5 +1,21 @@
+/*
+ * Copyright 2012 Robert Philipp
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 package org.freezedry.persistence.tests;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -15,7 +31,9 @@ import java.io.Reader;
 import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +50,11 @@ import org.freezedry.persistence.writers.JsonWriter;
 import org.freezedry.persistence.writers.XmlWriter;
 import org.junit.Test;
 
+/**
+ * Tests for FreezeDry
+ * 
+ * @author Robert Philipp
+ */
 public class PersistenceTest {
 
 	private static final String PATH = "src/org/freezedry/persistence/tests/";
@@ -128,13 +151,13 @@ public class PersistenceTest {
 	 * @param fileName
 	 * @throws IOException
 	 */
-	private void writeXml( final InfoNode node, final String fileName ) throws IOException
+	private void writeXml( final InfoNode node, final String fileName, final boolean isDisplayTypeInfo ) throws IOException
 	{
 		// write out XML
 		try( final PrintWriter printWriter = new PrintWriter( new FileWriter( PATH + fileName ) ) )
 		{
 			final XmlWriter writer = new XmlWriter();
-			writer.setDisplayTypeInfo( false );
+			writer.setDisplayTypeInfo( isDisplayTypeInfo );
 			writer.write( node, printWriter );
 		}
 		catch( IOException e )
@@ -198,7 +221,7 @@ public class PersistenceTest {
 	 * @param object
 	 * @param reObject
 	 */
-	private void testTrue( final Object object, final Object reObject )
+	private void testEquals( final Object object, final Object reObject )
 	{
 		if( object.getClass().isArray() )
 		{
@@ -209,6 +232,23 @@ public class PersistenceTest {
 			{
 				assertTrue( Array.get( object, i ).equals( Array.get( reObject, i ) ) );
 			}
+		}
+		else if( object instanceof Collection && reObject instanceof Collection )
+		{
+			final Collection< ? > colObject = Collection.class.cast( object );
+			final Collection< ? > colReObject = Collection.class.cast( reObject );
+			
+			final int size = colObject.size();
+			assertEquals( size, colReObject.size() );
+
+			final Iterator< ? > iter = colObject.iterator();
+			final Iterator< ? > reIter = colReObject.iterator();
+			while( iter.hasNext() && reIter.hasNext() )
+			{
+				final Object elem = iter.next();
+				final Object reElem = reIter.next();
+				assertTrue( elem.equals( reElem ) );
+			}			
 		}
 		else if( object.getClass().isPrimitive() )
 		{
@@ -227,13 +267,23 @@ public class PersistenceTest {
 	 */
 	private void testXml( final Object object, final String fileName )
 	{
+		testXml( object, fileName, false );
+	}
+	
+	/**
+	 * 
+	 * @param object
+	 * @param fileName
+	 */
+	private void testXml( final Object object, final String fileName, final boolean isDisplayTypeInfo )
+	{
 		try
 		{
 			// create the semantic model for the division
 			final InfoNode rootNode = createInfoNode( object );
 	
 			// write out XML
-			writeXml( rootNode, fileName );
+			writeXml( rootNode, fileName, isDisplayTypeInfo );
 			
 			// read in XML
 			final InfoNode infoNode = readXml( fileName, object.getClass() );
@@ -242,7 +292,7 @@ public class PersistenceTest {
 			final Object reObject = createObject( infoNode, object.getClass() );
 			
 			// these should be the same
-			testTrue( object, reObject );
+			testEquals( object, reObject );
 		}
 		catch( Exception e )
 		{
@@ -272,7 +322,7 @@ public class PersistenceTest {
 			final Object reObject = createObject( infoNode, object.getClass() );
 			
 			// these should be the same
-			testTrue( object, reObject );
+			testEquals( object, reObject );
 		}
 		catch( Exception e )
 		{
@@ -363,4 +413,49 @@ public class PersistenceTest {
 	{
 		testJson( new String[] { "three", "point", "one", "four", "one", "five", "nine" }, "string_array.json" );
 	}
+	
+	@Test
+	public void testPrimitivesXml()
+	{
+		testXml( "this is a test", "string.xml" );
+		testXml( 3.14, "double.xml" );
+		testXml( 3, "int.xml" );
+	}
+
+	@Test
+	public void testPrimitivesJson()
+	{
+		testJson( "this is a test", "string.json" );
+		testJson( 3.14, "double.json" );
+		testJson( 3, "int.json" );
+	}
+
+	// these test will currently fail because there is no way to know what the type of the element is
+	// when the list is the root level element. so the reconstructed list ends up holding Object elements
+	// instead of Integer elements, and, unfortunately, these can't be cast to an Integer.
+//	@Test
+//	public void testListsXml()
+//	{
+//		testXml( new ArrayList< Integer >( Arrays.asList( 3, 1, 4, 1, 5, 9, 2, 6 ) ), "arrays_list.xml" );
+//	}
+//
+//	@Test
+//	public void testListsJson()
+//	{
+//		testJson( new ArrayList< Integer >( Arrays.asList( 3, 1, 4, 5, 9, 2, 6 ) ), "arrays_list.json" );
+//	}
+
+	// blows up...would need to use the map node builder
+//	@Test
+//	public void testMapXml()
+//	{
+//		final Map< String, Integer > pi = new LinkedHashMap<>();
+//		pi.put( "three", 3 );
+//		pi.put( "one", 1 );
+//		pi.put( "four", 4 );
+//		pi.put( "one again", 1 );
+//		pi.put( "five", 5 );
+//		pi.put( "nine", 9 );
+//		testXml( pi, "map.xml" );
+//	}
 }
