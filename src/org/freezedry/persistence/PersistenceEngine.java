@@ -458,22 +458,22 @@ public class PersistenceEngine {
 				throw new IllegalArgumentException( message.toString(), e );
 			}
 		}
-//		// if the override node builders contains a node builder for this specific class, then we'll use it
-//		else if( containsNodeBuilder( clazz ) && !isNonRootObject( clazz ) )
-//		{
-//			try
-//			{
-//				rootNode = getNodeBuilder( clazz ).createInfoNode( null, object, clazz.getSimpleName() );
-//			}
-//			catch( ReflectiveOperationException e )
-//			{
-//				final StringBuffer message = new StringBuffer();
-//				message.append( "Error building the root node" + Constants.NEW_LINE );
-//				message.append( "  Class: " + clazz.getName() );
-//				LOGGER.error( message.toString(), e );
-//				throw new IllegalArgumentException( message.toString(), e );
-//			}
-//		}
+		// if the override node builders contains a node builder for this specific class, then we'll use it
+		else if( containsNodeBuilder( clazz ) && !isNonRootObject( clazz ) )
+		{
+			try
+			{
+				rootNode = getNodeBuilder( clazz ).createInfoNode( null, object, clazz.getSimpleName() );
+			}
+			catch( ReflectiveOperationException e )
+			{
+				final StringBuffer message = new StringBuffer();
+				message.append( "Error building the root node" + Constants.NEW_LINE );
+				message.append( "  Class: " + clazz.getName() );
+				LOGGER.error( message.toString(), e );
+				throw new IllegalArgumentException( message.toString(), e );
+			}
+		}
 		else
 		{
 			rootNode = InfoNode.createRootNode( clazz.getSimpleName(), clazz );
@@ -667,23 +667,23 @@ public class PersistenceEngine {
 				throw new IllegalArgumentException( message.toString(), e );
 			}
 		}
-//		// TODO issue with the generic type of the list
-//		// if the override node builders contains a node builder for this specific class, then we'll use it
-//		else if( containsNodeBuilder( clazz ) && !isNonRootObject( clazz ) )
-//		{
-//			try
-//			{
-//				object = getNodeBuilder( clazz ).createObject( null, clazz, rootNode );
-//			}
-//			catch( ReflectiveOperationException e )
-//			{
-//				final StringBuffer message = new StringBuffer();
-//				message.append( "Error creating object" + Constants.NEW_LINE );
-//				message.append( "  Class: " + clazz.getName() );
-//				LOGGER.error( message.toString(), e );
-//				throw new IllegalArgumentException( message.toString(), e );
-//			}
-//		}
+		// TODO issue with the generic type of the list
+		// if the override node builders contains a node builder for this specific class, then we'll use it
+		else if( containsNodeBuilder( clazz ) && !isNonRootObject( clazz ) )
+		{
+			try
+			{
+				object = getNodeBuilder( clazz ).createObject( null, clazz, rootNode );
+			}
+			catch( ReflectiveOperationException e )
+			{
+				final StringBuffer message = new StringBuffer();
+				message.append( "Error creating object" + Constants.NEW_LINE );
+				message.append( "  Class: " + clazz.getName() );
+				LOGGER.error( message.toString(), e );
+				throw new IllegalArgumentException( message.toString(), e );
+			}
+		}
 		else
 		{
 			// instantiate the object and build it recursively
