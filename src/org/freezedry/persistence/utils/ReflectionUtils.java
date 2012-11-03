@@ -16,6 +16,7 @@
 package org.freezedry.persistence.utils;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -28,9 +29,11 @@ import java.util.concurrent.RunnableScheduledFuture;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.freezedry.persistence.annotations.Persist;
+import org.freezedry.persistence.builders.DoubleNodeBuilder;
 import org.freezedry.persistence.builders.NodeBuilder;
 import org.freezedry.persistence.containers.orderedseries.IntegerOrderedSeries;
 import org.freezedry.persistence.copyable.Copyable;
+import org.freezedry.persistence.tests.BadPerson;
 import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.tests.Fconcrete;
 import org.freezedry.persistence.utils.tests.circle.A;
@@ -351,7 +354,8 @@ public class ReflectionUtils {
 	 */
 	public static Field getFieldForPersistenceName( final Class< ? > clazz, final String persistName )
 	{
-		final List< Field > fields = Arrays.asList( clazz.getDeclaredFields() );
+//		final List< Field > fields = Arrays.asList( clazz.getDeclaredFields() );
+		final List< Field > fields = getAllDeclaredFields( clazz );
 		Field foundField = null;
 		for( final Field field : fields )
 		{
@@ -604,10 +608,86 @@ public class ReflectionUtils {
 		return item;
 	}
 
+	/**
+	 * Returns the declared fields from the specified {@link Class} and all it's parents. 
+	 * @param clazz The {@link Class} for which to return all the declared fields.
+	 * @return the declared fields from the specified {@link Class} and all it's parents.
+	 */
+	public static final List< Field > getAllDeclaredFields( final Class< ? > clazz ) 
+	{
+		// grab the list of fields from the class
+		final List< Field > fields = new ArrayList<>( Arrays.asList( clazz.getDeclaredFields() ) );
+		
+		// call the recursive method to add all the fields for the parent class
+		return getDeclaredFields( clazz, fields );
+	}
 	
-	public static void main( String[] args )
+	/**
+	 * Recursive method to grab all the declared fields from the specified class and its super classes.
+	 * @param clazz The class for which to return the declared fields
+	 * @param fields The list of fields for the specified class, to which we add the fields of the super class
+	 * @return the declared fields from the specified class and its super classes.
+	 */
+	private static final List< Field > getDeclaredFields( final Class< ? > clazz, final List< Field > fields )
+	{
+		final Class< ? > superClazz = clazz.getSuperclass();
+		if( superClazz != null )
+		{
+			final List< Field > declaredFields = new ArrayList<>( Arrays.asList( superClazz.getDeclaredFields() ) ); 
+			fields.addAll( declaredFields );
+			return getDeclaredFields( superClazz, fields );
+		}
+		else
+		{
+			return fields;
+		}
+	}
+	
+	/**
+	 * Returns the specified declared field from the specified class or its ancestors.
+	 * @param clazz The class from which to find the field of the specified name
+	 * @param fieldName The name of the declared field
+	 * @return the specified declared field from the specified class or its ancestors.
+	 * @throws NoSuchFieldException if no field with the specified name is found in the specified class or ancestor classes
+	 */
+	public static final Field getDeclaredField( final Class< ? > clazz, final String fieldName ) throws NoSuchFieldException
+	{
+		Field field = null;
+		try
+		{
+			// does the current class have the requested field
+			field = clazz.getDeclaredField( fieldName );
+		}
+		catch( NoSuchFieldException e )
+		{
+			// the current class doesn't have the request field, so we recursively walk
+			// our way up to ancestor (parents') chain looking for the field until we
+			// find it, or until we run out of ancestors
+			final Class< ? > parentClazz = clazz.getSuperclass();
+			if( parentClazz == null )
+			{
+				throw new NoSuchFieldException( e.getMessage() );
+			}
+			else
+			{
+				field = getDeclaredField( parentClazz, fieldName );
+			}
+		}
+		return field;
+	}
+	
+	public static void main( String[] args ) throws NoSuchFieldException
 	{
 		DOMConfigurator.configure( "log4j.xml" );
+		
+		final List< Field > fields = getAllDeclaredFields( DoubleNodeBuilder.class );
+		for( Field field : fields )
+		{
+			System.out.println( field.getName() );
+		}
+		
+		System.out.println( getDeclaredField( BadPerson.class, "givenName" ) );
+		System.exit( 0 );
 
 		System.out.println( "List -> Collection: distance = " + calculateClassDistance( List.class, Collection.class, -1 ) );
 		System.out.println( "List -> Iterable: distance = " + calculateClassDistance( List.class, Iterable.class, -1 ) );

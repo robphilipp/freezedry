@@ -15,6 +15,7 @@
  */
 package org.freezedry.persistence.builders;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -113,10 +114,13 @@ public class CollectionNodeBuilder extends AbstractNodeBuilder {
 			try
 			{
 				// grab the persistence name from any annotations to the field
-				persistName = ReflectionUtils.getPersistenceName( containingClass.getDeclaredField( fieldName ) );
+//				persistName = ReflectionUtils.getPersistenceName( containingClass.getDeclaredField( fieldName ) );
+				final Field field = ReflectionUtils.getDeclaredField( containingClass, fieldName );
+				persistName = ReflectionUtils.getPersistenceName( field );
 
 				// check the annotations to see of the collection elements have been given a name
-				final PersistCollection collectionAnnotation = containingClass.getDeclaredField( fieldName ).getAnnotation( PersistCollection.class );
+//				final PersistCollection collectionAnnotation = containingClass.getDeclaredField( fieldName ).getAnnotation( PersistCollection.class );
+				final PersistCollection collectionAnnotation = field.getAnnotation( PersistCollection.class );
 				if( collectionAnnotation != null && !collectionAnnotation.elementPersistName().isEmpty() )
 				{
 					elementPersistName = collectionAnnotation.elementPersistName();

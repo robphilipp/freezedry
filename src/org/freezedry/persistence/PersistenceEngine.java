@@ -503,7 +503,8 @@ public class PersistenceEngine {
 		// run through the fields associated with object's Class< ? >, create the nodes for
 		// each field, and add that node to the current node. recall that this is a recursive
 		// algorithm where createNode(...) may call this method recursively.
-		final List< Field > fields = Arrays.asList( clazz.getDeclaredFields() );
+//		final List< Field > fields = Arrays.asList( clazz.getDeclaredFields() );
+		final List< Field > fields = ReflectionUtils.getAllDeclaredFields( clazz );
 		for( final Field field : fields )
 		{
 			// if the field is a class constant (i.e. static final) then don't add the node
@@ -854,7 +855,8 @@ public class PersistenceEngine {
 			// grab the class' field
 			try
 			{
-				final Field field = clazz.getDeclaredField( fieldName );
+//				final Field field = clazz.getDeclaredField( fieldName );
+				final Field field = ReflectionUtils.getDeclaredField( clazz, fieldName );
 				
 				// grab the generic parameter type of the field and add it to the info node
 				final Type type = field.getGenericType();

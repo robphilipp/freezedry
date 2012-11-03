@@ -30,7 +30,6 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.lang.reflect.Array;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -440,11 +439,11 @@ public class PersistenceTest {
 //		testXml( new ArrayList< Integer >( Arrays.asList( 3, 1, 4, 1, 5, 9, 2, 6 ) ), "arrays_list.xml" );
 //	}
 
-	@Test
-	public void testListsJson()
-	{
-		testJson( new ArrayList< Integer >( Arrays.asList( 3, 1, 4, 5, 9, 2, 6 ) ), "arrays_list.json" );
-	}
+//	@Test
+//	public void testListsJson()
+//	{
+//		testJson( new ArrayList< Integer >( Arrays.asList( 3, 1, 4, 5, 9, 2, 6 ) ), "arrays_list.json" );
+//	}
 
 	// blows up...would need to use the map node builder
 //	@Test
@@ -459,4 +458,18 @@ public class PersistenceTest {
 //		pi.put( "nine", 9 );
 //		testXml( pi, "map.xml" );
 //	}
+	
+	@Test
+	public void testInheritence()
+	{
+		final BadPerson evilBob = new BadPerson( "Evil", "Bob", 66 );
+		evilBob.addEvilDoing( "Scaring an old lady." );
+		evilBob.addEvilDoing( "Putting milk in friend's beer can." );
+		
+		final InfoNode evilBobRoot = createInfoNode( evilBob );
+		
+		final BadPerson evilBobTwin = (BadPerson)createObject( evilBobRoot, BadPerson.class );
+		
+		testEquals( evilBob, evilBobTwin );
+	}
 }

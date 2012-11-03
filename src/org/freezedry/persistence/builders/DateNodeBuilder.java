@@ -209,7 +209,8 @@ public class DateNodeBuilder extends AbstractLeafNodeBuilder {
 		{
 			// if the field isn't found or no annotation is present, then we stay
 			// with the default date format
-			final Field field = containingClass.getDeclaredField( fieldName );
+//			final Field field = containingClass.getDeclaredField( fieldName );
+			final Field field = ReflectionUtils.getDeclaredField( containingClass, fieldName );
 			final PersistDateAs annotation = field.getAnnotation( PersistDateAs.class );
 			field.getAnnotations();
 			if( annotation != null )

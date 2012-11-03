@@ -93,7 +93,9 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 		{
 			try
 			{
-				persistName = ReflectionUtils.getPersistenceName( containingClass.getDeclaredField( fieldName ) );
+//				persistName = ReflectionUtils.getPersistenceName( containingClass.getDeclaredField( fieldName ) );
+				final Field field = ReflectionUtils.getDeclaredField( containingClass, fieldName );
+				persistName = ReflectionUtils.getPersistenceName( field );
 			}
 			catch( ReflectiveOperationException e )
 			{
@@ -118,7 +120,8 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 		String valuePersistName = PersistMap.VALUE_PERSIST_NAME;
 		try
 		{
-			final Field field = containingClass.getDeclaredField( fieldName );
+//			final Field field = containingClass.getDeclaredField( fieldName );
+			final Field field = ReflectionUtils.getDeclaredField( containingClass, fieldName );
 			final PersistMap mapAnnotation = field.getAnnotation( PersistMap.class );
 			if( mapAnnotation != null )
 			{

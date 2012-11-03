@@ -16,6 +16,7 @@
 package org.freezedry.persistence.builders;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -152,7 +153,9 @@ public class ArrayNodeBuilder extends AbstractNodeBuilder {
 		{
 			try
 			{
-				persistName = ReflectionUtils.getPersistenceName( containingClass.getDeclaredField( fieldName ) );
+//				persistName = ReflectionUtils.getPersistenceName( containingClass.getDeclaredField( fieldName ) );
+				final Field field = ReflectionUtils.getDeclaredField( containingClass, fieldName );
+				persistName = ReflectionUtils.getPersistenceName( field );
 			}
 			catch( ReflectiveOperationException e )
 			{
@@ -180,7 +183,9 @@ public class ArrayNodeBuilder extends AbstractNodeBuilder {
 			PersistArray arrayAnnotation = null;
 			if( containingClass != null )
 			{
-				arrayAnnotation = containingClass.getDeclaredField( fieldName ).getAnnotation( PersistArray.class );
+//				arrayAnnotation = containingClass.getDeclaredField( fieldName ).getAnnotation( PersistArray.class );
+				final Field field = ReflectionUtils.getDeclaredField( containingClass, fieldName );
+				arrayAnnotation = field.getAnnotation( PersistArray.class );
 			}
 			if( arrayAnnotation != null && !arrayAnnotation.elementPersistName().isEmpty() )
 			{
