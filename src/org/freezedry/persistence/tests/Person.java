@@ -31,6 +31,8 @@ import org.freezedry.persistence.utils.DateUtils;
 
 public class Person {
 	
+	private volatile int hashCode;
+
 //	@Persist( persistenceName = "FirstName" )
 	private String givenName;
 	
@@ -74,6 +76,7 @@ public class Person {
 	public final void setGivenName( String givenName )
 	{
 		this.givenName = givenName;
+		hashCode = 0;
 	}
 
 	/**
@@ -90,6 +93,7 @@ public class Person {
 	public final void setFamilyName( String familyName )
 	{
 		this.familyName = familyName;
+		hashCode = 0;
 	}
 
 	/**
@@ -106,11 +110,13 @@ public class Person {
 	public final void setAge( int age )
 	{
 		this.age = age;
+		hashCode = 0;
 	}
 	
 	public final void setBirthdate( final Calendar date )
 	{
 		birthDate = date;
+		hashCode = 0;
 	}
 	
 	public final Calendar getBirthdate()
@@ -125,6 +131,7 @@ public class Person {
 			this.mood = new ArrayList<>();
 		}
 		this.mood.add( mood );
+		hashCode = 0;
 	}
 	
 	public final List< Double > getMood()
@@ -139,6 +146,7 @@ public class Person {
 			friends = new LinkedHashMap<>();
 		}
 		friends.put( name, type );
+		hashCode = 0;
 	}
 	
 	public final void addGroup( final String name, final Map< String, String > group )
@@ -148,6 +156,7 @@ public class Person {
 			groups = new LinkedHashMap<>();
 		}
 		groups.put( name, group );
+		hashCode = 0;
 	}
 	
 	@Override
@@ -177,4 +186,99 @@ public class Person {
 		}
 		return buffer.toString();
 	}
+	
+	@Override
+	public boolean equals( final Object object )
+	{
+		// same object
+		if( object == this )
+		{
+			return true;
+		}
+		
+		// is it the same type, this also catches if obj is null
+		if( !( object instanceof Person ) )
+		{
+			return false;
+		}
+		
+		// cast
+		final Person person = (Person)object;
+		
+		boolean isEqual = ( givenName == null ? person.givenName == null : givenName.equals( person.givenName ) );
+		isEqual = isEqual && ( familyName == null ? true : familyName.equals( person.familyName ) );
+		isEqual = isEqual && age == person.age;
+		isEqual = isEqual && ( birthDate == null ? person.birthDate == null : birthDate.equals( person.birthDate ) );
+		if( !isEqual )
+		{
+			return false;
+		}
+		if( mood != null && person.mood != null && mood.size() == person.mood.size() )
+		{
+			for( int i = 0; i < mood.size(); ++i )
+			{
+				if( !mood.get( i ).equals( person.mood.get( i ) ) )
+				{
+					return false;
+				}
+			}
+		}
+		if( friends != null && person.friends != null && friends.size() == person.friends.size() )
+		{
+			for( String name : friends.keySet() )
+			{
+				if( !friends.get( name ).equals( person.friends.get( name ) ) )
+				{
+					return false;
+				}
+			}
+		}
+		if( groups != null && person.groups != null && groups.size() == person.groups.size() )
+		{
+			for( String groupName : groups.keySet() )
+			{
+				final Map< String, String > group = groups.get( groupName );
+				final Map< String, String > otherGroup = person.groups.get( groupName );
+				if( group.size() == otherGroup.size() )
+				{
+					for( String name : group.keySet() )
+					{
+						if( !group.get( name ).equals( otherGroup.get( name ) ) )
+						{
+							return false;
+						}
+					}
+				}
+				else
+				{
+					return false;
+				}
+			}
+		}
+		
+		return isEqual;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.sun.java.Object#hashCode()
+	 */
+	@Override
+	public int hashCode()
+	{
+		int result = hashCode;
+		if( result == 0 )
+		{
+			result = 17;
+			result = 31 * result + givenName.hashCode();
+			result = 31 * result + familyName.hashCode();
+			result = 31 * result + age;
+			result = 31 * result + birthDate.hashCode();
+			result = 31 * result + mood.hashCode();
+			result = 31 * result + friends.hashCode();
+			result = 31 * result + groups.hashCode();
+			hashCode = result;
+		}
+		return hashCode;
+	}
+
 }

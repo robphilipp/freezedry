@@ -134,6 +134,25 @@ public class PersistenceTest {
 		return division;
 	}
 	
+	private static BadPerson[] createBadPeople()
+	{
+		final BadPerson[] people = new BadPerson[ 3 ];
+		BadPerson person = new BadPerson( "Evil", "Bob", 33 );
+		person.addEvilDoing( "Frightened old lady." );
+		person.addEvilDoing( "Stepped on innocent ant." );
+		people[ 0 ] = person;
+		
+		person = new BadPerson( "Krugger", "Fred", 55 );
+		person.addEvilDoing( "Invaded peoples' dreams" );
+		person.addFriend( "Bob Evil", "colleague" );
+		people[ 1 ] = person;
+		
+		person = new BadPerson( "Dropper", "Eve", 23 );
+		person.addEvilDoing( "Listens to peoples conversations" );
+		people[ 2 ] = person;
+		return people;
+	}
+	
 	private InfoNode createInfoNode( final Object object )
 	{
 		// create the semantic model
@@ -412,6 +431,18 @@ public class PersistenceTest {
 	public void testStringArraysJson()
 	{
 		testJson( new String[] { "three", "point", "one", "four", "one", "five", "nine" }, "string_array.json" );
+	}
+	
+	@Test
+	public void testBadPersonArraysXml()
+	{
+		testXml( createBadPeople(), "bad_person_array.xml" );
+	}
+	
+	@Test
+	public void testBadPersonArraysJson()
+	{
+		testJson( createBadPeople(), "bad_person_array.json" );
 	}
 	
 	@Test
