@@ -34,13 +34,14 @@ import java.lang.annotation.Target;
 @Retention( RetentionPolicy.RUNTIME )
 @Target( { ElementType.TYPE, ElementType.FIELD } )
 public @interface Persist {
-	
+
 	String persistenceName() default "";
 
 	Class< ? > instantiateAs() default Null.class;
-//	Class< ? >[] instantiateGenericsAs() default {};
 	
 	Class< ? > useNodeBuilder() default Null.class;
+	
+	boolean ignore() default false;
 	
 	public static class Null { } 
 }

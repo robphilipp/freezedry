@@ -507,6 +507,14 @@ public class PersistenceEngine {
 		final List< Field > fields = ReflectionUtils.getAllDeclaredFields( clazz );
 		for( final Field field : fields )
 		{
+			// if the field has a @Persist annotation, and the ignore is true, then
+			// simply ignore the field
+			final Persist persistAnnotation = field.getAnnotation( Persist.class );
+			if( persistAnnotation != null && persistAnnotation.ignore() )
+			{
+				continue;
+			}
+			
 			// if the field is a class constant (i.e. static final) then don't add the node
 			final int modifiers = field.getModifiers();
 			if( Modifier.isFinal( modifiers ) && Modifier.isStatic( modifiers ) && !isPersistClassConstants )

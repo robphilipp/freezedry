@@ -3,11 +3,16 @@ package org.freezedry.persistence.tests;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.freezedry.persistence.annotations.Persist;
+
 public class BadPerson extends Person {
 	
 	private volatile int hashCode;
 
 	private List< String > evilDoings = new ArrayList<>();
+	
+	@Persist( ignore=true )
+	private String fieldToIgnore = "this is a field to ignore and shouldn't be written";
 
 	public BadPerson( String familyName, String givenName, int age )
 	{
