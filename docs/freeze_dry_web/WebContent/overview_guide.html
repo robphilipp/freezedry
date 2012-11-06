@@ -10,10 +10,14 @@
 	<script src="scripts/syntax_highlight/shBrushXml.js"></script>
 
     <script src="scripts/toc-creator.js"></script>
+    <script src="scripts/sizing.js"></script>
 
-    <script src="scripts/mootools-core-1.4.5.js" ></script>
+    <script src="scripts/jquery-1.8.2.js"></script>
     <script>
-        window.addEvent( 'domready', function() {
+        var tocBounds = { minWidth: 100, maxWidth: 225, minHeight: 400, maxHeight: 750 };
+        var articleBounds = { minWidth: 100, maxWidth: 775, minHeight: 400, maxHeight: 1000 };
+        $(document).ready( function() {
+
             // syntax highlighting for the code
             SyntaxHighlighter.defaults['gutter'] = false;
             SyntaxHighlighter.defaults['toolbar'] = false;
@@ -21,7 +25,15 @@
 
             // create the table of contents
             createToc( "Contents" );
-        }, false );
+
+            // adjust the article window size
+            adjustSizes( tocBounds, articleBounds );
+        } );
+
+        window.onresize = function() {
+            adjustSizes( tocBounds, articleBounds );
+        };
+
     </script>
 
 
@@ -38,19 +50,19 @@
 </header>
 
 <nav>
-	<a href="index.html">Home</a> | 
-	<a href="quick_start.html">Quick Start</a> |
-	<a href="javadocs/index.html" target="tab">Java Docs</a> |
-	<a href="https://sourceforge.net/p/freezedried/code/" target="tab">Code (hg)</a> |
-	<a href="https://sourceforge.net/projects/freezedried/files/" target="tab">Downloads</a> |
-	<a href="https://sourceforge.net/p/freezedried/wiki/Home/" target="tab">Wiki</a> |
-	<a href="https://sourceforge.net/p/freezedried/tickets/" target="tab">Tickets</a> |
+	<a href="index.html">Home</a>
+	<a href="quick_start.html">Quick Start</a>
+	<a href="javadocs/index.html" target="tab">Java Docs</a>
+	<a href="https://sourceforge.net/p/freezedried/code/" target="tab">Code (hg)</a>
+	<a href="https://sourceforge.net/projects/freezedried/files/" target="tab">Downloads</a>
+	<a href="https://sourceforge.net/p/freezedried/wiki/Home/" target="tab">Wiki</a>
+	<a href="https://sourceforge.net/p/freezedried/tickets/" target="tab">Tickets</a>
 	<a href="https://sourceforge.net/p/freezedried/discussion/" target="tab">Discussion</a>
 </nav>
 
 <article>
 
-<h2 id="overview"><a href="#top">Overview</a></h2>
+<h2 id="overview"><a href="#overview">Overview</a></h2>
 
 <p><b>FreezeDry</b> provides an easy mechanism for converting Java objects into a persisted
 form and then back again. And there is no need for creating binding files.</p>
@@ -141,7 +153,7 @@ by implementing a custom node builder, or by implementing a custom reader and wr
 
 <p>In the next sections we will describe <b>FreezeDry</b>s design.</p>
 
-<h2 id="landscape"><a href="#top">FreezeDry Landscape</a></h2>
+<h2 id="landscape"><a href="#overview">FreezeDry Landscape</a></h2>
 
 <p>At a high level, <b>FreezeDry</b> has is composed of:</p>
 
@@ -170,7 +182,7 @@ the key. And in XML, you could add an attribute <em>type</em> to each element. B
 And so in both of these cases, type information is likely lost. And mostly, it is when reconstituting complex objects 
 from persistence where <b>FreezeDry</b> may need help.</p>
 
-<h4 id="persistence"><a href="#top">Persistence</a></h4>
+<h4 id="persistence"><a href="#overview">Persistence</a></h4>
 
 <p><b>FreezeDry</b> provides an easy way to persist Java objects to XML, JSON, and lists of key-value pairs. And to be 
 useful, it also provides an easy way to reconstitute objects from their persisted form. As shown above, you can write 
@@ -217,7 +229,7 @@ typically be needed for dealing with that specified persistence form.</p>
 		and between the key and the values.</td></tr>
 </table>
 
-<h4 id="behavior_mod"><a href="#top">Behavior Modification</a></h4>
+<h4 id="behavior_mod"><a href="#overview">Behavior Modification</a></h4>
 
 <p><b>FreezeDry</b>'s behavior can be modified in a number ways. The four typical approaches to modifying its behavior are:</p>
 
@@ -230,7 +242,7 @@ typically be needed for dealing with that specified persistence form.</p>
 		 and the <em>Semantic Model</em>, or extending existing <b class="class">Reader</b> or <b class="class">Writer</b> classes.</li>
 </ul>
 
-<h4 id="persistence_engine"><a href="#top">The Persistence Engine</a></h4>
+<h4 id="persistence_engine"><a href="#overview">The Persistence Engine</a></h4>
 
 <p>When using the <b>FreezeDry</b> persistence framework, you'll mostly be dealing with three classes. 
 The <b class="class">PersistenceEngine</b>, a <b class="class">Reader</b>, and a <b class="class">Writer</b>. 
@@ -245,7 +257,7 @@ Rather, it should just know that it can. And the reason it can, is because it ma
 objects that do know the details. The <b class="class">PersistenceEngine</b> only knows how a field (based on its class) 
 is mapped to a specified <b class="class">NodeBuilder</b>.</p>
 
-<h5 id="object_to_semantic_model"><a href="#top">Object to Semantic Model</a></h5>
+<h5 id="object_to_semantic_model"><a href="#overview">Object to Semantic Model</a></h5>
 
 <p>To create a semantic model from an object, you use the <b class="class">PersistenceEngine</b> method:</p>
 
@@ -278,7 +290,7 @@ there is an entry for <b class="class">Collection</b>, and recognize that a <b c
     NodeBuilder removeNodeBuilder( final Class&lt; ? &gt; clazz )
 </pre>
 
-<h5 id="semantic_model_to_object"><a href="#top">Semantic Model to Object</a></h5>
+<h5 id="semantic_model_to_object"><a href="#overview">Semantic Model to Object</a></h5>
 
 <p>To create an object from the semantic model, you use the <b class="class">PersistenceEngine</b> method</p>
 
@@ -297,7 +309,7 @@ a valid <b>Semantic Model</b> as represented by the root node of the <b class="c
 you also give the <b class="class">PersistenceEngine</b> the *class* that the semantic model represents, you 
 get back an object of that class type. Its as simple as that.</p>
 
-<h4 id="semantic_model"><a href="#top">Semantic Model</a></h4>
+<h4 id="semantic_model"><a href="#overview">Semantic Model</a></h4>
 
 <p><b>FreezeDry's</b> semantic model is a tree structure that is built from <b class="class">InfoNode</b> objects. 
 So if you love recursion, then you'll love the semantic model because it's all about recursion. Powerfully 
@@ -329,7 +341,7 @@ may only contain the <em>persistName</em>. The <b class="class">PersistenceEngin
 <em>class</em>, using a set of default class types for instantiation, and/or field annotations, will figure 
 out the types that it needs to instantiate.</p>
 
-<h4 id="node_builders"><a href="#top">Node Builders</a></h4>
+<h4 id="node_builders"><a href="#overview">Node Builders</a></h4>
 
 <p><b class="class">NodeBuilders</b> are responsible for creating an <b class="class">InfoNode</b> from an object 
 or field, and for creating an object or setting a field within an object when given an <b class="class">InfoNode</b>.</p>
@@ -345,7 +357,7 @@ semantic model. When creating an object from the semantic model, the <b class="c
 also uses the <b class="class">NodeBuilder</b> associated with the type represented by the <b class="class">InfoNode</b>, 
 and in cases when the <b class="class">InfoNode</b> doesn't hold the type information, it finds it from the class itself.</p>
 
-<h5 id="node_builder_class_interface"><a href="#top">NodeBuilder Interface</a></h5>
+<h5 id="node_builder_class_interface"><a href="#overview">NodeBuilder Interface</a></h5>
 
 <p>The <b class="class">NodeBuilder</b> interface has</p> 
 
@@ -388,7 +400,7 @@ it comes across. And the <b class="class">PersistenceEngine</b> calls the approp
 to create the <b class="class">InfoNode</b> for <b class="class">Person</b> (or uses default behavior to create a 
 compound <b class="class">InfoNode</b>).</p>
 
-<h5 id="node_builder_class_abstract"><a href="#top">AbstractNodeBuilder</a></h5>
+<h5 id="node_builder_class_abstract"><a href="#overview">AbstractNodeBuilder</a></h5>
 
 <p>The <b class="class">AbstractNodeBuilder</b> implements manages the reference to the <b class="class">PersistenceEngine</b> but also provides a mapping for instantiating objects for which the type is an interface or abstract. For example, suppose that your class looks like this</p>
 
@@ -431,7 +443,7 @@ compound <b class="class">InfoNode</b>).</p>
     boolean containsInterface( final Class&lt; ? &gt; clazz )
 </pre>
 
-<h5 id="available_node_builders"><a href="#top">Available NodeBuilders</a></h5>
+<h5 id="available_node_builders"><a href="#overview">Available NodeBuilders</a></h5>
 
 <p><b>FreezeDry</b> comes with a set of <b class="class">NodeBuilder</b> objects that deal with many of the basic types.</p>
 
@@ -448,16 +460,18 @@ compound <b class="class">InfoNode</b>).</p>
 	            <li><b class="class">LongNodeBuilder</b> for dealing with <b class="class">Long</b> and <b class="class">long</b></li>
 	            <li><b class="class">ShortNodeBuilder</b> for dealing with <b class="class">Short</b> and <b class="class">short</b></li>
 	            <li><b class="class">DateNodeBuilder</b> for dealing with <b class="class">Calendar</b> dates</li>
+                <li><b class="class">CharacterNodeBuilder</b> for dealing with <b class="class">Character</b> and <b class="class">char</b></li>
 	        </ul>
 	     </li>
           </ul>
       </li>
 	<li><b class="class">CollectionNodeBuilder</b> for dealing with collections such as <b class="class">List</b>, <b class="class">Set</b>, <b class="class">Queue</b>, etc</li>
 	<li><b class="class">MapNodeBuilder</b> for dealing with <b class="class">HashMap</b>, <b class="class">LinkedHashMap</b>, etc.</li>
-	<li><b class="class">ArrayNodeBuilder</b> for dealing with arrays of objects such as **String[]**, **int[]**, etc</li>
+	<li><b class="class">ArrayNodeBuilder</b> for dealing with arrays of objects such as <b class="class">String[]</b>,
+        <b class="class">int[]</b>, etc</li>
 </ul>
 
-<h4 id="readers_writers"><a href="#top">Readers and Writers</a></h4>
+<h4 id="readers_writers"><a href="#overview">Readers and Writers</a></h4>
 
 <p>The <b class="class">PersistenceReader</b> and <b class="class">PersistenceWriter</b> interfaces each define one method.</p>
 
@@ -494,7 +508,7 @@ semantic model into an object.</p>
 	<tr><td><b class="class">KeyValueWriter</b></td><td>Key-Values</td><td>writes an object to a persisted form that is a list of key-value pairs</td></tr>
 </table>
  
-<h5 id="key_value_reader_writer"><a href="#top">Key-Value Readers and Writers</a></h5>
+<h5 id="key_value_reader_writer"><a href="#overview">Key-Value Readers and Writers</a></h5>
 
 <p>Because XML and JSON are well-documented standards, I won't discuss them here. But the Key-Value readers and 
 writers require a description. Effectively, the lists of key-value pairs are flattened versions of a Java object, 
@@ -564,25 +578,25 @@ composed of elements, which are separated by a ".".</p>
 <p>Both of these separators can be specified through code.</p>
 
 <p>The elements of the key are determined by how they appear in the class. For example, notice the 
-"<em>Division.carNames</em>" near the bottom of the key-value pair list. The "<b class="class">Division</b>" 
-is the class that is being persisted. And "<em>carNames</em>" is a field in that class, which happens to be a 
+<b class="class">Division.carNames</b> near the bottom of the key-value pair list. The <b class="class">Division</b>
+is the class that is being persisted. And <b class="class">carNames</b> is a field in that class, which happens to be a
 <b class="class">List&lt; String &gt;</b>. The "[0]", "[1]", and "[2]" are the indexes of the element in 
 the list, and are generated by a <b class="class">PersistenceRenderer</b> that uses a <b class="class">Decorator</b>. 
-Similarly, at the bottom of the list of key-value pairs, you may notice "<em>Division.personMap</em>". As the name 
-suggests, "<em>personMap</em>" is a <b class="class">Map&lt; String, Person &gt;</b>.</p>
+Similarly, at the bottom of the list of key-value pairs, you may notice <b class="class">Division.personMap</b>. As the name
+suggests, <b class="class">personMap</b> is a <b class="class">Map&lt; String, Person &gt;</b>.</p>
 
 <h6>Renderers</h6>
 
 <p><b class="class">Renderer</b>s are responsible for expressing the objects they render as key-value pairs. 
 And, at the same time, they are responsible for parsing the key-value pairs that adhere to their format, 
 back into an object. For example, in the above text, near the bottom, notice the three key-value pairs 
-that start with "<em>Division.carNames</em>". The <b class="class">CollectionRenderer</b> knows how to 
+that start with <b class="class">Division.carNames</b>. The <b class="class">CollectionRenderer</b> knows how to
 take a collection (List, Set, Queue, etc) and renderer into key-value pairs (and how to parse the key-values 
-back into a collection). As another example, the keys beginning "<em>Division.personMap</em>" found at the bottom of 
+back into a collection). As another example, the keys beginning <b class="class">Division.personMap</b> found at the bottom of
 the list of key-value pairs, represent a <b class="class">Map&lt; String, Person &gt;</b> and therefore use a 
 <b class="class">MapRenderer</b> to create these key-value pairs.</p>
 
-<p>Each <b class="class">PersistenceRenderer</b> also provides a method <b>isRenderer(...)</b> that returns 
+<p>Each <b class="class">PersistenceRenderer</b> also provides a method <b class="class">isRenderer(...)</b> that returns
 true if the key-string passed to it matches the format of something that it renderers. 
 <b>FreezeDry</b> provides the following renderers:</p>
 
@@ -600,7 +614,7 @@ true if the key-string passed to it matches the format of something that it rend
 
 <p>You may also notice that strings are surrounded by quotes, integers don't have decimals, and 
 that doubles only show 3 decimal places. These decorations and formatting are achieved by 
-<b class="class">Decorator</b>s. <b class="class">Decorator</b>s also provide an <b>isDecorated(...)</b> 
+<b class="class">Decorator</b>s. <b class="class">Decorator</b>s also provide an <b class="class">isDecorated(...)</b>
 method that returns true if the string it is passed is decorated (matches its pattern) by that 
 decorator. And if the string is decorated by that decorator, it can "undecorate" it as well.</p>
 
@@ -608,14 +622,31 @@ decorator. And if the string is decorated by that decorator, it can "undecorate"
 
 <table>
 	<tr><th>Name</th><th>Description</th></tr>
-	<tr><td><b class="class">Decorator</b></td><td>Interface defining what a Decorator is.</td></tr>
-	<tr><td><b class="class">StringDecorator</b></td><td>By default surrounds a string with quotes. The opening string and closing string can be specified. For example, an index has an opening string "\[" and a closing string of "\]".</td></tr>
-	<tr><td><b class="class">IntegerDecorator</b></td><td>Formats and parses integers</td></tr>
-	<tr><td><b class="class">DoubleDecorator</b></td><td>Formats and parse floating point numbers. By default has 3 digits to the right of the decimal point. The format can be adjusted.</td></tr>
-	<tr><td><b class="class">BooleanDecorator</b></td><td>Formats parses booleans.</td></tr>
+	<tr>
+        <td><b class="class">Decorator</b></td>
+        <td>Interface defining what a Decorator is.</td>
+    </tr>
+	<tr>
+        <td><b class="class">StringDecorator</b></td><td>By default surrounds a string with quotes.
+            The opening string and closing string can be specified. For example, an index has an
+            opening string "[" and a closing string of "]".</td>
+    </tr>
+	<tr>
+        <td><b class="class">IntegerDecorator</b></td>
+        <td>Formats and parses integers</td>
+    </tr>
+	<tr>
+        <td><b class="class">DoubleDecorator</b></td>
+        <td>Formats and parse floating point numbers. By default has 3 digits to the right of the
+            decimal point. The format can be adjusted.</td>
+    </tr>
+	<tr>
+        <td><b class="class">BooleanDecorator</b></td>
+        <td>Formats and parses <b class="class">boolean</b>.</td>
+    </tr>
 </table>
 
-<h4 id="annotations"><a href="#top">Annotations</a></h4>
+<h4 id="annotations"><a href="#overview">Annotations</a></h4>
 
 <p>In some cases you may want to change the way an object or field are persisted. For example,
 you may want to persist a field using a specified name instead of its field name. The code below 
@@ -648,7 +679,7 @@ field name. But, now, you can easily override its name.</p>
 <b>FreezeDry</b>. The first type is the <em>built-in</em> annotation <b class="class">Persist</b>. And the second type 
 are <em>custom</em> annotations that are specific to a <b class="class">NodeBuilder</b>.</p>
 
-<h5 id="built_in_annotations"><a href="#top">Built-In Annotations</a></h5>
+<h5 id="built_in_annotations"><a href="#overview">Built-In Annotations</a></h5>
 
 <p>This is used by the persistence engine, and is meant to represent common types of customizations that one would want 
 to perform across all objects. Such as the specifying a name for the persisted field. The other customization is the 
@@ -680,7 +711,7 @@ The <b class="class">Persist</b> annotation is shown below.
 
 <p>Notice that the retention policy states that the annotation is available at run-time, and that the targets are types and fields.</p>
 
-<h5 id="custom_annotations"><a href="#top">Custom Annotations</a></h5>
+<h5 id="custom_annotations"><a href="#overview">Custom Annotations</a></h5>
 
 <p>Custom annotations, the "second type", are intended to work hand-in-hand with a specific <b class="class">NodeBuilder</b>. 
 The idea is that when a <b class="class">NodeBuilder</b> is creating an <b class="class">InfoNode</b> from an object or field, 
@@ -698,10 +729,30 @@ you should create an annotation if you want to customize its behavior from the c
 	<tr><td>PersistDate</td><td><b class="class">DateNodeBuilder</b></td><td>value (represents the format)</td></tr>
 </table>
 
-<h2 id="whats_new"><a href="#top">What's New</a></h2>
+<h2 id="whats_new"><a href="#overview">What's New</a></h2>
 
 <p>This section describes the larger changes. More detailed changes can be found in the README 
 file in the file download area. Most updates will contain bug fixes and minor code refactoring.</p>
+
+<h4>Version 0.2.4 (from version 0.2.3)</h4>
+<p>Mainly bug fix related to inheritance, completed TODO for setting the persist names of map elements,
+added ability to specify that a field is ignored (i.e. not persisted), and added test cases.</p>
+<ol>
+    <li>When using <b class="class">@PersistMap</b> with one or both of the options:
+        <ul>
+            <li><b class="class">keyPersistName</b></li>
+            <li><b class="class">valuePersistName</b></li>
+        </ul>
+        the <b class="class">java.lang.Map</b> was not reconstructed properly from its persisted state. I
+        finished a "TODO" that allows you to use the persistence name for the key and value.
+    </li>
+    <li>Fixed bug where the fields from the ancestor objects (parent and parent's parent, etc) where not getting
+        persisted.</li>
+    <li>Added an <b class="class">ignore</b> option to the <b class="class">@Persist</b> annotation that takes
+        a <b class="class">boolean</b> value of <b class="class">true</b> or <b class="class">false</b>. If the
+        option is set to <b class="class">true</b>, the FreezeDry will ignore that field.</li>
+    <li>Added test cases to the unit tests.</li>
+</ol>
 
 <h4>Version 0.2.3 (from version 0.2.2)</h4>
 <p>Mainly provided fixes that allow FreezeDry to be use more effectively as a serialization engine. Mostly this work
