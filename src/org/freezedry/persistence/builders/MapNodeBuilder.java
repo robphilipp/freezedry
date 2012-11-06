@@ -215,6 +215,11 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 		final Pair< Class< ? >, List< Type > > valueInfo = extractTypeInfo( types.get( 1 ) );
 		final Class< ? > valueClass = valueInfo.getFirst();
 		final List< Type > valueTypes = valueInfo.getSecond();
+				
+		// grab the names that the semantic model uses to represent the key and value.
+		final Pair< String, String > keyValueNames = getKeyValueNames( containingClass, node );
+		String keyPersistenceName = keyValueNames.getFirst();
+		String valuePersistenceName = keyValueNames.getSecond();
 		
 		// run through the nodes, calling the persistence engine to create the element objects
 		// and add them to the newly created map. each info node should have an entry node, and
@@ -236,19 +241,20 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 				throw new IllegalArgumentException( message.toString() );
 			}
 			
-			// TODO, find the annotations to map these nodes to their key and value
+			// the order of the elements can be reversed. For example, the key could be the second
+			// element (instead of the first) and the value could be the first. We check both possibilities
 			Object key = null;
 			Object value = null;
 			final InfoNode firstNode = keyValue.get( 0 );
 			final InfoNode secondNode = keyValue.get( 1 );
-			if( PersistMap.KEY_PERSIST_NAME.equals( firstNode.getPersistName() ) &&
-				PersistMap.VALUE_PERSIST_NAME.equals( secondNode.getPersistName() )	)
+			if( keyPersistenceName.equals( firstNode.getPersistName() ) &&
+				valuePersistenceName.equals( secondNode.getPersistName() )	)
 			{
 				key = buildObject( containingClass, keyClass, keyTypes, firstNode, node );
 				value = buildObject( containingClass, valueClass, valueTypes, secondNode, node );
 			}
-			else if( PersistMap.KEY_PERSIST_NAME.equals( secondNode.getPersistName() ) &&
-					 PersistMap.VALUE_PERSIST_NAME.equals( firstNode.getPersistName() ) )
+			else if( keyPersistenceName.equals( secondNode.getPersistName() ) &&
+					 valuePersistenceName.equals( firstNode.getPersistName() ) )
 			{
 				key = buildObject( containingClass, keyClass, keyTypes, secondNode, node );
 				value = buildObject( containingClass, valueClass, valueTypes, firstNode, node );
@@ -286,6 +292,60 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 		
 		// done...
 		return map;
+	}
+	
+	/**
+	 * Returns the key and value names for the {@link Map}. These are either default values, or, if
+	 * the field has a {@link PersistMap} annotation, it may have overridden either the key or value name.
+	 * For example, suppose the user has annotated the field with 
+	 * {@code @PersistMap(entryPersistName="client",keyPersistName="endPoint",valuePersistName="weight")}.
+	 * Then the info node of the children would contain "endpoint" instead of the expected "Key" for the
+	 * key name, and "weight" instead of the expected "Value" for the value. And the we need to know that
+	 * so we can deal with it.
+	 * @param containingClass The {@link Class} containing the field represented by the specified node
+	 * @param node The node representing the field
+	 * @return The key and value names associated with the {@link Map}
+	 */
+	private Pair< String, String > getKeyValueNames( final Class< ? > containingClass, final InfoNode node )
+	{
+		// create the pair containing the default key and value names
+		final Pair< String, String > keyValue = new Pair< String, String >( PersistMap.KEY_PERSIST_NAME, PersistMap.VALUE_PERSIST_NAME );
+		
+		// attempt to grab the field with the node's persistence name (in this case this would be the
+		// field name)
+		final String persistName = node.getPersistName();
+		Field field = null;
+		try
+		{
+			field = ReflectionUtils.getDeclaredField( containingClass, persistName );
+		}
+		catch( NoSuchFieldException e )
+		{
+			field = ReflectionUtils.getFieldForPersistenceName( containingClass, node.getPersistName() );
+		}
+		
+		// if a field was found, then see if that field has an annotation, and if that annotation overrides
+		// the key name and/or the value name
+		if( field != null )
+		{
+			final PersistMap mapAnnotation = field.getAnnotation( PersistMap.class );
+			if( mapAnnotation != null )
+			{
+				final String keyName = mapAnnotation.keyPersistName();
+				if( keyName != null && !keyName.isEmpty() )
+				{
+					keyValue.setFirst( keyName );
+				}
+				
+				final String valueName = mapAnnotation.valuePersistName();
+				if( valueName != null && !valueName.isEmpty() )
+				{
+					keyValue.setSecond( valueName );
+				}
+			}
+		}
+		
+		return keyValue;
 	}
 	
 	/*

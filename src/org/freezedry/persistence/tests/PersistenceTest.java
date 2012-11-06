@@ -503,4 +503,18 @@ public class PersistenceTest {
 		
 		testEquals( evilBob, evilBobTwin );
 	}
+	
+	@Test
+	public void testMaps()
+	{
+		testXml( new MapMagic(), "map_magic.xml" );
+
+//		final MapMagic mapMagic = new MapMagic();
+//		
+//		final InfoNode magicRoot = createInfoNode( mapMagic );
+//		
+//		final MapMagic magicTwin = (MapMagic)createObject( magicRoot, MapMagic.class );
+//		
+//		testEquals( mapMagic, magicTwin );
+	}
 }
