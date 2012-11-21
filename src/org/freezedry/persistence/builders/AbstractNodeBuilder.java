@@ -223,6 +223,7 @@ public abstract class AbstractNodeBuilder implements NodeBuilder {
 	 * if the specified {@link Class} is {@link Map} and the {@link InfoNode} contains a {@link Class} 
 	 * {@link LinkedHashMap}, then it will create a {@link LinkedHashMap}. Also updates the node with any
 	 * additional generic type information it will need for further processing. 
+	 * @param containingClass The class containing the field to instantiate.
 	 * @param clazz The specified {@link Class} to instantiate.
 	 * @param types The generic type information
 	 * @param node The {@link InfoNode} associated with the specified {@link Class}

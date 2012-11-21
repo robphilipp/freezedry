@@ -180,7 +180,7 @@ public class PersistenceEngine {
 		return builders;
 	}
 	
-	/*
+	/**
 	 * @return a map containing a primitive type and the wrapper object used to represent that primitive type
 	 */
 	private static Map< Class< ? >, Object > createPrimitives()
@@ -316,7 +316,7 @@ public class PersistenceEngine {
 	 * @return true if the {@link Class} is a non-root object (i.e. an object that shouldn't be a
 	 * root element in the semantic model.
 	 */
-	public boolean isNonRootObject( final Class< ? > clazz )
+	public boolean isForbiddenRootObject( final Class< ? > clazz )
 	{
 		boolean isNonRootObject = false;
 		if( NON_ROOT_OBJECTS.contains( clazz ) )
@@ -339,6 +339,18 @@ public class PersistenceEngine {
 			}
 		}
 		return isNonRootObject;
+	}
+	
+	/**
+	 * Returns true if the specified {@link Class} is an allowed root object (i.e. the root node in
+	 * the semantic model); false otherwise
+	 * @param clazz The {@link Class} to test
+	 * @return true if the specified {@link Class} is an allowed root object (i.e. the root node in
+	 * the semantic model); false otherwise
+	 */
+	public boolean isAllowedRootObject( final Class< ? > clazz )
+	{
+		return !isForbiddenRootObject( clazz );
 	}
 	
 	/**
@@ -458,8 +470,9 @@ public class PersistenceEngine {
 				throw new IllegalArgumentException( message.toString(), e );
 			}
 		}
-		// if the override node builders contains a node builder for this specific class, then we'll use it
-		else if( containsNodeBuilder( clazz ) && !isNonRootObject( clazz ) )
+		// if the override node builder map contains a node builder for this specific class, and
+		// the class is allowed to be a root object, then we'll use it
+		else if( containsNodeBuilder( clazz ) && isAllowedRootObject( clazz ) )
 		{
 			try
 			{
@@ -562,7 +575,7 @@ public class PersistenceEngine {
 		final Class< ? > clazz = object.getClass();
 		
 		// construct the node. There are several cases to consider:
-		// 0. the field annotated with a specified node builder in mind
+		// 0. the field is annotated with a specified node builder in mind
 		// 1. the object is intended to be a leaf node: create a leaf InfoNode object
 		//    with the appropriately populated values, and we're done.
 		// 2. the object is of a special type: use the appropriate node factory 
@@ -678,7 +691,7 @@ public class PersistenceEngine {
 		}
 		// TODO issue with the generic type of the list
 		// if the override node builders contains a node builder for this specific class, then we'll use it
-		else if( containsNodeBuilder( clazz ) && !isNonRootObject( clazz ) )
+		else if( containsNodeBuilder( clazz ) && isAllowedRootObject( clazz ) )
 		{
 			try
 			{
