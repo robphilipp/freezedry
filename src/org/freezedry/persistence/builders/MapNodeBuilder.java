@@ -17,6 +17,7 @@ package org.freezedry.persistence.builders;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -93,7 +94,6 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 		{
 			try
 			{
-//				persistName = ReflectionUtils.getPersistenceName( containingClass.getDeclaredField( fieldName ) );
 				final Field field = ReflectionUtils.getDeclaredField( containingClass, fieldName );
 				persistName = ReflectionUtils.getPersistenceName( field );
 			}
@@ -120,7 +120,6 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 		String valuePersistName = PersistMap.VALUE_PERSIST_NAME;
 		try
 		{
-//			final Field field = containingClass.getDeclaredField( fieldName );
 			final Field field = ReflectionUtils.getDeclaredField( containingClass, fieldName );
 			final PersistMap mapAnnotation = field.getAnnotation( PersistMap.class );
 			if( mapAnnotation != null )
@@ -168,6 +167,42 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 		return node;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.builders.NodeBuilder#createInfoNode(java.lang.Object)
+	 */
+	@Override
+	public InfoNode createInfoNode( final Object object ) throws ReflectiveOperationException
+	{
+		// create the InfoNode object (we first have to determine the node type, down the road, we'll check the
+		// factories for registered node generators for the Class< ? > of the object)
+		final Class< ? > clazz = object.getClass();
+
+		// create the root node
+		final InfoNode node = InfoNode.createRootNode( clazz.getName(), clazz );
+
+		// run through the Collection elements, recursively calling createNode(...) to create
+		// the appropriate node which to add to the newly created compound node.
+		// run through the Map entries, recursively calling createNode(...) to create
+		// the appropriate node which to add to the newly created compound node.
+		for( Map.Entry< ?, ? > entry : ((Map< ?, ? >)object).entrySet() )
+		{
+			// create the map entry node
+			final InfoNode entryNode = InfoNode.createCompoundNode( "", entry.getClass().getSimpleName(), entry.getClass() );
+			
+			// create the key node and add it to the entry node
+			entryNode.addChild( createNode( clazz, entry.getKey(), entry.getKey().getClass().getName() ) );
+			
+			// create the value node and add it to the entry node
+			entryNode.addChild( createNode( clazz, entry.getValue(), entry.getValue().getClass().getName() ) );
+			
+			// add the entry node to the info node representing the map
+			node.addChild( entryNode );
+		}
+		
+		return node;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.freezedry.persistence.builders.infonodes.NodeBuilder#createObject(java.lang.Class, org.freezedry.persistence.tree.nodes.InfoNode)
@@ -259,6 +294,57 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 				key = buildObject( containingClass, keyClass, keyTypes, secondNode, node );
 				value = buildObject( containingClass, valueClass, valueTypes, firstNode, node );
 			}
+			
+			// add the new objects to the map
+			map.put( key, value );
+		}
+		
+		// return the newly created and populated collection
+		return map;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.builders.NodeBuilder#createObject(java.lang.Class, org.freezedry.persistence.tree.InfoNode)
+	 */
+	@Override
+	public Object createObject( final Class< ? > clazz, final InfoNode node ) throws ReflectiveOperationException
+	{
+		// creates the map...
+		final Map< ? super Object, ? super Object > map = createMap( clazz );
+
+		// run through the nodes, calling the persistence engine to create the element objects
+		// and add them to the newly created map. each info node should have an entry node, and
+		// each entry node should have a key node and a value node.
+		for( InfoNode entryNode : node.getChildren() )
+		{
+			final List< InfoNode > keyValue = entryNode.getChildren();
+			if( keyValue.size() != 2 )
+			{
+				final StringBuffer message = new StringBuffer();
+				message.append( "The info node for this map must have two nodes. But snap! It doesn't" + Constants.NEW_LINE );
+				message.append( "  Number of nodes: " + keyValue.size() + Constants.NEW_LINE );
+				message.append( "  Node names: " + Constants.NEW_LINE );
+				for( InfoNode childNode : keyValue )
+				{
+					message.append( "    " + childNode.getPersistName() + Constants.NEW_LINE );
+				}
+				LOGGER.error( message.toString() );
+				throw new IllegalArgumentException( message.toString() );
+			}
+			
+			// TODO...can the order be reversed here? If so, how to fix...?
+			// the order of the elements can be reversed. For example, the key could be the second
+			// element (instead of the first) and the value could be the first. We check both possibilities
+			final InfoNode keyNode = keyValue.get( 0 );
+			final Class< ? > keyClass = Class.forName( keyNode.getPersistName() );
+			final List< Type > keyTypes = Arrays.asList( (Type)keyClass );
+			final Object key = buildObject( null, keyClass, keyTypes, keyNode, node );
+
+			final InfoNode valueNode = keyValue.get( 1 );
+			final Class< ? > valueClass = Class.forName( valueNode.getPersistName() );
+			final List< Type > valueTypes = Arrays.asList( (Type)valueClass );
+			final Object value = buildObject( null, valueClass, valueTypes, valueNode, node );
 			
 			// add the new objects to the map
 			map.put( key, value );

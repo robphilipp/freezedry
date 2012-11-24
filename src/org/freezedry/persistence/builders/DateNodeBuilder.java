@@ -16,6 +16,7 @@
 package org.freezedry.persistence.builders;
 
 import java.lang.reflect.Field;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -209,7 +210,6 @@ public class DateNodeBuilder extends AbstractLeafNodeBuilder {
 		{
 			// if the field isn't found or no annotation is present, then we stay
 			// with the default date format
-//			final Field field = containingClass.getDeclaredField( fieldName );
 			final Field field = ReflectionUtils.getDeclaredField( containingClass, fieldName );
 			final PersistDateAs annotation = field.getAnnotation( PersistDateAs.class );
 			field.getAnnotations();
@@ -225,6 +225,31 @@ public class DateNodeBuilder extends AbstractLeafNodeBuilder {
 		
 		// create a new leaf node with the new date string
 		final InfoNode node = InfoNode.createLeafNode( fieldName, date, persistName, clazz );
+		
+		// return the node
+		return node;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.builders.NodeBuilder#createInfoNode(java.lang.Object)
+	 */
+	@Override
+	public InfoNode createInfoNode( final Object object )
+	{
+		// grab the class for the object to persist
+		final Class< ? > clazz = object.getClass();
+		
+		// create a new leaf node
+		final String name = clazz.getName();
+		
+		// we must convert the object to the appropriate format
+		final String date = DateUtils.createStringFromDate( (Calendar)object, ISO_8601_DATE_FORMAT );
+		final InfoNode stringNode = InfoNode.createLeafNode( "value", date, "value", String.class );
+
+		// create the root node and add the string rep of the date
+		final InfoNode node = InfoNode.createRootNode( name, clazz );
+		node.addChild( stringNode );
 		
 		// return the node
 		return node;
@@ -272,6 +297,32 @@ public class DateNodeBuilder extends AbstractLeafNodeBuilder {
 			}
 		}
 		
+		return date;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.builders.AbstractLeafNodeBuilder#createObject(java.lang.Class, org.freezedry.persistence.tree.InfoNode)
+	 */
+	@Override
+	public Calendar createObject( final Class< ? > clazz, final InfoNode node )
+	{
+		final InfoNode valueNode = node.getChild( 0 );
+		final String value = (String)valueNode.getValue();
+		// try the ISO 8601 format (strict)
+		Calendar date = null;
+		try
+		{
+			date = DateUtils.createDateFromString( value, ISO_8601_DATE_FORMAT );
+		}
+		catch( ParseException e )
+		{
+			final StringBuffer message = new StringBuffer();
+			message.append( "Could not convert string to ISO 8601 date" + Constants.NEW_LINE );
+			message.append( "  Date String: " + value );
+			LOGGER.info( message.toString() );
+			throw new IllegalArgumentException( message.toString(), e );
+		}
 		return date;
 	}
 

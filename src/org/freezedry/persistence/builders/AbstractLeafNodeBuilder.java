@@ -90,4 +90,33 @@ public abstract class AbstractLeafNodeBuilder extends AbstractNodeBuilder {
 		// return the node
 		return node;
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.builders.NodeBuilder#createInfoNode(java.lang.Object)
+	 */
+	@Override
+	public InfoNode createInfoNode( final Object object )
+	{
+		// grab the class for the object to persist
+		final Class< ? > clazz = object.getClass();
+		
+		// create a new leaf node
+		final String name = clazz.getName();
+		final InfoNode node = InfoNode.createLeafNode( name, object, name, clazz );
+		
+		// return the node
+		return node;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.builders.NodeBuilder#createObject(java.lang.Class, org.freezedry.persistence.tree.InfoNode)
+	 */
+	@Override
+	public Object createObject( Class< ? > clazz, InfoNode node ) throws ReflectiveOperationException
+	{
+		return createObject( null, clazz, node );
+	}
+	
 }

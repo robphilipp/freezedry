@@ -476,7 +476,7 @@ public class PersistenceEngine {
 		{
 			try
 			{
-				rootNode = getNodeBuilder( clazz ).createInfoNode( null, object, clazz.getSimpleName() );
+				rootNode = getNodeBuilder( clazz ).createInfoNode( object );
 			}
 			catch( ReflectiveOperationException e )
 			{
@@ -516,7 +516,6 @@ public class PersistenceEngine {
 		// run through the fields associated with object's Class< ? >, create the nodes for
 		// each field, and add that node to the current node. recall that this is a recursive
 		// algorithm where createNode(...) may call this method recursively.
-//		final List< Field > fields = Arrays.asList( clazz.getDeclaredFields() );
 		final List< Field > fields = ReflectionUtils.getAllDeclaredFields( clazz );
 		for( final Field field : fields )
 		{
@@ -695,7 +694,7 @@ public class PersistenceEngine {
 		{
 			try
 			{
-				object = getNodeBuilder( clazz ).createObject( null, clazz, rootNode );
+				object = getNodeBuilder( clazz ).createObject( clazz, rootNode );
 			}
 			catch( ReflectiveOperationException e )
 			{

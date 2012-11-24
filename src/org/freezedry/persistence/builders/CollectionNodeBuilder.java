@@ -18,6 +18,7 @@ package org.freezedry.persistence.builders;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -162,6 +163,30 @@ public class CollectionNodeBuilder extends AbstractNodeBuilder {
 	
 	/*
 	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.builders.NodeBuilder#createInfoNode(java.lang.Object)
+	 */
+	@Override
+	public InfoNode createInfoNode( final Object object ) throws ReflectiveOperationException
+	{
+		// create the InfoNode object (we first have to determine the node type, down the road, we'll check the
+		// factories for registered node generators for the Class< ? > of the object)
+		final Class< ? > clazz = object.getClass();
+
+		// create the root node
+		final InfoNode node = InfoNode.createRootNode( clazz.getName(), clazz );
+
+		// run through the Collection elements, recursively calling createNode(...) to create
+		// the appropriate node which to add to the newly created compound node.
+		for( Object element : (Collection< ? >)object )
+		{
+			node.addChild( createNode( clazz, element, element.getClass().getName() ) );
+		}
+		
+		return node;
+	}
+	
+	/*
+	 * (non-Javadoc)
 	 * @see org.freezedry.persistence.builders.infonodes.NodeBuilder#createObject(java.lang.Class, org.freezedry.persistence.tree.nodes.InfoNode)
 	 */
 	@Override
@@ -205,6 +230,32 @@ public class CollectionNodeBuilder extends AbstractNodeBuilder {
 		for( InfoNode element : node.getChildren() ) 
 		{
 			final Object object = buildObject( containingClass, elementClass, elementTypes, element, node );
+			collection.add( object );
+		}
+		
+		// return the newly created and populated collection
+		return collection;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.builders.NodeBuilder#createObject(java.lang.Class, org.freezedry.persistence.tree.InfoNode)
+	 */
+	@Override
+	public Object createObject( final Class< ? > clazz, final InfoNode node ) throws ReflectiveOperationException
+	{
+		// creates the collection...
+		final Collection< ? super Object > collection = createCollection( clazz );
+		
+		// run through the nodes, calling the persistence engine to create the element objects
+		// and add them to the newly created collection.
+		for( InfoNode element : node.getChildren() ) 
+		{
+			final String elementTypeName = element.getPersistName();
+			final Class< ? > elementClass = Class.forName( elementTypeName );
+			final List< Type > elementTypes = Arrays.asList( (Type)elementClass );
+			
+			final Object object = buildObject( null, elementClass, elementTypes, element, node );
 			collection.add( object );
 		}
 		

@@ -153,7 +153,6 @@ public class ArrayNodeBuilder extends AbstractNodeBuilder {
 		{
 			try
 			{
-//				persistName = ReflectionUtils.getPersistenceName( containingClass.getDeclaredField( fieldName ) );
 				final Field field = ReflectionUtils.getDeclaredField( containingClass, fieldName );
 				persistName = ReflectionUtils.getPersistenceName( field );
 			}
@@ -183,7 +182,6 @@ public class ArrayNodeBuilder extends AbstractNodeBuilder {
 			PersistArray arrayAnnotation = null;
 			if( containingClass != null )
 			{
-//				arrayAnnotation = containingClass.getDeclaredField( fieldName ).getAnnotation( PersistArray.class );
 				final Field field = ReflectionUtils.getDeclaredField( containingClass, fieldName );
 				arrayAnnotation = field.getAnnotation( PersistArray.class );
 			}
@@ -239,42 +237,21 @@ public class ArrayNodeBuilder extends AbstractNodeBuilder {
 	
 	/*
 	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.builders.NodeBuilder#createInfoNode(java.lang.Object)
+	 */
+	@Override
+	public InfoNode createInfoNode( Object object ) throws ReflectiveOperationException
+	{
+		return createInfoNode( null, object, object.getClass().getName() );
+	}
+
+	/*
+	 * (non-Javadoc)
 	 * @see org.freezedry.persistence.builders.infonodes.NodeBuilder#createObject(java.lang.Class, org.freezedry.persistence.tree.nodes.InfoNode)
 	 */
 	@Override
 	public Object createObject( final Class< ? > containingClass, final Class< ? > clazz, final InfoNode node ) throws ReflectiveOperationException
 	{
-		// TODO figure out the generics in arrays...i.e. is Person< Location >[] legal?
-//		// grab the generic type parameters from the info node, and make sure there is only one
-//		// (i.e. List< Double > should have java.lang.Double as the generic type)
-//		// and pull out that type
-//		final List< Type > types = node.getGenericParameterTypes();
-//		if( types.size() != 1 )
-//		{
-//			final StringBuffer message = new StringBuffer();
-//			message.append( "Can only have one generic parameter in collection." + Constants.NEW_LINE );
-//			message.append( "  Number of Generic Parameters: " + types.size() + Constants.NEW_LINE );
-//			message.append( "  Generic Parameters: " + Constants.NEW_LINE );
-//			for( Type type : types )
-//			{
-//				message.append( "    " + ((Class< ? >)type).getName() + Constants.NEW_LINE );
-//			}
-//			throw new IllegalArgumentException( message.toString() );
-//		}
-//		
-//		// we need to get the generic types, but this isn't so simple. if the collection is a simple collection,
-//		// such as a Collection< String >, then the clazz will be a string. But if element, itself, has a generic type,
-//		// such as a Collection< List< String > >, then we need to pull the generic type information
-//		// from the List as well. normally, we do reflection on the field to get the
-//		// generic type info, but for this List, we have no field, so we need to pull it, save it,
-//		// and then when we run through the nodes, we set it into the node so we have it on the next
-//		// recursive call....complicated, huh? so, the types will hold any type generic information of
-//		// the elements. the clazz holds the Class of the elements. note that the ParameterizedType means that
-//		// it has generic type information.
-//		final Pair< Class< ? >, List< Type > > elementInfo = extractTypeInfo( types.get( 0 ) );
-//		final Class< ? > elementClass = elementInfo.getFirst();
-//		final List< Type > elementTypes = elementInfo.getSecond();
-		
 		// creates the collection...
 		final Object collection = createArray( clazz.getComponentType(), node.getChildCount() );
 
@@ -303,6 +280,16 @@ public class ArrayNodeBuilder extends AbstractNodeBuilder {
 		return collection;
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.builders.NodeBuilder#createObject(java.lang.Class, org.freezedry.persistence.tree.InfoNode)
+	 */
+	@Override
+	public Object createObject( Class< ? > clazz, InfoNode node ) throws ReflectiveOperationException
+	{
+		return createObject( null, clazz, node );
+	}
+
 	/*
 	 * Instantiates a {@link Collection} object based on the specified {@link Class}. However, if the specified {@link Class}
 	 * is an interface, then it used the default concrete {@link Collection} class found in {@link #concreteCollectionClass}. 

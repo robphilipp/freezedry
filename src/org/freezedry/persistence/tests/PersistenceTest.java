@@ -30,7 +30,9 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.lang.reflect.Array;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -451,6 +453,7 @@ public class PersistenceTest {
 		testXml( "this is a test", "string.xml" );
 		testXml( 3.14, "double.xml" );
 		testXml( 3, "int.xml" );
+		testXml( true, "boolean.xml" );
 	}
 
 	@Test
@@ -459,36 +462,60 @@ public class PersistenceTest {
 		testJson( "this is a test", "string.json" );
 		testJson( 3.14, "double.json" );
 		testJson( 3, "int.json" );
+		testJson( true, "boolean.json" );
 	}
 
-	// these test will currently fail because there is no way to know what the type of the element is
-	// when the list is the root level element. so the reconstructed list ends up holding Object elements
-	// instead of Integer elements, and, unfortunately, these can't be cast to an Integer.
-//	@Test
-//	public void testListsXml()
-//	{
-//		testXml( new ArrayList< Integer >( Arrays.asList( 3, 1, 4, 1, 5, 9, 2, 6 ) ), "arrays_list.xml" );
-//	}
+	@Test
+	public void testListsXml()
+	{
+		testXml( new ArrayList< Integer >( Arrays.asList( 3, 1, 4, 1, 5, 9, 2, 6 ) ), "integer_array_list.xml" );
+	}
 
-//	@Test
-//	public void testListsJson()
-//	{
-//		testJson( new ArrayList< Integer >( Arrays.asList( 3, 1, 4, 5, 9, 2, 6 ) ), "arrays_list.json" );
-//	}
+	@Test
+	public void testListsJson()
+	{
+		testJson( new ArrayList< Integer >( Arrays.asList( 3, 1, 4, 5, 9, 2, 6 ) ), "integer_array_list.json" );
+	}
 
-	// blows up...would need to use the map node builder
-//	@Test
-//	public void testMapXml()
-//	{
-//		final Map< String, Integer > pi = new LinkedHashMap<>();
-//		pi.put( "three", 3 );
-//		pi.put( "one", 1 );
-//		pi.put( "four", 4 );
-//		pi.put( "one again", 1 );
-//		pi.put( "five", 5 );
-//		pi.put( "nine", 9 );
-//		testXml( pi, "map.xml" );
-//	}
+	@Test
+	public void testMapXml()
+	{
+		final Map< String, Integer > pi = new LinkedHashMap<>();
+		pi.put( "three", 3 );
+		pi.put( "one", 1 );
+		pi.put( "four", 4 );
+		pi.put( "one again", 1 );
+		pi.put( "five", 5 );
+		pi.put( "nine", 9 );
+		testXml( pi, "map.xml" );
+	}
+	
+	@Test
+	public void testMapJson()
+	{
+		final Map< String, Integer > pi = new LinkedHashMap<>();
+		pi.put( "three", 3 );
+		pi.put( "one", 1 );
+		pi.put( "four", 4 );
+		pi.put( "one again", 1 );
+		pi.put( "five", 5 );
+		pi.put( "nine", 9 );
+		testJson( pi, "map.json" );
+	}
+	
+	@Test
+	public void testDateXml()
+	{
+		final Calendar date = Calendar.getInstance();
+		testXml( date, "date.xml" );
+	}
+	
+	@Test
+	public void testDateJson()
+	{
+		final Calendar date = Calendar.getInstance();
+		testJson( date, "date.json" );
+	}
 	
 	@Test
 	public void testInheritence()
@@ -509,12 +536,9 @@ public class PersistenceTest {
 	{
 		testXml( new MapMagic(), "map_magic.xml" );
 
-//		final MapMagic mapMagic = new MapMagic();
-//		
-//		final InfoNode magicRoot = createInfoNode( mapMagic );
-//		
-//		final MapMagic magicTwin = (MapMagic)createObject( magicRoot, MapMagic.class );
-//		
-//		testEquals( mapMagic, magicTwin );
+		final MapMagic mapMagic = new MapMagic();
+		final InfoNode magicRoot = createInfoNode( mapMagic );
+		final MapMagic magicTwin = (MapMagic)createObject( magicRoot, MapMagic.class );
+		testEquals( mapMagic, magicTwin );
 	}
 }

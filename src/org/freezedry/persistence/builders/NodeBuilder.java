@@ -15,6 +15,8 @@
  */
 package org.freezedry.persistence.builders;
 
+import java.util.ArrayList;
+
 import javax.sound.midi.MidiDevice.Info;
 
 import org.freezedry.persistence.PersistenceEngine;
@@ -47,16 +49,40 @@ public interface NodeBuilder extends Copyable< NodeBuilder > {
 	InfoNode createInfoNode( final Class< ? > containingClass, final Object object, final String fieldName ) throws ReflectiveOperationException;
 	
 	/**
+	/**
+	 * Generates an {@link InfoNode} from the specified {@link Object}. This method is used for objects that have
+	 * an overriding node builder and are not contained within a class. For example, suppose you would like
+	 * to persist an {@link ArrayList} for serialization and would like to maintain the type information.
+	 * @param object The value of the field with the specified field name
+	 * @return The constructed {@link InfoNode} based on the specified information
+	 * @throws ReflectiveOperationException
+	 */
+	InfoNode createInfoNode( final Object object ) throws ReflectiveOperationException;
+
+	/**
 	 * Creates an object of the specified {@link Class} based on the information in the {@link InfoNode}. Note that
 	 * the {@link Info} may also contain type information about the class to generate. The specified {@link Class}
 	 * overrides that value. This is done to avoid modifying the {@link Info} tree when supplemental information becomes
 	 * available.
+	 * @param containingClass The {@link Class} containing the clazz, represented by the {@link InfoNode}
 	 * @param clazz The {@link Class} of the object to create 
 	 * @param node The information about the object to create
 	 * @return The object constructed based on the info node.
 	 */
 	Object createObject( final Class< ? > containingClass, final Class< ? > clazz, final InfoNode node ) throws ReflectiveOperationException;
-	
+
+	/**
+	 * Creates an object of the specified {@link Class} based on the information in the {@link InfoNode}. 
+	 * This method is used for objects that have an overriding node builder and are not contained within a 
+	 * class. For example, suppose you would like to persist an {@link ArrayList} for serialization and would 
+	 * like to maintain the type information. 
+	 * @param clazz The {@link Class} of the object to create 
+	 * @param node The information about the object to create
+	 * @return The object constructed based on the info node.
+	 * @throws ReflectiveOperationException
+	 */
+	Object createObject( final Class< ? > clazz, final InfoNode node ) throws ReflectiveOperationException;
+
 	/**
 	 * Sets the {@link PersistenceEngine} with which this {@link NodeBuilder} must work. Recall, that the
 	 * {@link #createInfoNode(Class, Object, String)} methods is called from within an recursive algorithm 
