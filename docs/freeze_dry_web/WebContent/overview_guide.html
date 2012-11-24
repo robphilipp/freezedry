@@ -734,6 +734,21 @@ you should create an annotation if you want to customize its behavior from the c
 <p>This section describes the larger changes. More detailed changes can be found in the README 
 file in the file download area. Most updates will contain bug fixes and minor code refactoring.</p>
 
+<h4>Version 0.2.5 (from version 0.2.4)</h4>
+<p>Mainly improved the use of FreezeDry for serialization of objects that have an associated <b class="class">NodeBuilder</b>.</p>
+
+<ol>
+    <li>Added the ability to persist objects that have an associated <b class="class">NodeBuilder</b> as root
+        objects as described by the <b class="class">NodeBuilder</b>. For example, when persisting an <b class="class">ArrayList</b>
+        as a member of another object, the <b class="class">ArrayList</b> uses the <b class="class">CollectionNodeBuilder</b> to
+        create and parse the <b class="class">InfoNode</b> objects. In version 0.2.4, however, when the <b class="class">ArrayList</b>
+        was the root object (i.e. not a member of another object) then the <b class="class">ArrayList</b> was persisted as if it
+        were any other object, rather than by using the <b class="class">CollectionNodeBuilder</b>. Version 0.2.5 fixes this.</li>
+    <li>Changed the <b class="class">NodeBuilder</b> interface to have two additional methods that override the
+        <b class="class">createInfoNode(Class<?>, Object, String)</b> method and the <b class="class">createObject(Class<?>, Class<?>, InfoNode)</b>
+        method. These new methods are called when an object has an associated <b class="class">NodeBuilder</b> <em>and</em>
+        is a root object.</li>
+</ol>
 <h4>Version 0.2.4 (from version 0.2.3)</h4>
 <p>Mainly bug fix related to inheritance, completed TODO for setting the persist names of map elements,
 added ability to specify that a field is ignored (i.e. not persisted), and added test cases.</p>
