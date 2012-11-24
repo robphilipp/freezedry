@@ -45,7 +45,7 @@ public interface NodeBuilder extends Copyable< NodeBuilder > {
 	 * @throws ReflectiveOperationException
 	 */
 	InfoNode createInfoNode( final Class< ? > containingClass, final Object object, final String fieldName ) throws ReflectiveOperationException;
-
+	
 	/**
 	 * Creates an object of the specified {@link Class} based on the information in the {@link InfoNode}. Note that
 	 * the {@link Info} may also contain type information about the class to generate. The specified {@link Class}
@@ -53,7 +53,7 @@ public interface NodeBuilder extends Copyable< NodeBuilder > {
 	 * available.
 	 * @param clazz The {@link Class} of the object to create 
 	 * @param node The information about the object to create
-	 * @return
+	 * @return The object constructed based on the info node.
 	 */
 	Object createObject( final Class< ? > containingClass, final Class< ? > clazz, final InfoNode node ) throws ReflectiveOperationException;
 	
