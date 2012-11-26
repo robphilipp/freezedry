@@ -31,7 +31,13 @@ import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.Constants;
 import org.freezedry.persistence.utils.ReflectionUtils;
 
-
+/**
+ * Handles the persistence and serialization of {@link Map} objects. When use for serialization
+ * (i.e. typically when maps are root objects it is for serialization), then applies a key- and
+ * value-prefix to the key's and value's respectively.
+ *  
+ * @author Robert Philipp
+ */
 public class MapNodeBuilder extends AbstractNodeBuilder {
 	
 	private static final Logger LOGGER = Logger.getLogger( MapNodeBuilder.class );
