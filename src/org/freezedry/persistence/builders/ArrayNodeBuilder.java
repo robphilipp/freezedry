@@ -242,7 +242,34 @@ public class ArrayNodeBuilder extends AbstractNodeBuilder {
 	@Override
 	public InfoNode createInfoNode( final Object object, final String persistName ) throws ReflectiveOperationException
 	{
-		return createInfoNode( null, object, persistName );//object.getClass().getName() );
+		// create the InfoNode object (we first have to determine the node type, down the road, we'll check the
+		// factories for registered node generators for the Class< ? > of the object)
+		final Class< ? > clazz = object.getClass();
+
+		// create the compound name
+		final InfoNode node = InfoNode.createCompoundNode( persistName, persistName, clazz );
+		
+		// run through the Collection elements, recursively calling createNode(...) to create
+		// the appropriate node which to add to the newly created compound node.
+		for( int i = 0; i < Array.getLength( object ); ++i )
+		{
+			// grab the array's element type, and then its fully qualified name
+			final Class< ? > elementClazz = object.getClass().getComponentType();
+			final String name = elementClazz.getSimpleName();
+			
+			// grab the element and create the node. however, because the element may be a primitive
+			// we need to set the node's class type to the actual element node. if we don't do this
+			// then, for example, all ints will become Integers and if we ask for the type to be 
+			// set within the node, the type will be incorrect
+			final Object element = Array.get( object, i );
+			final InfoNode elementNode = createNode( null, element, name );
+			elementNode.setClazz( elementClazz );
+			
+			// add the new node as a child to the parent
+			node.addChild( elementNode );
+		}
+		
+		return node;
 	}
 
 	/*

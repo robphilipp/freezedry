@@ -18,7 +18,7 @@ package org.freezedry.persistence.builders;
 import org.freezedry.persistence.PersistenceEngine;
 import org.freezedry.persistence.tree.InfoNode;
 
-public class LongNodeBuilder extends AbstractLeafNodeBuilder {
+public class LongNodeBuilder extends AbstractPrimitiveLeafNodeBuilder {
 
 	/**
 	 * Constructs the {@link NodeBuilder} for going between primitives, their wrappers, {@link String}s and 
@@ -58,6 +58,33 @@ public class LongNodeBuilder extends AbstractLeafNodeBuilder {
 		return Long.parseLong( valueString.toString() );
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.builders.AbstractLeafNodeBuilder#createObject(java.lang.Class, org.freezedry.persistence.tree.InfoNode)
+	 */
+	@Override
+	public Long createObject( final Class< ? > clazz, final InfoNode node ) throws ReflectiveOperationException
+	{
+		// grab the child node's value
+		final Object nodeValue = node.getChild( 0 ).getValue();
+		
+		// here it is a bit complicated. recall that this method is called for root nodes, and so
+		// value seems to jump between Long, Integer, and String
+		Long value = null;
+		if( nodeValue instanceof Long )
+		{
+			value = (Long)nodeValue;
+		}
+		if( nodeValue instanceof Integer )
+		{
+			value = (long)(int)nodeValue;
+		}
+		else
+		{
+			value = Long.parseLong( (String)nodeValue );
+		}
+		return value;
+	}
 	/*
 	 * (non-Javadoc)
 	 * @see com.synapse.copyable.Copyable#getCopy()

@@ -4,7 +4,7 @@ import org.freezedry.persistence.PersistenceEngine;
 import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.Constants;
 
-public class CharacterNodeBuilder extends AbstractLeafNodeBuilder {
+public class CharacterNodeBuilder extends AbstractPrimitiveLeafNodeBuilder {
 
 	/**
 	 * Constructs the {@link NodeBuilder} for going between primitives, their wrappers, {@link Character}s and 
@@ -60,6 +60,30 @@ public class CharacterNodeBuilder extends AbstractLeafNodeBuilder {
 		return character;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.builders.AbstractLeafNodeBuilder#createObject(java.lang.Class, org.freezedry.persistence.tree.InfoNode)
+	 */
+	@Override
+	public Character createObject( final Class< ? > clazz, final InfoNode node ) throws ReflectiveOperationException
+	{
+		// grab the child node's value
+		final Object nodeValue = node.getChild( 0 ).getValue();
+		
+		// here it is a bit complicated. recall that this method is called for root nodes, and so
+		// value seems to jump between Character and String
+		Character value = null;
+		if( nodeValue instanceof Character )
+		{
+			value = (Character)nodeValue;
+		}
+		else
+		{
+			value = ((String)nodeValue).charAt( 0 );
+		}
+		return value;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.synapse.copyable.Copyable#getCopy()

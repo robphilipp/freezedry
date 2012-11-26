@@ -18,7 +18,7 @@ package org.freezedry.persistence.builders;
 import org.freezedry.persistence.PersistenceEngine;
 import org.freezedry.persistence.tree.InfoNode;
 
-public class BooleanNodeBuilder extends AbstractLeafNodeBuilder {
+public class BooleanNodeBuilder extends AbstractPrimitiveLeafNodeBuilder {
 
 	/**
 	 * Constructs the {@link NodeBuilder} for going between primitives, their wrappers, {@link String}s and 
@@ -58,6 +58,30 @@ public class BooleanNodeBuilder extends AbstractLeafNodeBuilder {
 		return Boolean.parseBoolean( valueString.toString() );
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.builders.AbstractLeafNodeBuilder#createObject(java.lang.Class, org.freezedry.persistence.tree.InfoNode)
+	 */
+	@Override
+	public Boolean createObject( final Class< ? > clazz, final InfoNode node ) throws ReflectiveOperationException
+	{
+		// grab the child node's value
+		final Object nodeValue = node.getChild( 0 ).getValue();
+		
+		// here it is a bit complicated. recall that this method is called for root nodes, and so
+		// value seems to jump between Boolean and String
+		Boolean value = null;
+		if( nodeValue instanceof Boolean )
+		{
+			value = (Boolean)nodeValue;
+		}
+		else
+		{
+			value = Boolean.parseBoolean( (String)nodeValue );
+		}
+		return value;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.synapse.copyable.Copyable#getCopy()

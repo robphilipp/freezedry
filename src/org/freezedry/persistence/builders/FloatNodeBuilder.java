@@ -18,14 +18,14 @@ package org.freezedry.persistence.builders;
 import org.freezedry.persistence.PersistenceEngine;
 import org.freezedry.persistence.tree.InfoNode;
 
-public class StringNodeBuilder extends AbstractLeafNodeBuilder {
+public class FloatNodeBuilder extends AbstractPrimitiveLeafNodeBuilder {
 
 	/**
 	 * Constructs the {@link NodeBuilder} for going between primitives, their wrappers, {@link String}s and 
 	 * back to {@link Object}s.
 	 * @param engine The {@link PersistenceEngine}
 	 */
-	public StringNodeBuilder( final PersistenceEngine engine )
+	public FloatNodeBuilder( final PersistenceEngine engine )
 	{
 		super( engine );
 	}
@@ -33,7 +33,7 @@ public class StringNodeBuilder extends AbstractLeafNodeBuilder {
 	/**
 	 * Default no-arg constructor
 	 */
-	public StringNodeBuilder()
+	public FloatNodeBuilder()
 	{
 		super();
 	}
@@ -42,41 +42,20 @@ public class StringNodeBuilder extends AbstractLeafNodeBuilder {
 	 * Copy constructor
 	 * @param builder
 	 */
-	public StringNodeBuilder( final StringNodeBuilder builder )
+	public FloatNodeBuilder( final FloatNodeBuilder builder )
 	{
 		super( builder );
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.freezedry.persistence.builders.AbstractLeafNodeBuilder#createInfoNode(java.lang.Object, java.lang.String)
-	 */
-	@Override
-	public InfoNode createInfoNode( final Object object, final String persistName )
-	{
-		// grab the class for the object to persist
-		final Class< ? > clazz = object.getClass();
-		
-		// we must convert the object to the appropriate format
-		final InfoNode stringNode = InfoNode.createLeafNode( "value", (String)object, "value", String.class );
 
-		// create the root node and add the string rep of the date
-		final InfoNode node = InfoNode.createRootNode( persistName, clazz );
-		node.addChild( stringNode );
-		
-		// return the node
-		return node;
-	}
-	
 	/*
 	 * (non-Javadoc)
 	 * @see org.freezedry.persistence.builders.infonodes.NodeBuilder#createObject(java.lang.Class, org.freezedry.persistence.tree.nodes.InfoNode)
 	 */
 	@Override
-	public String createObject( final Class< ? > containingClass, final Class< ? > clazz, final InfoNode node )
+	public Float createObject( final Class< ? > containingClass, final Class< ? > clazz, final InfoNode node )
 	{
 		final Object valueString = node.getValue();
-		return valueString.toString();
+		return Float.parseFloat( valueString.toString() );
 	}
 
 	/*
@@ -84,20 +63,40 @@ public class StringNodeBuilder extends AbstractLeafNodeBuilder {
 	 * @see org.freezedry.persistence.builders.AbstractLeafNodeBuilder#createObject(java.lang.Class, org.freezedry.persistence.tree.InfoNode)
 	 */
 	@Override
-	public String createObject( final Class< ? > clazz, final InfoNode node ) throws ReflectiveOperationException
+	public Float createObject( final Class< ? > clazz, final InfoNode node ) throws ReflectiveOperationException
 	{
-		final InfoNode valueNode = node.getChild( 0 );
-		final String value = (String)valueNode.getValue();
+		// grab the child node's value
+		final Object nodeValue = node.getChild( 0 ).getValue();
+		
+		// here it is a bit complicated. recall that this method is called for root nodes, and so
+		// value seems to jump between Float, Double, and String, and because "1.0" could be "1", also Integer
+		Float value = null;
+		if( nodeValue instanceof Float )
+		{
+			value = (Float)nodeValue;
+		}
+		else if( nodeValue instanceof Double )
+		{
+			value = (float)(double)nodeValue;
+		}
+		else if( nodeValue instanceof Integer )
+		{
+			value = Float.valueOf( (int)nodeValue );
+		}
+		else
+		{
+			value = Float.parseFloat( (String)nodeValue );
+		}
 		return value;
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.synapse.copyable.Copyable#getCopy()
 	 */
 	@Override
-	public StringNodeBuilder getCopy()
+	public FloatNodeBuilder getCopy()
 	{
-		return new StringNodeBuilder( this );
+		return new FloatNodeBuilder( this );
 	}
 }

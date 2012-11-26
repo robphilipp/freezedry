@@ -245,8 +245,7 @@ public class DateNodeBuilder extends AbstractLeafNodeBuilder {
 		final InfoNode stringNode = InfoNode.createLeafNode( "value", date, "value", String.class );
 
 		// create the root node and add the string rep of the date
-		final String name = persistName;//clazz.getName();
-		final InfoNode node = InfoNode.createRootNode( name, clazz );
+		final InfoNode node = InfoNode.createRootNode( persistName, clazz );
 		node.addChild( stringNode );
 		
 		// return the node

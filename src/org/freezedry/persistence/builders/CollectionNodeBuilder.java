@@ -173,7 +173,6 @@ public class CollectionNodeBuilder extends AbstractNodeBuilder {
 		final Class< ? > clazz = object.getClass();
 
 		// create the root node
-//		final InfoNode node = InfoNode.createRootNode( clazz.getName(), clazz );
 		final InfoNode node = InfoNode.createRootNode( persistName, clazz );
 
 		// run through the Collection elements, recursively calling createNode(...) to create

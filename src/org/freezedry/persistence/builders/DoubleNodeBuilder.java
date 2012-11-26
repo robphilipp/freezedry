@@ -18,7 +18,7 @@ package org.freezedry.persistence.builders;
 import org.freezedry.persistence.PersistenceEngine;
 import org.freezedry.persistence.tree.InfoNode;
 
-public class DoubleNodeBuilder extends AbstractLeafNodeBuilder {
+public class DoubleNodeBuilder extends AbstractPrimitiveLeafNodeBuilder {
 
 	/**
 	 * Constructs the {@link NodeBuilder} for going between primitives, their wrappers, {@link String}s and 
@@ -46,7 +46,7 @@ public class DoubleNodeBuilder extends AbstractLeafNodeBuilder {
 	{
 		super( builder );
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.freezedry.persistence.builders.infonodes.NodeBuilder#createObject(java.lang.Class, org.freezedry.persistence.tree.nodes.InfoNode)
@@ -58,6 +58,34 @@ public class DoubleNodeBuilder extends AbstractLeafNodeBuilder {
 		return Double.parseDouble( valueString.toString() );
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.freezedry.persistence.builders.AbstractLeafNodeBuilder#createObject(java.lang.Class, org.freezedry.persistence.tree.InfoNode)
+	 */
+	@Override
+	public Double createObject( final Class< ? > clazz, final InfoNode node ) throws ReflectiveOperationException
+	{
+		// grab the child node's value
+		final Object nodeValue = node.getChild( 0 ).getValue();
+		
+		// here it is a bit complicated. recall that this method is called for root nodes, and so
+		// value seems to jump between Double and String, and because "1.0" could be "1", also Integer
+		Double value = null;
+		if( nodeValue instanceof Double )
+		{
+			value = (Double)nodeValue;
+		}
+		else if( nodeValue instanceof Integer )
+		{
+			value = Double.valueOf( (int)nodeValue );
+		}
+		else
+		{
+			value = Double.parseDouble( (String)nodeValue );
+		}
+		return value;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see com.synapse.copyable.Copyable#getCopy()

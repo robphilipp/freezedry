@@ -413,16 +413,17 @@ public class PersistenceTest {
 	@Test
 	public void testDoubleArraysXml()
 	{
-		testXml( new double[] { 3, 1, 4, 1, 5, 9, 2, 6 }, "double_array.xml" );
+//		testXml( new double[] { 3, 1, 4, 1, 5, 9, 2, 6 }, "double_array.xml" );
 		testXml( new double[] { 3.14, 1.41, 4.15, 1.59, 5.92, 9.26, 2.6, 6. }, "double_array.xml" );
 	}
 
 	@Test
 	public void testDoubleArraysJson()
 	{
-		testJson( new double[] { 3, 1, 4, 1, 5, 9, 2, 6 }, "double_array.json" );
+//		testJson( new double[] { 3, 1, 4, 1, 5, 9, 2, 6 }, "double_array.json" );
 		testJson( new double[] { 3.14, 1.41, 4.15, 1.59, 5.92, 9.26, 2.6, 6. }, "double_array.json" );
 	}
+	
 	@Test
 	public void testStringArraysXml()
 	{
@@ -451,18 +452,42 @@ public class PersistenceTest {
 	public void testPrimitivesXml()
 	{
 		testXml( "this is a test", "string.xml" );
-		testXml( 3.14, "double.xml" );
-		testXml( 3, "int.xml" );
-		testXml( true, "boolean.xml" );
+		testXml( 3.14, "double_primitive.xml" );
+		testXml( Double.valueOf( 3.14 ), "double.xml" );
+		testXml( Float.valueOf( (float)3.14 ), "float.xml" );
+		testXml( (float)3.14, "float_primitive.xml" );
+		testXml( Integer.valueOf( 3 ), "int.xml" );
+		testXml( 3, "int_primitive.xml" );
+		testXml( new Long( 31415926 ), "long.xml" );
+		testXml( Short.valueOf( (short)314 ), "short.xml" );
+		testXml( (short)314, "short_primitive.xml" );
+		testXml( 'p', "char_primitive.xml" );
+		testXml( new Character( 'p' ), "char.xml" );
+		testXml( true, "boolean_primitive.xml" );
+		testXml( Boolean.valueOf( true ), "boolean.xml" );
+		testXml( (byte)3, "byte_primitive.xml" );
+		testXml( Byte.valueOf( (byte)3 ), "byte.xml" );
 	}
 
 	@Test
 	public void testPrimitivesJson()
 	{
 		testJson( "this is a test", "string.json" );
-		testJson( 3.14, "double.json" );
-		testJson( 3, "int.json" );
-		testJson( true, "boolean.json" );
+		testJson( 3.14, "double_primitive.json" );
+		testJson( Double.valueOf( 3.14 ), "double.json" );
+		testJson( Float.valueOf( (float)3.14 ), "float.json" );
+		testJson( (float)3.14, "float_primitive.json" );
+		testJson( Integer.valueOf( 3 ), "int.json" );
+		testJson( 3, "int_primitive.json" );
+		testJson( new Long( 31415926 ), "long.json" );
+		testJson( Short.valueOf( (short)314 ), "short.json" );
+		testJson( (short)314, "short_primitive.json" );
+		testJson( 'p', "char_primitive.json" );
+		testJson( new Character( 'p' ), "char.json" );
+		testJson( true, "boolean_primitive.json" );
+		testJson( Boolean.valueOf( true ), "boolean.json" );
+		testJson( (byte)3, "byte_primitive.json" );
+		testJson( Byte.valueOf( (byte)3 ), "byte.json" );
 	}
 
 	@Test

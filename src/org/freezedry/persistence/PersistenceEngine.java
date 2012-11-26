@@ -49,10 +49,12 @@ import org.freezedry.persistence.annotations.PersistCollection;
 import org.freezedry.persistence.annotations.PersistDateAs;
 import org.freezedry.persistence.builders.ArrayNodeBuilder;
 import org.freezedry.persistence.builders.BooleanNodeBuilder;
+import org.freezedry.persistence.builders.ByteNodeBuilder;
 import org.freezedry.persistence.builders.CharacterNodeBuilder;
 import org.freezedry.persistence.builders.CollectionNodeBuilder;
 import org.freezedry.persistence.builders.DateNodeBuilder;
 import org.freezedry.persistence.builders.DoubleNodeBuilder;
+import org.freezedry.persistence.builders.FloatNodeBuilder;
 import org.freezedry.persistence.builders.IntegerNodeBuilder;
 import org.freezedry.persistence.builders.LongNodeBuilder;
 import org.freezedry.persistence.builders.MapNodeBuilder;
@@ -86,12 +88,12 @@ import org.xml.sax.SAXException;
  * For example, for and instance of the {@link PersistenceEngine}, {@code engine} you can map a {@link Map} to a 
  * {@link MapNodeBuilder}, so that all {@link Map} objects use the {@link MapNodeBuilder} to convert between the 
  * semantic model and an object, by<p>
- * {@code engine.addNodeBuilder( Map.class, new MapNodeBuilder() );}
+ * {@code engine.addNodeBuilder( Map.class, new MapNodeBuilder() );}<p>
  * Importantly, in this case, the {@link PersistenceEngine} will use the {@link MapNodeBuilder} for all objects that 
  * implement {@link Map}. That means that a {@link LinkedHashMap} will also use {@link MapNodeBuilder}. Suppose you
  * want to have the {@link LinkedHashMap} used a different {@link NodeBuilder}, say {@code LinkedMapNodeBuilder} (which
  * doesn't exist, but you could write one), then you would perform the mapping as above:<p>
- * {@code engine.addNodeBuilder( LinkedHashMap.class, new LinkedMapNodeBuilder() );}
+ * {@code engine.addNodeBuilder( LinkedHashMap.class, new LinkedMapNodeBuilder() );}<p>
  * And now, {@link HashMap} would use the {@link MapNodeBuilder}, but {@link LinkedHashMap} would use the 
  * {@code LinkedMapNodeBuilder}.<p>
  * 
@@ -154,17 +156,21 @@ public class PersistenceEngine {
 		// primitive node info node builders (these are intended to create leaf nodes)
 		builders.put( Integer.TYPE, new IntegerNodeBuilder( this ) );
 		builders.put( Double.TYPE, new DoubleNodeBuilder( this ) );
+		builders.put( Float.TYPE, new FloatNodeBuilder( this ) );
 		builders.put( Long.TYPE, new LongNodeBuilder( this ) );
 		builders.put( Short.TYPE, new ShortNodeBuilder( this ) );
 		builders.put( Boolean.TYPE, new BooleanNodeBuilder( this ) );
 		builders.put( Character.TYPE, new CharacterNodeBuilder( this ) );
+		builders.put( Byte.TYPE, new ByteNodeBuilder( this ) );
 		
 		builders.put( Integer.class, new IntegerNodeBuilder( this ) );
 		builders.put( Double.class, new DoubleNodeBuilder( this ) );
+		builders.put( Float.class, new FloatNodeBuilder( this ) );
 		builders.put( Long.class, new LongNodeBuilder( this ) );
 		builders.put( Short.class, new ShortNodeBuilder( this ) );
 		builders.put( Boolean.class, new BooleanNodeBuilder( this ) );
 		builders.put( Character.class, new CharacterNodeBuilder( this ) );
+		builders.put( Byte.class, new ByteNodeBuilder( this ) );
 		builders.put( String.class, new StringNodeBuilder( this ) );
 		
 		// other leaf nodes
@@ -204,18 +210,26 @@ public class PersistenceEngine {
 	private static Set< Class< ? > > nonRootObjects()
 	{
 		final Set< Class< ? > > primitives = new HashSet<>();
-		primitives.add( Integer.class );
-		primitives.add( Long.class );
-		primitives.add( Short.class );
-		primitives.add( Double.class );
-		primitives.add( Float.class );
-		primitives.add( Boolean.class );
-		primitives.add( Byte.class );
-		primitives.add( Character.class );
-		primitives.add( String.class );
+//		primitives.add( Integer.class );
+//		primitives.add( Long.class );
+//		primitives.add( Short.class );
+//		primitives.add( Double.class );
+//		primitives.add( Float.class );
+//		primitives.add( Boolean.class );
+//		primitives.add( Byte.class );
+//		primitives.add( Character.class );
+//		primitives.add( String.class );
 		
 		// add the primitives as well
-		primitives.addAll( PRIMITIVE_TYPES.keySet() );
+//		primitives.addAll( PRIMITIVE_TYPES.keySet() );
+//		primitives.add( Integer.TYPE );
+//		primitives.add( Long.TYPE );
+//		primitives.add( Short.TYPE );
+//		primitives.add( Double.TYPE );
+//		primitives.add( Float.TYPE );
+//		primitives.add( Boolean.TYPE );
+//		primitives.add( Byte.TYPE );
+//		primitives.add( Character.TYPE );
 		return primitives;
 	}
 	
@@ -459,7 +473,8 @@ public class PersistenceEngine {
 			final String persistName = clazz.getSimpleName().replaceAll( "\\[\\]", genaralArrayNodeBuilder.getCompoundArrayNameSuffix() );
 			try
 			{
-				rootNode = genaralArrayNodeBuilder.createInfoNode( null, object, persistName );
+//				rootNode = genaralArrayNodeBuilder.createInfoNode( null, object, persistName );
+				rootNode = genaralArrayNodeBuilder.createInfoNode( object, persistName );
 			}
 			catch( ReflectiveOperationException e )
 			{

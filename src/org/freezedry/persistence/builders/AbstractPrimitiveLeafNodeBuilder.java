@@ -18,14 +18,20 @@ package org.freezedry.persistence.builders;
 import org.freezedry.persistence.PersistenceEngine;
 import org.freezedry.persistence.tree.InfoNode;
 
-public class StringNodeBuilder extends AbstractLeafNodeBuilder {
+/**
+ * Abstract class that implements the {@link #createInfoNode(Object, String)} for classes
+ * that are leaves in the semantic model, and also primitive types or wrappers.
+ * 
+ * @author Robert Philipp
+ */
+public abstract class AbstractPrimitiveLeafNodeBuilder extends AbstractLeafNodeBuilder {
 
 	/**
 	 * Constructs the {@link NodeBuilder} for going between primitives, their wrappers, {@link String}s and 
 	 * back to {@link Object}s.
 	 * @param engine The {@link PersistenceEngine}
 	 */
-	public StringNodeBuilder( final PersistenceEngine engine )
+	public AbstractPrimitiveLeafNodeBuilder( final PersistenceEngine engine )
 	{
 		super( engine );
 	}
@@ -33,7 +39,7 @@ public class StringNodeBuilder extends AbstractLeafNodeBuilder {
 	/**
 	 * Default no-arg constructor
 	 */
-	public StringNodeBuilder()
+	public AbstractPrimitiveLeafNodeBuilder()
 	{
 		super();
 	}
@@ -42,7 +48,7 @@ public class StringNodeBuilder extends AbstractLeafNodeBuilder {
 	 * Copy constructor
 	 * @param builder
 	 */
-	public StringNodeBuilder( final StringNodeBuilder builder )
+	public AbstractPrimitiveLeafNodeBuilder( final AbstractPrimitiveLeafNodeBuilder builder )
 	{
 		super( builder );
 	}
@@ -58,7 +64,7 @@ public class StringNodeBuilder extends AbstractLeafNodeBuilder {
 		final Class< ? > clazz = object.getClass();
 		
 		// we must convert the object to the appropriate format
-		final InfoNode stringNode = InfoNode.createLeafNode( "value", (String)object, "value", String.class );
+		final InfoNode stringNode = InfoNode.createLeafNode( "value", object, "value", clazz );
 
 		// create the root node and add the string rep of the date
 		final InfoNode node = InfoNode.createRootNode( persistName, clazz );
@@ -67,37 +73,5 @@ public class StringNodeBuilder extends AbstractLeafNodeBuilder {
 		// return the node
 		return node;
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.freezedry.persistence.builders.infonodes.NodeBuilder#createObject(java.lang.Class, org.freezedry.persistence.tree.nodes.InfoNode)
-	 */
-	@Override
-	public String createObject( final Class< ? > containingClass, final Class< ? > clazz, final InfoNode node )
-	{
-		final Object valueString = node.getValue();
-		return valueString.toString();
-	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.freezedry.persistence.builders.AbstractLeafNodeBuilder#createObject(java.lang.Class, org.freezedry.persistence.tree.InfoNode)
-	 */
-	@Override
-	public String createObject( final Class< ? > clazz, final InfoNode node ) throws ReflectiveOperationException
-	{
-		final InfoNode valueNode = node.getChild( 0 );
-		final String value = (String)valueNode.getValue();
-		return value;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see com.synapse.copyable.Copyable#getCopy()
-	 */
-	@Override
-	public StringNodeBuilder getCopy()
-	{
-		return new StringNodeBuilder( this );
-	}
 }
