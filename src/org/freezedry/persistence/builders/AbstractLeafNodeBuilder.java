@@ -96,13 +96,13 @@ public abstract class AbstractLeafNodeBuilder extends AbstractNodeBuilder {
 	 * @see org.freezedry.persistence.builders.NodeBuilder#createInfoNode(java.lang.Object)
 	 */
 	@Override
-	public InfoNode createInfoNode( final Object object )
+	public InfoNode createInfoNode( final Object object, final String persistName )
 	{
 		// grab the class for the object to persist
 		final Class< ? > clazz = object.getClass();
 		
 		// create a new leaf node
-		final String name = clazz.getName();
+		final String name = persistName;//clazz.getName();
 		final InfoNode node = InfoNode.createLeafNode( name, object, name, clazz );
 		
 		// return the node

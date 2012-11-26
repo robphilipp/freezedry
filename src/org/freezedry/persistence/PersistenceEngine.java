@@ -476,7 +476,7 @@ public class PersistenceEngine {
 		{
 			try
 			{
-				rootNode = getNodeBuilder( clazz ).createInfoNode( object );
+				rootNode = getNodeBuilder( clazz ).createInfoNode( object, clazz.getName() );
 			}
 			catch( ReflectiveOperationException e )
 			{
@@ -611,7 +611,16 @@ public class PersistenceEngine {
 			final NodeBuilder builder = getNodeBuilder( clazz );
 			try
 			{
-				node = builder.createInfoNode( containingClass, object, fieldName );
+				// if the containing class is null, then this is a root object and we
+				// must use the root object version of the createInfoNode method
+				if( containingClass == null )
+				{
+					node = builder.createInfoNode( object, fieldName );
+				}
+				else
+				{
+					node = builder.createInfoNode( containingClass, object, fieldName );
+				}
 			}
 			catch( ReflectiveOperationException e )
 			{
@@ -688,7 +697,6 @@ public class PersistenceEngine {
 				throw new IllegalArgumentException( message.toString(), e );
 			}
 		}
-		// TODO issue with the generic type of the list
 		// if the override node builders contains a node builder for this specific class, then we'll use it
 		else if( containsNodeBuilder( clazz ) && isAllowedRootObject( clazz ) )
 		{
@@ -751,7 +759,7 @@ public class PersistenceEngine {
 				int minNumParams = Integer.MAX_VALUE;
 				
 				// create the constructor reference and the list of arguments associated
-				// with the constuctor that has the smallest number of parameters
+				// with the constructor that has the smallest number of parameters
 				Constructor< ? > minParamConstructor = null;
 				Class< ? >[] minParamTypes = null;
 				
@@ -875,7 +883,6 @@ public class PersistenceEngine {
 			// grab the class' field
 			try
 			{
-//				final Field field = clazz.getDeclaredField( fieldName );
 				final Field field = ReflectionUtils.getDeclaredField( clazz, fieldName );
 				
 				// grab the generic parameter type of the field and add it to the info node
@@ -1014,7 +1021,16 @@ public class PersistenceEngine {
 			final NodeBuilder builder = getNodeBuilder( clazz );
 			try
 			{
-				object = builder.createObject( containingClass, clazz, currentNode );
+				// if the containing class is null, then this is a root node, and so we must use
+				// the root node version of the create object class
+				if( containingClass == null )
+				{
+					object = builder.createObject( clazz, currentNode );
+				}
+				else
+				{
+					object = builder.createObject( containingClass, clazz, currentNode );
+				}
 			}
 			catch( ReflectiveOperationException e )
 			{

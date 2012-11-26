@@ -166,20 +166,21 @@ public class CollectionNodeBuilder extends AbstractNodeBuilder {
 	 * @see org.freezedry.persistence.builders.NodeBuilder#createInfoNode(java.lang.Object)
 	 */
 	@Override
-	public InfoNode createInfoNode( final Object object ) throws ReflectiveOperationException
+	public InfoNode createInfoNode( final Object object, final String persistName ) throws ReflectiveOperationException
 	{
 		// create the InfoNode object (we first have to determine the node type, down the road, we'll check the
 		// factories for registered node generators for the Class< ? > of the object)
 		final Class< ? > clazz = object.getClass();
 
 		// create the root node
-		final InfoNode node = InfoNode.createRootNode( clazz.getName(), clazz );
+//		final InfoNode node = InfoNode.createRootNode( clazz.getName(), clazz );
+		final InfoNode node = InfoNode.createRootNode( persistName, clazz );
 
 		// run through the Collection elements, recursively calling createNode(...) to create
 		// the appropriate node which to add to the newly created compound node.
 		for( Object element : (Collection< ? >)object )
 		{
-			node.addChild( createNode( clazz, element, element.getClass().getName() ) );
+			node.addChild( createNode( null, element, element.getClass().getName() ) );
 		}
 		
 		return node;

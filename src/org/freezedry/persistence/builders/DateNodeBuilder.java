@@ -235,19 +235,17 @@ public class DateNodeBuilder extends AbstractLeafNodeBuilder {
 	 * @see org.freezedry.persistence.builders.NodeBuilder#createInfoNode(java.lang.Object)
 	 */
 	@Override
-	public InfoNode createInfoNode( final Object object )
+	public InfoNode createInfoNode( final Object object, final String persistName )
 	{
 		// grab the class for the object to persist
 		final Class< ? > clazz = object.getClass();
-		
-		// create a new leaf node
-		final String name = clazz.getName();
 		
 		// we must convert the object to the appropriate format
 		final String date = DateUtils.createStringFromDate( (Calendar)object, ISO_8601_DATE_FORMAT );
 		final InfoNode stringNode = InfoNode.createLeafNode( "value", date, "value", String.class );
 
 		// create the root node and add the string rep of the date
+		final String name = persistName;//clazz.getName();
 		final InfoNode node = InfoNode.createRootNode( name, clazz );
 		node.addChild( stringNode );
 		

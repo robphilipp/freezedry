@@ -49,7 +49,6 @@ public interface NodeBuilder extends Copyable< NodeBuilder > {
 	InfoNode createInfoNode( final Class< ? > containingClass, final Object object, final String fieldName ) throws ReflectiveOperationException;
 	
 	/**
-	/**
 	 * Generates an {@link InfoNode} from the specified {@link Object}. This method is used for objects that have
 	 * an overriding node builder and are not contained within a class. For example, suppose you would like
 	 * to persist an {@link ArrayList} for serialization and would like to maintain the type information.
@@ -57,7 +56,8 @@ public interface NodeBuilder extends Copyable< NodeBuilder > {
 	 * @return The constructed {@link InfoNode} based on the specified information
 	 * @throws ReflectiveOperationException
 	 */
-	InfoNode createInfoNode( final Object object ) throws ReflectiveOperationException;
+	InfoNode createInfoNode( final Object object, final String persistName ) throws ReflectiveOperationException;
+//	InfoNode createInfoNode( final Object object ) throws ReflectiveOperationException;
 
 	/**
 	 * Creates an object of the specified {@link Class} based on the information in the {@link InfoNode}. Note that

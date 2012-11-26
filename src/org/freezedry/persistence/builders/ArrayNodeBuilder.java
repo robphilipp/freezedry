@@ -240,9 +240,9 @@ public class ArrayNodeBuilder extends AbstractNodeBuilder {
 	 * @see org.freezedry.persistence.builders.NodeBuilder#createInfoNode(java.lang.Object)
 	 */
 	@Override
-	public InfoNode createInfoNode( Object object ) throws ReflectiveOperationException
+	public InfoNode createInfoNode( final Object object, final String persistName ) throws ReflectiveOperationException
 	{
-		return createInfoNode( null, object, object.getClass().getName() );
+		return createInfoNode( null, object, persistName );//object.getClass().getName() );
 	}
 
 	/*

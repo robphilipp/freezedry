@@ -466,15 +466,72 @@ public class PersistenceTest {
 	}
 
 	@Test
-	public void testListsXml()
+	public void testListXml()
 	{
 		testXml( new ArrayList< Integer >( Arrays.asList( 3, 1, 4, 1, 5, 9, 2, 6 ) ), "integer_array_list.xml" );
 	}
+	
+	@Test
+	public void testListListXml()
+	{
+		final List< List< Integer > > list = new ArrayList<>();
+		list.add( new ArrayList< Integer >( Arrays.asList( 3, 1 ) ) );
+		list.add( new ArrayList< Integer >( Arrays.asList( 4, 1 ) ) );
+		list.add( new ArrayList< Integer >( Arrays.asList( 5, 9 ) ) );
+		list.add( new ArrayList< Integer >( Arrays.asList( 2, 6 ) ) );
+		testXml( list, "integer_array_list_list.xml" );
+	}
+	
+	@Test
+	public void testListMapXml()
+	{
+		final Map< String, Integer > pi = new LinkedHashMap<>();
+		pi.put( "three", 3 );
+		pi.put( "one", 1 );
+		pi.put( "four", 4 );
+		pi.put( "one again", 1 );
+		pi.put( "five", 5 );
+		pi.put( "nine", 9 );
+
+		final List< Map< String, Integer > > list = new ArrayList<>();
+		list.add( pi );
+		list.add( pi );
+		testXml( list, "map_array_list.xml" );
+	}
 
 	@Test
-	public void testListsJson()
+	public void testListJson()
 	{
 		testJson( new ArrayList< Integer >( Arrays.asList( 3, 1, 4, 5, 9, 2, 6 ) ), "integer_array_list.json" );
+
+	}
+	
+	@Test
+	public void testListListJson()
+	{
+		final List< List< Integer > > list = new ArrayList<>();
+		list.add( new ArrayList< Integer >( Arrays.asList( 3, 1 ) ) );
+		list.add( new ArrayList< Integer >( Arrays.asList( 4, 1 ) ) );
+		list.add( new ArrayList< Integer >( Arrays.asList( 5, 9 ) ) );
+		list.add( new ArrayList< Integer >( Arrays.asList( 2, 6 ) ) );
+		testJson( list, "integer_array_list_list.json" );
+	}
+
+	@Test
+	public void testListMapJson()
+	{
+		final Map< String, Integer > pi = new LinkedHashMap<>();
+		pi.put( "three", 3 );
+		pi.put( "one", 1 );
+		pi.put( "four", 4 );
+		pi.put( "one again", 1 );
+		pi.put( "five", 5 );
+		pi.put( "nine", 9 );
+
+		final List< Map< String, Integer > > list = new ArrayList<>();
+		list.add( pi );
+		list.add( pi );
+		testJson( list, "map_array_list.json" );
 	}
 
 	@Test
@@ -491,6 +548,17 @@ public class PersistenceTest {
 	}
 	
 	@Test
+	public void testMapListXml()
+	{
+		final Map< String, List< Integer > > piList = new LinkedHashMap<>();
+		piList.put( "three-one", new ArrayList< Integer >( Arrays.asList( 3, 1 ) ) );
+		piList.put( "four-one", new ArrayList< Integer >( Arrays.asList( 4, 1 ) ) );
+		piList.put( "five-nine", new ArrayList< Integer >( Arrays.asList( 5, 9 ) ) );
+		piList.put( "two-six", new ArrayList< Integer >( Arrays.asList( 2, 6 ) ) );
+		testXml( piList, "map_list.xml" );
+	}
+	
+	@Test
 	public void testMapJson()
 	{
 		final Map< String, Integer > pi = new LinkedHashMap<>();
@@ -501,6 +569,17 @@ public class PersistenceTest {
 		pi.put( "five", 5 );
 		pi.put( "nine", 9 );
 		testJson( pi, "map.json" );
+	}
+	
+	@Test
+	public void testMapListJson()
+	{
+		final Map< String, List< Integer > > piList = new LinkedHashMap<>();
+		piList.put( "three-one", new ArrayList< Integer >( Arrays.asList( 3, 1 ) ) );
+		piList.put( "four-one", new ArrayList< Integer >( Arrays.asList( 4, 1 ) ) );
+		piList.put( "five-nine", new ArrayList< Integer >( Arrays.asList( 5, 9 ) ) );
+		piList.put( "two-six", new ArrayList< Integer >( Arrays.asList( 2, 6 ) ) );
+		testJson( piList, "map_list.json" );
 	}
 	
 	@Test

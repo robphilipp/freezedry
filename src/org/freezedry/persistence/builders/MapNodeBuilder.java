@@ -36,6 +36,12 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 	
 	private static final Logger LOGGER = Logger.getLogger( MapNodeBuilder.class );
 	
+	// for maps that are root objects, these are the key and value prefixes so that upon reconstruction
+	// there is a way to know which node contains the key, and which node contains the value
+	private static final String KEY_PREFIX = "key";
+	private static final String VALUE_PREFIX = "value";
+	private static final String KEY_VALUE_SEPARATOR = ":";
+	
 	/**
 	 * Constructs the {@link NodeBuilder} for going between {@link Map}s and 
 	 * {@link Object}s.
@@ -172,7 +178,7 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 	 * @see org.freezedry.persistence.builders.NodeBuilder#createInfoNode(java.lang.Object)
 	 */
 	@Override
-	public InfoNode createInfoNode( final Object object ) throws ReflectiveOperationException
+	public InfoNode createInfoNode( final Object object, final String persistName ) throws ReflectiveOperationException
 	{
 		// create the InfoNode object (we first have to determine the node type, down the road, we'll check the
 		// factories for registered node generators for the Class< ? > of the object)
@@ -191,10 +197,10 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 			final InfoNode entryNode = InfoNode.createCompoundNode( "", entry.getClass().getSimpleName(), entry.getClass() );
 			
 			// create the key node and add it to the entry node
-			entryNode.addChild( createNode( clazz, entry.getKey(), entry.getKey().getClass().getName() ) );
+			entryNode.addChild( createNode( null, entry.getKey(), KEY_PREFIX + KEY_VALUE_SEPARATOR + entry.getKey().getClass().getName() ) );
 			
 			// create the value node and add it to the entry node
-			entryNode.addChild( createNode( clazz, entry.getValue(), entry.getValue().getClass().getName() ) );
+			entryNode.addChild( createNode( null, entry.getValue(), VALUE_PREFIX + KEY_VALUE_SEPARATOR + entry.getValue().getClass().getName() ) );
 			
 			// add the entry node to the info node representing the map
 			node.addChild( entryNode );
@@ -333,25 +339,49 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 				throw new IllegalArgumentException( message.toString() );
 			}
 			
-			// TODO...can the order be reversed here? If so, how to fix...?
 			// the order of the elements can be reversed. For example, the key could be the second
 			// element (instead of the first) and the value could be the first. We check both possibilities
-			final InfoNode keyNode = keyValue.get( 0 );
-			final Class< ? > keyClass = Class.forName( keyNode.getPersistName() );
-			final List< Type > keyTypes = Arrays.asList( (Type)keyClass );
-			final Object key = buildObject( null, keyClass, keyTypes, keyNode, node );
+			final InfoNode firstNode = keyValue.get( 0 );
+			final InfoNode secondNode = keyValue.get( 1 );
+			Pair< Object, Object > keyValuePair = null;
+			if( firstNode.getPersistName().startsWith( KEY_PREFIX + KEY_VALUE_SEPARATOR ) && 
+				secondNode.getPersistName().startsWith( VALUE_PREFIX + KEY_VALUE_SEPARATOR ) )
+			{
+				keyValuePair = getKeyValuePair( firstNode, secondNode, node );
+			}
+			else if( firstNode.getPersistName().startsWith( VALUE_PREFIX + KEY_VALUE_SEPARATOR ) && 
+					 secondNode.getPersistName().startsWith( KEY_PREFIX + KEY_VALUE_SEPARATOR ) )
+			{
+				keyValuePair = getKeyValuePair( secondNode, firstNode, node );
+			}
 
-			final InfoNode valueNode = keyValue.get( 1 );
-			final Class< ? > valueClass = Class.forName( valueNode.getPersistName() );
-			final List< Type > valueTypes = Arrays.asList( (Type)valueClass );
-			final Object value = buildObject( null, valueClass, valueTypes, valueNode, node );
-			
 			// add the new objects to the map
-			map.put( key, value );
+			map.put( keyValuePair.getFirst(), keyValuePair.getSecond() );
 		}
 		
 		// return the newly created and populated collection
 		return map;
+	}
+	
+	/**
+	 * Creates a key-value pair containing the object built from the key node and value node.  
+	 * @param keyNode The node containing the key
+	 * @param valueNode The node containing the value
+	 * @param parentNode The parent node that contains both the key and value nodes
+	 * @return A key-value pair containing the object built from the key node and value node.
+	 * @throws ReflectiveOperationException
+	 */
+	private Pair< Object, Object > getKeyValuePair( final InfoNode keyNode, final InfoNode valueNode, final InfoNode parentNode ) throws ReflectiveOperationException
+	{
+		final Class< ? > keyClass = Class.forName( keyNode.getPersistName().split( "\\" + KEY_VALUE_SEPARATOR )[ 1 ] );
+		final List< Type > keyTypes = Arrays.asList( (Type)keyClass );
+		final Object key = buildObject( null, keyClass, keyTypes, keyNode, parentNode );
+
+		final Class< ? > valueClass = Class.forName( valueNode.getPersistName().split( "\\" + KEY_VALUE_SEPARATOR )[ 1 ] );
+		final List< Type > valueTypes = Arrays.asList( (Type)valueClass );
+		final Object value = buildObject( null, valueClass, valueTypes, valueNode, parentNode );
+		
+		return new Pair< Object, Object >( key, value );
 	}
 	
 	/*
