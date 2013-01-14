@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +52,19 @@ import org.freezedry.persistence.utils.tests.circle.Gconcrete;
 public class ReflectionUtils {
 	
 	private static final Logger LOGGER = Logger.getLogger( ReflectionUtils.class );
+
+	private static Map< Class< ? >, Class< ? > > PRIMITIVE_TYPE_MAP = new HashMap<>();
+	static {
+		PRIMITIVE_TYPE_MAP.put( void.class, Void.class );
+		PRIMITIVE_TYPE_MAP.put( int.class, Integer.class );
+		PRIMITIVE_TYPE_MAP.put( short.class, Short.class );
+		PRIMITIVE_TYPE_MAP.put( long.class, Long.class );
+		PRIMITIVE_TYPE_MAP.put( double.class, Double.class );
+		PRIMITIVE_TYPE_MAP.put( float.class, Float.class );
+		PRIMITIVE_TYPE_MAP.put( byte.class, Byte.class );
+		PRIMITIVE_TYPE_MAP.put( char.class, Character.class );
+		PRIMITIVE_TYPE_MAP.put( boolean.class, Boolean.class );
+	}
 
 	/**
 	 * Returns true if the specified class is the specified super class or a descendant; false otherwise
@@ -676,6 +690,24 @@ public class ReflectionUtils {
 		return field;
 	}
 	
+	/**
+	 * Casts the specified object to the specified class, taking care of the specifial case where the
+	 * specified clazz is a primitive. 
+	 * @param clazz The {@link Class} to which to cast the object
+	 * @param object The object which to cast to the {@link Class}
+	 * @return The object cast to the specified {@link Class} type
+	 */
+	@SuppressWarnings( "unchecked" )
+	public static < T > T cast( final Class< ? extends T > clazz, final Object object )
+	{
+		final Class< ? > primitiveClazz = PRIMITIVE_TYPE_MAP.get( clazz );
+		if( primitiveClazz != null && primitiveClazz.equals( object.getClass() ) && !clazz.equals( void.class ) )
+		{
+			return (T)object;
+		}
+		return clazz.cast( object );
+	}
+
 	public static void main( String[] args ) throws NoSuchFieldException
 	{
 		DOMConfigurator.configure( "log4j.xml" );

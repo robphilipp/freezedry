@@ -23,6 +23,7 @@ import org.freezedry.persistence.readers.JsonReader;
 import org.freezedry.persistence.readers.PersistenceReader;
 import org.freezedry.persistence.readers.XmlReader;
 import org.freezedry.persistence.tree.InfoNode;
+import org.freezedry.persistence.utils.ReflectionUtils;
 import org.freezedry.persistence.writers.JsonWriter;
 import org.freezedry.persistence.writers.PersistenceWriter;
 import org.freezedry.persistence.writers.XmlWriter;
@@ -102,12 +103,27 @@ public abstract class AbstractPersistence implements Persistence {
 			LOGGER.info( rootNode.simpleTreeToString() );
 		}
 		
-		return clazz.cast( getPersistenceEngine().parseSemanticModel( clazz, rootNode ) );
+		// grab the deserialized object and attempt to cast it to the specified class.
+		// if the cast fails, check to see if we need to convert between wrapped types and
+		// their primitives
+		final Object object = getPersistenceEngine().parseSemanticModel( clazz, rootNode );
+		return ReflectionUtils.cast( clazz, object );
 	}
-
+	
 	/**
 	 * @return the {@link PersistenceReader} specific to the subclass implementation of the 
 	 * {@link Persistence} interface
 	 */
 	abstract protected PersistenceReader getPersistenceReader();
+	
+	public static void main( String...args )
+	{
+		final double pi = Math.PI;
+		System.out.println( Double.class.cast( pi ) );
+		
+		final Double PI = new Double( Math.PI );
+		
+		final Class< ? > clazz = double.class;
+		System.out.println( clazz.cast( PI ) );
+	}
 }
