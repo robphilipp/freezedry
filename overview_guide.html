@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset=utf-8>
+	<link rel="stylesheet" type="text/css" href="freezedry.css"/>
+
+	<!-- Code Syntax Highlighting -->
+	<script src="scripts/syntax_highlight/shCore.js"></script>
+	<script src="scripts/syntax_highlight/shBrushJava.js"></script>
+	<script src="scripts/syntax_highlight/shBrushXml.js"></script>
+
+    <script src="scripts/toc-creator.js"></script>
+    <script src="scripts/sizing.js"></script>
+
+    <script src="scripts/jquery-1.8.2.js"></script>
+    <script>
+        var tocBounds = { minWidth: 100, maxWidth: 225, minHeight: 400, maxHeight: 750 };
+        var articleBounds = { minWidth: 100, maxWidth: 775, minHeight: 400, maxHeight: 1000 };
+        $(document).ready( function() {
+
+            // syntax highlighting for the code
+            SyntaxHighlighter.defaults['gutter'] = false;
+            SyntaxHighlighter.defaults['toolbar'] = false;
+            SyntaxHighlighter.all();
+
+            // create the table of contents
+            createToc( "Contents" );
+
+            // adjust the article window size
+            adjustSizes( tocBounds, articleBounds );
+        } );
+
+        window.onresize = function() {
+            adjustSizes( tocBounds, articleBounds );
+        };
+
+    </script>
+
+
+	<link rel="stylesheet" type="text/css" href="scripts/syntax_highlight/shCore.css" />
+	<link rel="stylesheet" type="text/css" href="scripts/syntax_highlight/shThemeEclipse.css" />
+
+	<title>FreezeDry Overview Guide</title>
+</head>
+
+<body>
+
+<header id="top">
+	<img src="images/web_banner.png">
+</header>
+
+<nav>
+	<a href="index.html">Home</a>
+	<a href="quick_start.html">Quick Start</a>
+	<a href="javadocs/index.html" target="tab">Java Docs</a>
+	<a href="https://sourceforge.net/p/freezedried/code/" target="tab">Code (hg)</a>
+	<a href="https://sourceforge.net/projects/freezedried/files/" target="tab">Downloads</a>
+	<a href="https://sourceforge.net/p/freezedried/wiki/Home/" target="tab">Wiki</a>
+	<a href="https://sourceforge.net/p/freezedried/tickets/" target="tab">Tickets</a>
+	<a href="https://sourceforge.net/p/freezedried/discussion/" target="tab">Discussion</a>
+</nav>
+
+<article>
+
+<h2 id="overview"><a href="#overview">Overview</a></h2>
+
+<p><b>FreezeDry</b> provides an easy mechanism for converting Java objects into a persisted
+form and then back again. And there is no need for creating binding files.</p>
+
+<p class="image">
+<img src="images/architecture_overview.png" title="FreezeDry Architecture Overview"/>
+</p>
+
+<p>Version 0.2.0 adds a set of convenient classes to the <b>FreezeDry</b> framework that makes it much easier to 
+persist objects and reconstituting them from their persisted form. These new classes, derived from the <b class="class">Persistence</b> 
+interface, remove the need for you to deal directly with the <b class="class">Persistence Engine</b>. The <b class="class">Persistence</b>
+classes allow a fair amount of flexibility, but if they don't meet your needs, you can still use the <b class="class">PersistenceEngine</b>
+directly as before.</p>
+
+<p>The current <b>FreezeDry</b> version provides the ability to convert between Java objects and XML, Java objects and JSON, and Java
+objects and lists of key-value pairs. In its most basic form, converting a Java object into a persisted form is as simple as:</p>
+
+<!-- You also need to add some content to highlight, but that is covered elsewhere. -->
+<pre class="brush: java">
+    final XmlPersistence persistence = new XmlPersistence();
+    persistence.write( division, "person.xml" );
+</pre>
+
+<p>And to reconstitute the <b>division</b> object from the "person.xml" file, all you need to do is:</p>
+
+<pre class="brush: java">
+    final XmlPersistence persistence = new XmlPersistence();
+    Division redivision = persistence.read( Division.class, "person.xml" );
+</pre>
+
+<p>The approach used in version 0.1.0 is still available. In some cases you might find that the older method, although more
+complicated, provides more control over the transformation of objects and persisted forms into and out of the semantic model.
+The code below demonstrates how to persist a Java object to an XML file by directly using the <b class="class">PersistenceEngine</b>
+and an <b class="class">XmlWriter</b>:</p>
+
+<pre class="brush: java">
+    // create the persistence engine
+    final PersistenceEngine engine = new PersistenceEngine();
+
+    // create the semantic model that represents the object "division"
+    final InfoNode rootNode = engine.createSemanticModel( division );
+	
+    // write XML to the file "division.xml"
+    try( PrintWriter printWriter = new PrintWriter( new FileWriter( "division.xml" ) ) )
+    {
+        final XmlWriter writer = new XmlWriter();
+        writer.setDisplayTypeInfo( false );
+        writer.write( rootNode, printWriter );
+    }
+    catch( IOException e )
+    {
+        // deal with any IO exceptions
+        ....
+    }
+</pre>
+
+<p>Both approaches produces an XML file like the one below:</p>
+
+<pre class="brush: xml">
+    &lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
+    &lt;Division&gt;
+        &lt;people&gt;
+            &lt;Person&gt;
+                &lt;givenName&gt;Johnny&lt;/givenName&gt;
+                    &lt;familyName&gt;Hernandez&lt;/familyName&gt;
+                    &lt;age&gt;13&lt;/age&gt;
+                    &lt;birthDate&gt;1963-04-22&lt;/birthDate&gt;
+                    &lt;friends&gt;
+                        &lt;MapEntry&gt;
+                            &lt;Key&gt;Polly&lt;/Key&gt;
+                            &lt;Value&gt;bird&lt;/Value&gt;
+                        &lt;/MapEntry&gt;
+                        ...
+                    &lt;/friends&gt;
+                &lt;/Person&gt;
+                &lt;Person&gt;
+                    &lt;givenName&gt;Julie&lt;/givenName&gt;
+                    &lt;familyName&gt;Prosky&lt;/familyName&gt;
+                    &lt;age&gt;15&lt;/age&gt;
+                &lt;/Person&gt;
+                ...
+        &lt;/people&gt;
+    &lt;/Division&gt;
+</pre>
+
+<p>Don't like the way the XML is mapped to your object? Well, there are ways to alter the XML mapping--either through annotations, 
+by implementing a custom node builder, or by implementing a custom reader and writer.</p>
+
+<p>In the next sections we will describe <b>FreezeDry</b>s design.</p>
+
+<h2 id="landscape"><a href="#overview">FreezeDry Landscape</a></h2>
+
+<p>At a high level, <b>FreezeDry</b> has is composed of:</p>
+
+<ul>
+	<li>A set of <b class="class">Persistence</b> classes responsible for converting between Java objects 
+		and their persisted forms.</li>
+	<li>A <b>Persistence Engine</b> responsible for converting between Java objects and the <b>Semantic Model</b>.</li>
+	<li>A <b>Semantic Model</b> composed of <b class="class">InfoNode</b> objects, each of which hold information 
+		about a particular field within the object that is to be persisted or reconstituted.</li>
+	<li>A set of <b class="class">NodeBuilder</b> classes that hold detailed information about how to convert a 
+		particular Java <b class="class">Class</b> between an object and an <b class="class">InfoNode</b>.</li>
+	<li>A set of <b class="class">PersistenceWriter</b> classes, each of which take a <b>Semantic Model</b> and 
+		convert it to its persisted form.</li>
+	<li>A set <b class="class">PersistenceReader</b> classes, each of which read from the persisted form and 
+		convert it to a <b>Semantic Model</b>.</li>
+	<li>And optionally, <em>annotations</em> that provide custom instructions to the <b class="class">PersistenceEngine</b> 
+		for converting between Java objects and the <b>Semantic Model</b>.</li>
+</ul>
+
+<p><b>FreezeDry</b> is set up to work right out of the box for most needs. And it mostly does that. In cases where you 
+need to customize its behavior, or where <b>FreezeDry</b> gets stuck, it will need your help. It really tries hard to 
+figure out what you're trying to do, but it isn't perfect. It turns out to be easier to convert a Java object into a 
+persisted state, such as an XML or JSON file, than converting a persisted state into a Java object. Largely this is 
+do to the lossy nature of the persistence. For example, in JSON there isn't an elegant way to add type information to 
+the key. And in XML, you could add an attribute <em>type</em> to each element. But that isn't usually considered good form. 
+And so in both of these cases, type information is likely lost. And mostly, it is when reconstituting complex objects 
+from persistence where <b>FreezeDry</b> may need help.</p>
+
+<h4 id="persistence"><a href="#overview">Persistence</a></h4>
+
+<p><b>FreezeDry</b> provides an easy way to persist Java objects to XML, JSON, and lists of key-value pairs. And to be 
+useful, it also provides an easy way to reconstitute objects from their persisted form. As shown above, you can write 
+an object to its persisted form in one simple line of code:</p>
+
+<pre class="brush: java">
+    new XmlPersistence().write( division, "person.xml" );
+</pre>
+
+<p>and you can also reconstitute the <b>division</b> object from the "person.xml" file in one simple, but more complex, line of code:</p>
+
+<pre class="brush: java">
+    Division redivision = new XmlPersistence().read( Division.class, "person.xml" );
+</pre>
+
+<p>There are currently three <b class="class">Persistence</b> classes, all of which derive from the 
+<b class="class">Persistence</b> interface. There is an <b class="class">AbstractPersistence</b> class which 
+manages the <b class="class">PersistenceEngine</b>, and then there is an <b class="class">AbstractFileBasedPersistence</b>
+ class which defines and implements a <b>read</b> and <b>write</b> method for file-based actions.</p>
+
+<table>
+	<tr><th>Class</th><th>Description</th></tr>
+	<tr><td><b class="class">Persistence</b></td><td>The interface defining what a <b class="class">Persistence</b> class must provide</td></tr>
+	<tr><td><b class="class">AbstractPersistence</b></td><td>Manages the <b class="class">PersistenceEngine</b></td></tr>
+	<tr><td><b class="class">AbstractFileBasedPersistence</b></td><td>Provides basic file-base read and write methods</td></tr>
+	<tr><td><b class="class">XmlPersistence</b></td><td>Writes Java objects to XML, and reads XML back into Java objects</td></tr>
+	<tr><td><b class="class">JsonPersistence</b></td><td>Writes Java objects to JSON, and reads JSON back into Java objects</td></tr>
+	<tr><td><b class="class">KeyValuePersistence</b></td><td>Writes Java objects to list of key-value pairs, and reads lists of
+		key-value pairs back into Java objects</td></tr>
+</table>
+
+<p>Each <b class="class">Persistence</b> class provides access to the <b class="class">PersistenceEngine</b> 
+through which you can perform modifications in the same way as previously (see <a href="#behavior_mod">Behavior Modification</a>).
+In addition, each of the concrete <b class="class">Persistence</b> implementation provide customization that would 
+typically be needed for dealing with that specified persistence form.</p>
+
+<table>
+	<tr><th>Class</th><th>Customization</th></tr>
+	<tr><td><b class="class">XmlPersistence</b></td><td><b>setDisplayTypeInfo(boolean)</b> allows user to specify 
+		that the type info should be added to the XML elements as attributes.</td></tr>
+	<tr><td><b class="class">JsonPersistence</b></td><td>none</td></tr>
+	<tr><td><b class="class">KeyValuePersistence</b></td><td><b>setKeySeparator(...)</b> and 
+		<b>setKeyValueSeparator(...)</b> allows the user to set the separator between the elements of the key, 
+		and between the key and the values.</td></tr>
+</table>
+
+<h4 id="behavior_mod"><a href="#overview">Behavior Modification</a></h4>
+
+<p><b>FreezeDry</b>'s behavior can be modified in a number ways. The four typical approaches to modifying its behavior are:</p>
+
+<ul>
+	<li>Implementing the <b class="class">NodeBuilder</b> interface or extending one of the <b class="class">NodeBuilder</b> classes.</li>
+	<li>Modifying the <b class="class">PersistenceEngine</b>'s default <em>class</em> to <b class="class">NodeBuilder</b> mapping.</li>
+	<li>Creating <em>annotations</em> to work in conjunction with a custom <b class="class">NodeBuilder</b> and <em>annotating</em> the Java class 
+		that is to be persisted.</li>
+	<li>Implementing the <b class="class">Reader</b> or <b class="class">Writer</b> interfaces to convert between a <em>persistence form</em>
+		 and the <em>Semantic Model</em>, or extending existing <b class="class">Reader</b> or <b class="class">Writer</b> classes.</li>
+</ul>
+
+<h4 id="persistence_engine"><a href="#overview">The Persistence Engine</a></h4>
+
+<p>When using the <b>FreezeDry</b> persistence framework, you'll mostly be dealing with three classes. 
+The <b class="class">PersistenceEngine</b>, a <b class="class">Reader</b>, and a <b class="class">Writer</b>. 
+The <b class="class">PersistenceEngine</b> is responsible for taking a Java object, and constructing the a 
+tree-like representation of that object called the <b>Semantic Model</b>. It is also responsible for converting
+the tree-like <b>Semantic Model</b> back into a Java object.</p>
+
+<p>The <b class="class">PersistenceEngine</b> is responsible for taking objects and their fields into and out of
+a <b>Semantic Model</b>, but to do so it needs help. Really, the <b class="class">PersistenceEngine</b> doesn't,
+and shouldn't, know the details of how to convert a particular field into an <b class="class">InfoNode</b> (and back). 
+Rather, it should just know that it can. And the reason it can, is because it manages a set of <b class="class">NodeBuilder</b> 
+objects that do know the details. The <b class="class">PersistenceEngine</b> only knows how a field (based on its class) 
+is mapped to a specified <b class="class">NodeBuilder</b>.</p>
+
+<h5 id="object_to_semantic_model"><a href="#overview">Object to Semantic Model</a></h5>
+
+<p>To create a semantic model from an object, you use the <b class="class">PersistenceEngine</b> method:</p>
+
+<pre class="brush: java">
+    final InfoNode createSemanticModel( final Object object )
+</pre>
+
+<p>to which you pass the object you wish to persist. Upon such a call, the <b class="class">PersistenceEngine</b>
+will recurse through the object, and for each field construct an <b class="class">InfoNode</b> that holds 
+information about that field. To create the <b class="class">InfoNode</b>, the <b class="class">PersistenceEngine</b>
+selects a <b class="class">NodeBuilder</b> based on the mapping between the *class* of the objects and their 
+associated <b class="class">NodeBuilder</b>. For example, suppose that during processing, the 
+<b class="class">PersistenceEngine</b> ran across a field was a <b class="class">List&lt; String &gt;</b>. In the default case, the 
+<b class="class">PersistenceEngine</b> would look up the <b class="class">List</b> in the mapping, and find that 
+there is an entry for <b class="class">Collection</b>, and recognize that a <b class="class">List</b> is a 
+<b class="class">Collection</b>, and return the <b class="class">CollectionNodeBuilder</b>. Then, when the 
+<b class="class">PersistenceEngine</b> ran across the <b class="class">String</b> element, it would use a 
+<b class="class">StringNodeBuilder</b>.</p>
+
+<p>To find out what class is mapped to what <b class="class">NodeBuilder</b> object, you can use the <b class="class">PersistenceEngine</b> method</p>
+
+<pre class="brush: java">
+    final NodeBuilder getNodeBuilder( final Class&lt; ? &gt; clazz )
+</pre>
+
+<p>And to adjust the mapping you can use one of the following methods</p>
+  
+<pre class="brush: java">
+    NodeBuilder addNodeBuilder( final Class&lt; ? &gt; clazz, final NodeBuilder builder )
+    NodeBuilder removeNodeBuilder( final Class&lt; ? &gt; clazz )
+</pre>
+
+<h5 id="semantic_model_to_object"><a href="#overview">Semantic Model to Object</a></h5>
+
+<p>To create an object from the semantic model, you use the <b class="class">PersistenceEngine</b> method</p>
+
+<pre class="brush: java">
+    Object parseSemanticModel( final Class&lt; ? &gt; clazz, final InfoNode rootNode )
+</pre>
+
+<p>Naturally, you may ask where the <em>rootNode</em> comes from. Good question. It comes from the <b class="class">Reader</b> method</p>
+
+<pre class="brush: java">
+    InfoNode read( final Class&lt; ? &gt; clazz, final InputStream input )
+</pre>
+
+<p>but more on that later. The key point to remember is that the by handing the <b class="class">PersistenceEngine</b> 
+a valid <b>Semantic Model</b> as represented by the root node of the <b class="class">InfoNode</b> tree, and 
+you also give the <b class="class">PersistenceEngine</b> the *class* that the semantic model represents, you 
+get back an object of that class type. Its as simple as that.</p>
+
+<h4 id="semantic_model"><a href="#overview">Semantic Model</a></h4>
+
+<p><b>FreezeDry's</b> semantic model is a tree structure that is built from <b class="class">InfoNode</b> objects. 
+So if you love recursion, then you'll love the semantic model because it's all about recursion. Powerfully 
+simple and stunningly complex. It just depends whether you're skimming the code or trying to debug it.</p>
+
+<p>The <b class="class">InfoNode</b> tree is a representation of the object with information about the object
+and all of its data, which may be other objects. When converting from an object to the semantic model, 
+the <b class="class">InfoNode</b> object will by rich with information. The Java object has it all. 
+However, when going from a persisted form to a semantic model to an object, the <b class="class">InfoNode</b> 
+objects may only hold the persisted name of the field, and in some cases the value. In other words, 
+in this case, the <b class="class">InfoNode</b> objects may hold only a sparse amount information.</p>
+
+<p>Let's take a look at what information an <b class="class">InfoNode</b> holds, aside from knowing 
+about its parent and its children.</p>
+
+<table>
+	<tr><th>Field</th><th>Type</th><th>Description</th></tr>
+	<tr><td>nodeType</td><td><b class="class">NodeType</b></td><td>enum: node is a ROOT, COMPOUND, or LEAF</td></tr>
+	<tr><td>fieldName</td><td><b class="class">String</b></td><td>the name of the object's field this node represents</td></tr>
+	<tr><td>value</td><td><b class="class">Object</b></td><td>the value of the field (must be a leaf node)</td></tr>
+	<tr><td>persistName</td><td><b class="class">String</b></td><td>the persisted name of the field</td></tr>
+	<tr><td>clazz</td><td><b class="class">Class&lt; ? &gt;</b></td><td>the class type of the field</td></tr>
+	<tr><td>genericParameterTypes</td><td><b class="class">List&lt; Type &gt;</b></td><td>the generic type information of the field</td></tr>
+</table>
+
+<p>As a note, when creating a semantic model from a persisted form, in many cases leaf nodes may only contain 
+the <em>persistName</em> and the <em>value</em>. Furthermore, in many cases, the root node and compound nodes 
+may only contain the <em>persistName</em>. The <b class="class">PersistenceEngine</b>, in conjunction with the 
+<em>class</em>, using a set of default class types for instantiation, and/or field annotations, will figure 
+out the types that it needs to instantiate.</p>
+
+<h4 id="node_builders"><a href="#overview">Node Builders</a></h4>
+
+<p><b class="class">NodeBuilders</b> are responsible for creating an <b class="class">InfoNode</b> from an object 
+or field, and for creating an object or setting a field within an object when given an <b class="class">InfoNode</b>.</p>
+
+<p>Recall that the <b class="class">PersistenceEngine</b> creates the semantic model which is composed of 
+<b class="class">InfoNode</b> objects arranged in a tree-like structure. It is the <b class="class">NodeBuilder</b> 
+objects that are responsible for creating <b class="class">InfoNode</b>s from an object and its fields. The 
+<b class="class">PersistenceEngine</b> holds a mapping between the class types and the <b class="class">NodeBuilder</b> 
+to use for creating an <b class="class">InfoNode</b> for that class type.</p>
+
+<p>Recall that the <b class="class">PersistenceEngine</b> is also responsible for creating an object from a 
+semantic model. When creating an object from the semantic model, the <b class="class">PersistenceEngine</b> 
+also uses the <b class="class">NodeBuilder</b> associated with the type represented by the <b class="class">InfoNode</b>, 
+and in cases when the <b class="class">InfoNode</b> doesn't hold the type information, it finds it from the class itself.</p>
+
+<h5 id="node_builder_class_interface"><a href="#overview">NodeBuilder Interface</a></h5>
+
+<p>The <b class="class">NodeBuilder</b> interface has</p> 
+
+<pre class="brush: java">
+    InfoNode createInfoNode( Class&lt; ? &gt; containingClass, Object object, String fieldName )
+    Object createObject( final Class&lt; ? &gt; clazz, final InfoNode node )
+    void setPersistenceEngine( final PersistenceEngine engine )
+</pre>
+
+<p>The first two methods are the methods we just mentioned. The first one creates an <b class="class">InfoNode</b> 
+from an object, providing the builder with information about the containing class and the name of the field the 
+object represents within the containing class. The containing class information turns out to be important when 
+dealing with structures such as</p>
+    
+<pre class="brush: java">
+    Map&lt; String, Map&lt; String, List&lt; Double &gt; &gt;
+    List&lt; Person &gt;
+</pre>
+
+<p>The second method creates an object from an <b class="class">InfoNode</b> using the class type information 
+specified in the method. In cases where the class type is also specified in the <b class="class">InfoNode</b> 
+the default <b class="class">NodeBuilder</b> implementations will use the most specified of the two specified 
+classes. For example, it would use <b class="class">ArrayList</b> if both <b class="class">ArrayList</b> and 
+<b class="class">List</b> where specified.</p>
+
+<p>The third method hands the <b class="class">NodeBuilder</b> a <b class="class">PersistenceEngine</b>. 
+Although this may seem odd at first glance, recall that the construction of the semantic model from an object, 
+and the construction of an object from the semantic model are done recursively. The <b class="class">NodeBuilder</b> 
+and the <b class="class">PersistenceEngine</b> work hand in hand. The <b class="class">PersistenceEngine</b> 
+calls upon the <b class="class">NodeBuilder</b> to create an <b class="class">InfoNode</b> or an object during 
+its recursive descent down the object structure or the semantic model. And the <b class="class">NodeBuilder</b> 
+calls back to the <b class="class">PersistenceEngine</b> to create <b class="class">InfoNode</b>s or objects for 
+compound nodes. For example, suppose that during the persistence of an object, the <b class="class">PesistenceEngine</b> 
+comes across a field that is a <b class="class">List&lt; Person &gt;</b>. In this case, it will call the 
+<b class="class">CollectionNodeBuilder</b> to create the an <b class="class">InfoNode</b> representing the 
+<b class="class">List</b>. However, the <b class="class">CollectionNodeBuilder</b> needs to create sub-nodes for 
+each <b class="class">Person</b> element in that list, which it doesn't know how to do. So it calls back to the 
+<b class="class">PersistenceEngine</b> to create an <b class="class">InfoNode</b> for each <b class="class">Person</b> 
+it comes across. And the <b class="class">PersistenceEngine</b> calls the appropriate <b class="class">NodeBuilder</b> 
+to create the <b class="class">InfoNode</b> for <b class="class">Person</b> (or uses default behavior to create a 
+compound <b class="class">InfoNode</b>).</p>
+
+<h5 id="node_builder_class_abstract"><a href="#overview">AbstractNodeBuilder</a></h5>
+
+<p>The <b class="class">AbstractNodeBuilder</b> implements manages the reference to the <b class="class">PersistenceEngine</b> but also provides a mapping for instantiating objects for which the type is an interface or abstract. For example, suppose that your class looks like this</p>
+
+<pre class="brush: java">
+    public class Example {
+        private List&lt; Double &gt; numbers;
+        ...
+    }
+</pre>
+
+<p>When attempting to instantiate the field *numbers*, unless the <b class="class">InfoNode</b> has type information that specifies that *numbers* is an <b class="class">ArrayList</b>, the <b class="class">NodeBuilder</b> must rely on some default mechanism to determine what class type to instantiate. The <b class="class">AbstractNodeBuilder</b> provides four methods to deal with this</p>
+
+<pre class="brush: java">
+    /**
+	 * Adds and interface to class mapping used when constructing a collection.
+	 * @param interfaceClass The interface
+	 * @param concreteClass The concrete Class to use to instantiate the specified interface
+	 */
+    void addInterfaceToClassMapping( Class&lt; ? &gt; interfaceClass, Class&lt; ? &gt; concreteClass )
+    
+    /**
+	 * @return The mapping between the interfaces and the concrete classes that will be used.
+	 */
+    Map&lt; String, String &gt; getInterfaceToClassMapping()
+
+    /**
+	 * Returns the concrete class for the specified interface. Or null if it doesn't exist
+	 * @param clazz The interface for which to return the concrete class
+	 * @return the concrete class for the specified interface. Or null if it doesn't exist
+	 */
+    Class&lt; ? &gt; getClassForInterface( final Class&lt; ? &gt; clazz )
+
+    /**
+	 * Returns true if the interface-to-class mapping contains the specified interface; 
+	 * false otherwise
+	 * @param clazz The interface to check
+	 * @return true if the interface-to-class mapping contains the specified interface;
+	 * false otherwise
+	 */
+    boolean containsInterface( final Class&lt; ? &gt; clazz )
+</pre>
+
+<h5 id="available_node_builders"><a href="#overview">Available NodeBuilders</a></h5>
+
+<p><b>FreezeDry</b> comes with a set of <b class="class">NodeBuilder</b> objects that deal with many of the basic types.</p>
+
+<ul>
+	<li><b class="class">NodeBuilder</b> is the interface which all implementations must implement</li>
+    <li><b class="class">AbstractNodeBuilder</b> contains some basic node-building utilities (see above)
+      	<ul>
+      		<li><b class="class">AbstractLeafNodeBuilder</b> deals with primitive types or result in leaf nodes
+           	<ul>
+           		<li><b class="class">IntegerNodeBuilder</b> for dealing with <b class="class">Integer</b> and <b class="class">int</b></li>
+	            <li><b class="class">DoubleNodeBuilder</b> for dealing with <b class="class">Double</b> and <b class="class">double</b></li>
+	            <li><b class="class">BooleanNodeBuilder</b> for dealing with <b class="class">Boolean</b> and <b class="class">boolean</b></li>
+	            <li><b class="class">StringNodeBuilder</b> for dealing with <b class="class">String</b></li>
+	            <li><b class="class">LongNodeBuilder</b> for dealing with <b class="class">Long</b> and <b class="class">long</b></li>
+	            <li><b class="class">ShortNodeBuilder</b> for dealing with <b class="class">Short</b> and <b class="class">short</b></li>
+	            <li><b class="class">DateNodeBuilder</b> for dealing with <b class="class">Calendar</b> dates</li>
+                <li><b class="class">CharacterNodeBuilder</b> for dealing with <b class="class">Character</b> and <b class="class">char</b></li>
+	        </ul>
+	     </li>
+          </ul>
+      </li>
+	<li><b class="class">CollectionNodeBuilder</b> for dealing with collections such as <b class="class">List</b>, <b class="class">Set</b>, <b class="class">Queue</b>, etc</li>
+	<li><b class="class">MapNodeBuilder</b> for dealing with <b class="class">HashMap</b>, <b class="class">LinkedHashMap</b>, etc.</li>
+	<li><b class="class">ArrayNodeBuilder</b> for dealing with arrays of objects such as <b class="class">String[]</b>,
+        <b class="class">int[]</b>, etc</li>
+</ul>
+
+<h4 id="readers_writers"><a href="#overview">Readers and Writers</a></h4>
+
+<p>The <b class="class">PersistenceReader</b> and <b class="class">PersistenceWriter</b> interfaces each define one method.</p>
+
+<pre class="brush: java">
+    public interface PersistenceWriter {	
+        void write( final InfoNode rootNode, final java.io.Writer output );
+    }
+</pre>
+
+<p>The <b class="class">PersistenceWriter</b> accepts the root <b class="class">InfoNode</b> of the semantic model 
+and a <b class="class">java.io.Writer</b> to which to send the persisted form (such as an XML or JSON file).</p>
+
+<pre class="brush: java">
+    public interface PersistenceReader {
+        InfoNode read( final Class&lt; ? &gt; clazz, final java.io.Reader reader );
+    }
+</pre>
+    
+<p>The <b class="class">PersistenceReader</b> accepts an <b class="class">java.io.Reader</b> representing the persisted 
+form (such as an XML or JSON file or stream), a class type that represents the class of the object to create from 
+the persisted form, and returns the semantic model as the root <b class="class">InfoNode</b> of the tree-like structure. 
+Recall that is exactly the semantic model that the <b class="class">PersistenceEngine</b> needs to parse the 
+semantic model into an object.</p>
+
+<p><b>FreezeDry</b> currently provides three <b class="class">PersistenceReaders</b> and three <b class="class">PersistenceWriters</b>.</p>
+
+<table>
+	<tr><th>Name</th><th>Persisted Form</th><th>Description</th></tr>
+	<tr><td><b class="class">XmlReader</b></td><td>XML</td><td>reads from XML sources and produces a semantic model</td></tr>
+	<tr><td><b class="class">XmlWriter</b></td><td>XML</td><td>writes an object to an XML persisted form</td></tr>
+	<tr><td><b class="class">JsonReader</b></td><td>JSON</td><td>reads from JSON sources and produces a semantic model</td></tr>
+	<tr><td><b class="class">JsonWriter</b></td><td>JSON</td><td>writes an object to a JSON persisted form</td></tr>
+	<tr><td><b class="class">KeyValueReader</b></td><td>Key-Values</td><td>reads lists of key-value pairs produces a semantic model</td></tr>
+	<tr><td><b class="class">KeyValueWriter</b></td><td>Key-Values</td><td>writes an object to a persisted form that is a list of key-value pairs</td></tr>
+</table>
+ 
+<h5 id="key_value_reader_writer"><a href="#overview">Key-Value Readers and Writers</a></h5>
+
+<p>Because XML and JSON are well-documented standards, I won't discuss them here. But the Key-Value readers and 
+writers require a description. Effectively, the lists of key-value pairs are flattened versions of a Java object, 
+and the readers and writers can handle quite complex objects straight out of the box. For example, the output 
+below shows what the <b class="class">Division</b> object (standard <b>FreezeDry</b> example) looks like when 
+persisted in a key-value form.</p>
+
+<pre class="brush: java">
+    Division.people[0].Person.givenName = "Johnny"
+    Division.people[0].Person.familyName = "Hernandez"
+    Division.people[0].Person.age = 13
+    Division.people[0].Person.birthDate = 1963-04-22
+    Division.people[0].Person.Mood[0] = 0.000
+    Division.people[0].Person.Mood[1] = 0.707
+    ...
+    Division.people[0].Person.Mood[9] = 0.707
+    Division.people[0].Person.friends{"Polly"} = "bird"
+    Division.people[0].Person.friends{"Sparky"} = "dog"
+    Division.people[0].Person.groups{"numbers"}{"one"} = "ONE"
+    Division.people[0].Person.groups{"numbers"}{"two"} = "TWO"
+    Division.people[0].Person.groups{"numbers"}{"three"} = "THREE"
+    Division.people[0].Person.groups{"letters"}{"a"} = "AY"
+    Division.people[0].Person.groups{"letters"}{"b"} = "BEE"
+    ...
+    Division.people[3].Person.givenName = "Booda"
+    Division.people[3].Person.familyName = "Ghad"
+    Division.people[3].Person.age = 17
+    Division.months{"January"}[0] = 1
+    Division.months{"January"}[1] = 2
+    Division.months{"January"}[2] = 3
+    Division.months{"January"}[3] = 31
+    ...
+    Division.months{"March"}[0] = 1
+    Division.months{"March"}[1] = 2
+    Division.months{"March"}[2] = 3
+    Division.months{"March"}[3] = 31
+    Division.carNames[0] = "civic"
+    Division.carNames[1] = "tsx"
+    Division.carNames[2] = "accord"
+    Division.collectionMatrix[0][0] = 11
+    Division.collectionMatrix[0][1] = 12
+    ...
+    Division.collectionMatrix[2][2] = 33
+    Division.personMap{"funny"}.givenName = "Pryor"
+    Division.personMap{"funny"}.familyName = "Richard"
+    Division.personMap{"funny"}.age = 63
+    Division.personMap{"sad"}.givenName = "Jones"
+    Division.personMap{"sad"}.familyName = "Jenny"
+    Division.personMap{"sad"}.age = 45
+    Division.personMap{"pretty"}.givenName = "Mendez"
+    Division.personMap{"pretty"}.familyName = "Ginder"
+    Division.personMap{"pretty"}.age = 23
+</pre>
+
+<h6>Keys and Values</h6>
+
+<p>Notice that each line has a key, followed by a separator ("="), and then followed by a value. 
+The values in this example are simple. The keys may appear a bit complex. Notice that each key is 
+composed of elements, which are separated by a ".".</p>
+
+<table>
+	<tr><th>Separator Name</th><th>Description</th></tr>
+	<tr><td>Key Separator</td><td>Separates the elements of the key</td></tr>
+	<tr><td>Key-Value Separator</td><td>Separates the key from the value</td></tr>
+</table>
+
+<p>Both of these separators can be specified through code.</p>
+
+<p>The elements of the key are determined by how they appear in the class. For example, notice the 
+<b class="class">Division.carNames</b> near the bottom of the key-value pair list. The <b class="class">Division</b>
+is the class that is being persisted. And <b class="class">carNames</b> is a field in that class, which happens to be a
+<b class="class">List&lt; String &gt;</b>. The "[0]", "[1]", and "[2]" are the indexes of the element in 
+the list, and are generated by a <b class="class">PersistenceRenderer</b> that uses a <b class="class">Decorator</b>. 
+Similarly, at the bottom of the list of key-value pairs, you may notice <b class="class">Division.personMap</b>. As the name
+suggests, <b class="class">personMap</b> is a <b class="class">Map&lt; String, Person &gt;</b>.</p>
+
+<h6>Renderers</h6>
+
+<p><b class="class">Renderer</b>s are responsible for expressing the objects they render as key-value pairs. 
+And, at the same time, they are responsible for parsing the key-value pairs that adhere to their format, 
+back into an object. For example, in the above text, near the bottom, notice the three key-value pairs 
+that start with <b class="class">Division.carNames</b>. The <b class="class">CollectionRenderer</b> knows how to
+take a collection (List, Set, Queue, etc) and renderer into key-value pairs (and how to parse the key-values 
+back into a collection). As another example, the keys beginning <b class="class">Division.personMap</b> found at the bottom of
+the list of key-value pairs, represent a <b class="class">Map&lt; String, Person &gt;</b> and therefore use a 
+<b class="class">MapRenderer</b> to create these key-value pairs.</p>
+
+<p>Each <b class="class">PersistenceRenderer</b> also provides a method <b class="class">isRenderer(...)</b> that returns
+true if the key-string passed to it matches the format of something that it renderers. 
+<b>FreezeDry</b> provides the following renderers:</p>
+
+<table>
+	<tr><th>Name</th><th>Description</th></tr>
+	<tr><td><b class="class">PersistenceRenderer</b></td><td>Interface defining what a persistence renderer must have</td></tr>
+	<tr><td><b class="class">AbstractPersistenceRenderer</b></td><td>Manages the *KeyValueBuilder* and the mapping between the types and the *Decorator*s. Also provides some come utilities needed by the renderers.</td></tr>
+	<tr><td><b class="class">LeafNodeRenderer</b></td><td>Renders simple leaf nodes</td></tr>
+	<tr><td><b class="class">MapRenderer</b></td><td>Used to render Maps</td></tr>
+	<tr><td><b class="class">CollectionRenderer</b></td><td>Used for rendering Collections</td></tr>
+	<tr><td><b class="class">FlatteningCollectionRenderer</b></td><td>Renders simple Collections as a single line value, and uses the <b class="class">CollectionRenderer</b> to deal with Collections of non-leaf type object (i.e. things that aren't strings or numbers)</td></tr>
+</table>
+
+<h6>Decorators</h6>
+
+<p>You may also notice that strings are surrounded by quotes, integers don't have decimals, and 
+that doubles only show 3 decimal places. These decorations and formatting are achieved by 
+<b class="class">Decorator</b>s. <b class="class">Decorator</b>s also provide an <b class="class">isDecorated(...)</b>
+method that returns true if the string it is passed is decorated (matches its pattern) by that 
+decorator. And if the string is decorated by that decorator, it can "undecorate" it as well.</p>
+
+<p><b>FreezeDry</b> provides the following out of the box:</p>
+
+<table>
+	<tr><th>Name</th><th>Description</th></tr>
+	<tr>
+        <td><b class="class">Decorator</b></td>
+        <td>Interface defining what a Decorator is.</td>
+    </tr>
+	<tr>
+        <td><b class="class">StringDecorator</b></td><td>By default surrounds a string with quotes.
+            The opening string and closing string can be specified. For example, an index has an
+            opening string "[" and a closing string of "]".</td>
+    </tr>
+	<tr>
+        <td><b class="class">IntegerDecorator</b></td>
+        <td>Formats and parses integers</td>
+    </tr>
+	<tr>
+        <td><b class="class">DoubleDecorator</b></td>
+        <td>Formats and parse floating point numbers. By default has 3 digits to the right of the
+            decimal point. The format can be adjusted.</td>
+    </tr>
+	<tr>
+        <td><b class="class">BooleanDecorator</b></td>
+        <td>Formats and parses <b class="class">boolean</b>.</td>
+    </tr>
+</table>
+
+<h4 id="annotations"><a href="#overview">Annotations</a></h4>
+
+<p>In some cases you may want to change the way an object or field are persisted. For example,
+you may want to persist a field using a specified name instead of its field name. The code below 
+shows a snippet of the <b class="class">Person</b> class. Notice the annotation above the 
+<em>familyName</em> field. This annotation tells the <b class="class">PersistenceEngine</b> two things. 
+First, when creating the semantic model, set the <em>persistName</em> as the specified persistence name. 
+Depending on the implementation of the <b class="class">Writer</b> interface, the <em>familyName</em> field 
+would then be persisted as <em>LastName</em>. Second, when creating an object from the semantic model, 
+if the semantic model has a *persistName* specified, it will find the field with the associated annotation 
+and set that field. In this case, if the <b class="class">InfoNode</b> has a persistence name of <em>LastName</em>, 
+the <em>familyName</em> field will be set.</p>
+
+<pre class="brush: java">
+    public class Person {
+        ...
+        @Persist( persistenceName = "LastName" )
+        private String familyName;
+        ...
+    }
+</pre>
+
+<p>"But", you may wonder, "didn't you say that often when reading a persisted form into the semantic model, 
+only the persistence name and value are specified?" And, you may question further, "Doesn't that mean that 
+I always have to annotate the class I want to persist?" Now you're starting to get angry, "That sucks!". 
+Well, slow down. If the <b class="class">InfoNode</b> doesn't have a <em>fieldName</em> specified, then it will look for 
+a <b>field</b> with the specified persistence name. In this way, the default behavior is to use the persistence name as the 
+field name. But, now, you can easily override its name.</p>
+
+<p>Let me back up a bit and explain the design related to annotations. There are two types of annotations used in 
+<b>FreezeDry</b>. The first type is the <em>built-in</em> annotation <b class="class">Persist</b>. And the second type 
+are <em>custom</em> annotations that are specific to a <b class="class">NodeBuilder</b>.</p>
+
+<h5 id="built_in_annotations"><a href="#overview">Built-In Annotations</a></h5>
+
+<p>This is used by the persistence engine, and is meant to represent common types of customizations that one would want 
+to perform across all objects. Such as the specifying a name for the persisted field. The other customization is the 
+class type to use to instantiate the field. As you recall, if we have a field that is of type <b class="class">Map&lt; String, String &gt;</b>, 
+then we may want to override the common behavior of <b>FreezeDry</b> that would instantiate this field as a 
+<b class="class">LinkedHashMap&lt; String, String &gt;</b>, and instead instantiate the field as a more simple 
+<b class="class">HashMap&lt; String, String &gt;</b>.</p>
+
+<pre class="brush: java">
+    public class Person {
+        ...
+        @Persist( instantiateAs = HashMap.class, persistenceName = "BuddyList" )
+        private Map&lt; String, String &gt; friends;
+        ...
+    }
+</pre>
+
+The <b class="class">Persist</b> annotation is shown below.
+
+<pre class="brush: java">
+    @Retention( RetentionPolicy.RUNTIME )
+    @Target( { ElementType.TYPE, ElementType.FIELD } )
+    public @interface Persist {
+        String persistenceName() default "";
+        Class&lt; ? &gt; instantiateAs() default Null.class;
+        public static class Null { } 
+    }
+</pre>
+
+<p>Notice that the retention policy states that the annotation is available at run-time, and that the targets are types and fields.</p>
+
+<h5 id="custom_annotations"><a href="#overview">Custom Annotations</a></h5>
+
+<p>Custom annotations, the "second type", are intended to work hand-in-hand with a specific <b class="class">NodeBuilder</b>. 
+The idea is that when a <b class="class">NodeBuilder</b> is creating an <b class="class">InfoNode</b> from an object or field, 
+or when the <b class="class">NodeBuilder</b> is creating an object or setting a field based on an <b class="class">InfoNode</b>, 
+the annotation for that type is customizes its behavior. So the rule is that for each <b class="class">NodeBuilder</b> you implement, 
+you should create an annotation if you want to customize its behavior from the class file of the object you wish to persist or reconstitute.</p>
+
+<p>The following custom annotations are already available within <b>FreezeDry</b>.</p>
+
+<table>
+	<tr><th>Annotation</th><th>NodeBuilder</th><th>Customizations</th></tr>
+	<tr><td>PeristCollection</td><td><b class="class">CollectionNodeBuilder</b></td><td>elementPersistName, elementType</td></tr>
+	<tr><td>PersistMap</td><td><b class="class">MapNodeBuilder</b></td><td>entryPersistName, keyPersistName, keyType, valuePersistName, valueType</td></tr>
+	<tr><td>PersistArray</td><td><b class="class">ArrayNodeBuilder</b></td><td>elementPersistName, elementType</td></tr>
+	<tr><td>PersistDate</td><td><b class="class">DateNodeBuilder</b></td><td>value (represents the format)</td></tr>
+</table>
+
+<h2 id="whats_new"><a href="#overview">What's New</a></h2>
+
+<p>This section describes the larger changes. More detailed changes can be found in the README 
+file in the file download area. Most updates will contain bug fixes and minor code refactoring.</p>
+
+<h4>Version 0.2.5 (from version 0.2.4)</h4>
+<p>Mainly improved the use of FreezeDry for serialization of objects that have an associated <b class="class">NodeBuilder</b>.</p>
+
+<ol>
+    <li>Added the ability to persist objects that have an associated <b class="class">NodeBuilder</b> as root
+        objects as described by the <b class="class">NodeBuilder</b>. For example, when persisting an <b class="class">ArrayList</b>
+        as a member of another object, the <b class="class">ArrayList</b> uses the <b class="class">CollectionNodeBuilder</b> to
+        create and parse the <b class="class">InfoNode</b> objects. In version 0.2.4, however, when the <b class="class">ArrayList</b>
+        was the root object (i.e. not a member of another object) then the <b class="class">ArrayList</b> was persisted as if it
+        were any other object, rather than by using the <b class="class">CollectionNodeBuilder</b>. Version 0.2.5 fixes this.</li>
+    <li>Changed the <b class="class">NodeBuilder</b> interface to have two additional methods that override the
+        <b class="class">createInfoNode(Class<?>, Object, String)</b> method and the <b class="class">createObject(Class<?>, Class<?>, InfoNode)</b>
+        method. These new methods are called when an object has an associated <b class="class">NodeBuilder</b> <em>and</em>
+        is a root object.</li>
+</ol>
+<h4>Version 0.2.4 (from version 0.2.3)</h4>
+<p>Mainly bug fix related to inheritance, completed TODO for setting the persist names of map elements,
+added ability to specify that a field is ignored (i.e. not persisted), and added test cases.</p>
+<ol>
+    <li>When using <b class="class">@PersistMap</b> with one or both of the options:
+        <ul>
+            <li><b class="class">keyPersistName</b></li>
+            <li><b class="class">valuePersistName</b></li>
+        </ul>
+        the <b class="class">java.lang.Map</b> was not reconstructed properly from its persisted state. I
+        finished a "TODO" that allows you to use the persistence name for the key and value.
+    </li>
+    <li>Fixed bug where the fields from the ancestor objects (parent and parent's parent, etc) where not getting
+        persisted.</li>
+    <li>Added an <b class="class">ignore</b> option to the <b class="class">@Persist</b> annotation that takes
+        a <b class="class">boolean</b> value of <b class="class">true</b> or <b class="class">false</b>. If the
+        option is set to <b class="class">true</b>, the FreezeDry will ignore that field.</li>
+    <li>Added test cases to the unit tests.</li>
+</ol>
+
+<h4>Version 0.2.3 (from version 0.2.2)</h4>
+<p>Mainly provided fixes that allow FreezeDry to be use more effectively as a serialization engine. Mostly this work
+was done for the <a href="http://diffusive.sourceforge.net">Diffusive</a> project.</p>
+<ol>
+    <li>Provided the capability to persist arrays as top level objects. For example, if you would like to directly persist
+        an <b class="class">int[][]</b> (i.e. not a field in some other class) you can now do this.</li>
+    <li>Fixed a minor issue where primitive types were being automatically wrapped in their Java types when specifying
+        their names as a type attribute or as the element names. For example, a <b class="class">double</b> element
+        had its type attribute or name set to <b class="class">Double</b> instead of <b class="class">double</b>.</li>
+</ol>
+
+<h4>Version 0.2.2 (from version 0.2.1)</h4>
+<ol>
+	<li>Removed the restriction that the persisted class requires a no-arg constructor.</li>
+	<li>Fixed bug the prevented Java types (<b class="class">String</b>, <b class="class">Character</b>, 
+		<b class="class">Double</b>, etc for which the <b class="class">Class.getClassloader()</b> call
+		would return <b class="class">null</b>) from being persisted as the top level element.</li>
+	<li>Added a Char/char node builded (was missing before, oversight).</li>
+	<li>Updated code so that "static final" fields are persisted by default, and are never 
+   		set based on the persisted value (if the value is persisted). static final fields
+   		take their value from the class' source code.</li>
+	<li>Various small bug fixes.</li>
+</ol>
+
+<h4>Version 0.2.1 (from version 0.2.0)</h4>
+<ol>
+	<li>Fixed a small bug in the <b class="class">KeyValuePersistence</b> class. The method to return the <b class="class">PersistenceBuider</b>
+	    returned it from the <b class="class">PersistenceWriter</b>. Modifying the mapping for the <b class="class">PersistenceRenderer</b>s in 
+	    that <b class="class">PersistenceBuilder</b> only applied to the builder for that writer. It did not modify the builder 
+	    for the <b class="class">PersistenceReader</b>. The <b class="class">PersistenceBuilder</b> for the reader then used a different mapping, 
+	    in some cases causing errors. This was a disconnect. Renamed the method, and now the user must 
+	    explicitly set both (until I can find a better solution).</li>
+</ol>
+
+<h4>Version 0.2.0 (from version 0.1.0)</h4>
+<ol>
+	<li>Added the ability to persist Java objects into lists of key-value pairs, and to reconstitute Java 
+	    objects from this persisted form. The key-value code, found in the "keyvalue" package. Because 
+	    no convenient framework existed to read and writer key-value pair lists from file (such as those 
+	    for XML and JSON) I built a whole set of classes to deal with that. Therefore, the "keyvalue" 
+	    package contains <b class="class">Renderer</b>s and <b class="class">Decorator</b>s that allow a fair amount of easy customization. 
+	    The <b class="class">Renderer</b>s are similar to the <b class="class">NodeBuilder</b> except that they work on converting between 
+	    <b class="class">InfoNodes</b> and *key-value* pairs. The <b class="class">Decorator</b>s provide a convenient way to decorate items. 
+	    For example, if a key or value is a <b class="class">String</b>, then by default it would be decorated (and undecorated) 
+	    by surrounding the string with quotes, by the <b class="class">StringDecorator</b>. <b class="class">Renderer</b>s and <b class="class">Decorator</b>s 
+	    can be extended to alter the behavior of the default <b>FreezeDry</b>. For example, the <b class="class">FlatteningCollectionRenderer</b> 
+	    changes the default behavior of the <b class="class">CollectionRenderer</b>.</li>
+	<li>Added <b class="class">Persistence</b> classes as a convenience. Now you can persist objects and reconstitute them from their 
+		persisted form through the use of the Persistence classes. For example, there is an <b class="class">XmlPersistence</b>, a 
+		<b class="class">JsonPersistence</b>, and a <b class="class">KeyValuePersistence</b>. In the <b>FreezeDryCloud</b> project (to be added shortly) 
+		there are <b class="class">Persistence</b> classes to persist directly to S3 buckets. These can easily be extended. And the 
+		previous approach of using the <b class="class">PersistenceEngine</b> is still available.</li>
+	<li>Renamed the persistence readers and writers from <b class="class">Reader</b> and <b class="class">Writer</b> to <b class="class">PersistenceReader</b> and 
+	    <b class="class">PersistenceWriter</b>, respecitively. This was done to avoid confusion with <b class="class">java.io.Reader</b> and
+	    <b class="class">java.io.Writer</b>.</li>
+	<li>Changed the signature of the <b class="class">PersistenceReader</b> to use <b class="class">java.io.Reader</b> instead of the <b class="class">InputStream</b>. 
+	    And changed the signature of the <b class="class">PersistenceWriter</b> to use the <b class="class">java.io.Writer</b> instead of the <b class="class">PrintWriter</b>.</li>
+	<li>Changed the <b class="class">InfoNode</b> to implement <b class="class">Copyable&gt; InfoNode &lt;</b> and provide a deep copy of the semantic model 
+	    (i.e. the subtree of the <b class="class">InfoNode</b> on which the copy is requested)</li>
+</ol>
+
+</article>
+ 
+</body>
+
+</html>
