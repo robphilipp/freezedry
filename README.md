@@ -6,7 +6,7 @@ Java persistence framework: no need for binding files, no-arg constructors, or a
 -----------------------------------------------------------------------------------
    Website Has Documentation
 -----------------------------------------------------------------------------------
-Please see the Website (http://freezedried.sourceforge.net) for documentation.
+Please see the Website (http://robphilipp.github.io/freezedry) for documentation.
 
 1. The "Overview Guide" page describes the framework and its usage.
 2. The "Quick Start" page describes the various files, which ones to use, how 
