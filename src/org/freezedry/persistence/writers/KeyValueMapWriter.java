@@ -1,3 +1,18 @@
+/*
+ * Copyright 2013 Robert Philipp, InvestLab Technology LLC
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 package org.freezedry.persistence.writers;
 
 import org.apache.log4j.Logger;
@@ -52,9 +67,8 @@ public class KeyValueMapWriter {
 	/**
 	 * Constructs a basic key-value writer that uses the default renderers and specified separator.
 	 * @param keySeparator The separator between the flattened elements of the key
-	 * @param keyValueSeparator The separator between the key and the value
 	 */
-	public KeyValueMapWriter( final String keySeparator, final String keyValueSeparator )
+	public KeyValueMapWriter( final String keySeparator )
 	{
 		keyValueFlattener = new KeyValueFlattener( keySeparator );
 	}
@@ -124,14 +138,14 @@ public class KeyValueMapWriter {
 	 * @return a {@link Map} that contains the flattened object. The key into the map is the flattened field name, and
 	 * the value is the string representation of that value.
 	 */
-	public Map< String, String > createMap( final InfoNode rootNode )
+	public Map< String, Object > createMap( final InfoNode rootNode )
 	{
 		final List< Pair< String, Object > > keyValuePairs = keyValueFlattener.buildKeyValuePairs( rootNode );
 
-		final Map< String, String > flattenedObject = new LinkedHashMap<>();
+		final Map< String, Object > flattenedObject = new LinkedHashMap<>();
 		for( final Pair< String, Object > pair : keyValuePairs )
 		{
-			flattenedObject.put( pair.getFirst(), pair.getSecond().toString() );
+			flattenedObject.put( pair.getFirst(), pair.getSecond() );
 		}
 
 		if( LOGGER.isTraceEnabled() )
@@ -236,11 +250,11 @@ public class KeyValueMapWriter {
 		final KeyValueBuilder builder = writer.getBuilder();
 		builder.putRenderer( Collection.class, new FlatteningCollectionRenderer( builder ) );
 		writer.setKeyElementSeparator( "." );
-		Map< String, String > flattenedObject = writer.createMap( rootNode );
+		Map< String, Object > flattenedObject = writer.createMap( rootNode );
 
-		for( Map.Entry< String, String > entry : flattenedObject.entrySet() )
+		for( Map.Entry< String, Object > entry : flattenedObject.entrySet() )
 		{
-			System.out.println( entry.getKey() + " = " + entry.getValue() );
+			System.out.println( entry.getKey() + " = " + entry.getValue().toString() );
 		}
 	}
 }

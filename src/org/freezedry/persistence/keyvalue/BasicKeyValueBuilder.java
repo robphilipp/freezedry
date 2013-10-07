@@ -128,7 +128,7 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 	public void createKeyValuePairs( final InfoNode infoNode, final String key, final List< Pair< String, Object > > keyValues, final boolean isWithholdPersitName )
 	{
 		// determine whether to show the persistence name. the isShowFullKey is top dog.
-		final boolean isHidePersistName = ( isShowFullKey() ? false : isWithholdPersitName );
+		final boolean isHidePersistName = (!isShowFullKey() && isWithholdPersitName);
 		
 		// grab the persistence renderer for the class or for its closest ancestor, or for the 
 		// array renderer if the class is an array
