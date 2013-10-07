@@ -13,7 +13,7 @@
 		set global properties for this build
 	 -->
 	<property name="src" location="src" />
-	<property name="build" location="bin" />
+	<property name="build" location="out/production/freezedry" />
 	<property name="dist" location="dist" />
 	<property name="release" location="FreezeDry_v${version}" />
 	<property name="libs" value="lib" />
@@ -49,9 +49,11 @@
 		the dependencies
 	-->
 	<property environment="env"/>
-	<property name="java-libs" value="${env.JAVA_LIBS}" />
-	<property name="json-libs" value="json"/>
-	<property name="internal_class_path" value="${junit} 
+    <!--<property name="java-libs" value="${env.JAVA_LIBS}" />-->
+    <property name="java-libs" value="../deps" />
+    <!--<property name="json-libs" value="json"/>-->
+    <property name="json-libs" value=""/>
+	<property name="internal_class_path" value="${junit}
 												${log4j} 
 												${json}" />
 

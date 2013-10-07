@@ -56,11 +56,12 @@ import org.freezedry.persistence.utils.DateUtils;
 public class KeyValueWriter implements PersistenceWriter {
 
 	private static final Logger LOGGER = Logger.getLogger( KeyValueWriter.class );
-	
+
 	public static final String KEY_VALUE_SEPARATOR = "=";
-	
-	private KeyValueBuilder builder;
-	private String keyValueSeparator = KEY_VALUE_SEPARATOR;
+
+	private final KeyValueFlattener keyValueFlattener;
+
+	private String keyValueSeparator;
 	
 	/**
 	 * Constructs a basic key-value writer that uses the specified renderers and separator.
@@ -77,7 +78,7 @@ public class KeyValueWriter implements PersistenceWriter {
 						   final String keySeparator,
 						   final String keyValueSeparator )
 	{
-		builder = new BasicKeyValueBuilder( renderers, arrayRenderer, keySeparator );
+		keyValueFlattener = new KeyValueFlattener( renderers, arrayRenderer, keySeparator );
 		this.keyValueSeparator = keyValueSeparator;
 	}
 
@@ -88,7 +89,7 @@ public class KeyValueWriter implements PersistenceWriter {
 	 */
 	public KeyValueWriter( final String keySeparator, final String keyValueSeparator )
 	{
-		builder = new BasicKeyValueBuilder( keySeparator );
+		keyValueFlattener = new KeyValueFlattener( keySeparator );
 		this.keyValueSeparator = keyValueSeparator;
 	}
 
@@ -97,7 +98,7 @@ public class KeyValueWriter implements PersistenceWriter {
 	 */
 	public KeyValueWriter()
 	{
-		builder = new BasicKeyValueBuilder();
+		keyValueFlattener = new KeyValueFlattener();
 	}
 	
 	/**
@@ -106,11 +107,11 @@ public class KeyValueWriter implements PersistenceWriter {
 	 */
 	public KeyValueWriter( final KeyValueBuilder builder )
 	{
-		this.builder = builder;
+		keyValueFlattener = new KeyValueFlattener( builder );
 	}
-	
+
 	/**
-	 * The separator between the flattened key elements. For example, suppose that a {@code Division} has a {@link List}
+	 * The separator between the flattened key elements. For example, suppose that a {@code Division} has a {@link java.util.List}
 	 * of {@code Person} objects, called {@code people}. The the key for a person's first name may be of the form:
 	 * {@code Division.people.Person[2].firstName}, or {@code Division:people:Person[2]:firstName}. The "{@code .}" and
 	 * the "{@code :}" are separators.
@@ -118,18 +119,18 @@ public class KeyValueWriter implements PersistenceWriter {
 	 */
 	public void setKeyElementSeparator( final String separator )
 	{
-		builder.setSeparator( separator );
+		keyValueFlattener.getBuilder().setSeparator( separator );
 	}
-	
+
 	/**
-	 * @return The separator between the flattened key elements. For example, suppose that a {@code Division} has a {@link List}
+	 * @return The separator between the flattened key elements. For example, suppose that a {@code Division} has a {@link java.util.List}
 	 * of {@code Person} objects, called {@code people}. The the key for a person's first name may be of the form:
 	 * {@code Division.people.Person[2].firstName}, or {@code Division:people:Person[2]:firstName}. The "{@code .}" and
 	 * the "{@code :}" are separators.
 	 */
 	public String getKeyElementSeparator()
 	{
-		return builder.getSeparator();
+		return keyValueFlattener.getBuilder().getSeparator();
 	}
 
 	/**
@@ -138,7 +139,7 @@ public class KeyValueWriter implements PersistenceWriter {
 	 */
 	public void setKeyValueSeparator( final String separator )
 	{
-		this.keyValueSeparator = separator;
+		keyValueSeparator = separator;
 	}
 
 	/**
@@ -152,48 +153,25 @@ public class KeyValueWriter implements PersistenceWriter {
 	/**
 	 * Sets the builder responsible for creating the key-value pairs from the semantic model,
 	 * and that is responsible for parsing the key-value pairs into a semantic model.
-	 * @param builder the {@link KeyValueBuilder} responsible for creating the key-value pairs 
-	 * from the semantic model, and that is responsible for parsing the key-value pairs into 
+	 * @param builder the {@link KeyValueBuilder} responsible for creating the key-value pairs
+	 * from the semantic model, and that is responsible for parsing the key-value pairs into
 	 * a semantic model.
 	 */
 	public void setBuilder( final KeyValueBuilder builder )
 	{
-		this.builder = builder;
+		keyValueFlattener.setBuilder( builder );
 	}
-	
+
 	/**
-	 * @return the {@link KeyValueBuilder} responsible for creating the key-value pairs 
-	 * from the semantic model, and that is responsible for parsing the key-value pairs into 
+	 * @return the {@link KeyValueBuilder} responsible for creating the key-value pairs
+	 * from the semantic model, and that is responsible for parsing the key-value pairs into
 	 * a semantic model.
 	 */
 	public KeyValueBuilder getBuilder()
 	{
-		return builder;
+		return keyValueFlattener.getBuilder();
 	}
-	
-	/**
-	 * When set to true, the full key is persisted. So for example, normally, if there is a {@link List}
-	 * of {@link String} called {@code names}, then the key will have the form {@code names[i]}. When this is
-	 * set to true, then the {@link List} would have a key of the form {@code names[i].String}. I recommend
-	 * against setting this to true.
-	 * @param isShowFullKey true means that the full key will be persisted; false is default
-	 */
-	public void setShowFullKey( final boolean isShowFullKey )
-	{
-		builder.setShowFullKey( isShowFullKey );
-	}
-	
-	/**
-	 * When set to true, the full key is persisted. So for example, normally, if there is a {@link List}
-	 * of {@link String} called {@code names}, then the key will have the form {@code names[i]}. When this is
-	 * set to true, then the {@link List} would have a key of the form {@code names[i].String}
-	 * @return true means that the full key will be persisted; false is default
-	 */
-	public boolean isShowFullKey()
-	{
-		return builder.isShowFullKey();
-	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.freezedry.persistence.writers.PersistenceWriter#write(org.freezedry.persistence.tree.InfoNode, java.io.Writer)
@@ -201,7 +179,7 @@ public class KeyValueWriter implements PersistenceWriter {
 	@Override
 	public void write( final InfoNode rootNode, final Writer output )
 	{
-		final List< Pair< String, Object > > keyValuePairs = builder.buildKeyValuePairs( rootNode );
+		final List< Pair< String, Object > > keyValuePairs = keyValueFlattener.buildKeyValuePairs( rootNode );
 		try
 		{
 			for( final Pair< String, Object > pair : keyValuePairs )
