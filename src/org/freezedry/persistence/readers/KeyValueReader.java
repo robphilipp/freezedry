@@ -41,6 +41,7 @@ import org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer;
 import org.freezedry.persistence.tests.Division;
 import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.Constants;
+import org.freezedry.persistence.writers.KeyValueFlattener;
 import org.freezedry.persistence.writers.KeyValueWriter;
 
 public class KeyValueReader implements PersistenceReader {

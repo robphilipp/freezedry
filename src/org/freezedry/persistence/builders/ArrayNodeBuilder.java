@@ -149,7 +149,7 @@ public class ArrayNodeBuilder extends AbstractNodeBuilder {
 		// method recursively to create the appropriate node. If the containing class is null (i.e. for int[], String[], etc) then
 		// we use the specified field name.
 		String persistName = null;
-		if( containingClass != null )
+		if( containingClass != null && !containingClass.isArray() )
 		{
 			try
 			{
@@ -180,7 +180,7 @@ public class ArrayNodeBuilder extends AbstractNodeBuilder {
 			// then later in the code we set the name for which to persist the elements to the classes simple
 			// name with the compound array name suffix
 			PersistArray arrayAnnotation = null;
-			if( containingClass != null )
+			if( containingClass != null && !containingClass.isArray() )
 			{
 				final Field field = ReflectionUtils.getDeclaredField( containingClass, fieldName );
 				arrayAnnotation = field.getAnnotation( PersistArray.class );

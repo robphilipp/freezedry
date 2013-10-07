@@ -128,7 +128,7 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 	public void createKeyValuePairs( final InfoNode infoNode, final String key, final List< Pair< String, Object > > keyValues, final boolean isWithholdPersitName )
 	{
 		// determine whether to show the persistence name. the isShowFullKey is top dog.
-		final boolean isHidePersistName = ( isShowFullKey() ? false : isWithholdPersitName );
+		final boolean isHidePersistName = (!isShowFullKey() && isWithholdPersitName);
 		
 		// grab the persistence renderer for the class or for its closest ancestor, or for the 
 		// array renderer if the class is an array
@@ -145,7 +145,7 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 		{
 			// create the new key based on the specified key and the persistence name
 			final String newKey = createKey( infoNode, key, isHidePersistName );
-			final Pair< String, Object > keyValuePair = new Pair< String, Object >( newKey, null );
+			final Pair< String, Object > keyValuePair = new Pair<>( newKey, null );
 			
 			// if the node is a leaf node, then it has a value, and we need to create a key-value pair
 			// otherwise we need to recurse back to the calling method to build out the key-value pairs
