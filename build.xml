@@ -12,7 +12,8 @@
 	<!-- 
 		set global properties for this build
 	 -->
-	<property name="src" location="src" />
+	<property name="src" location="src/main/" />
+    <property name="dependencies" location="/Users/rob/Documents/workspace/alm_system_libs" />
 	<property name="build" location="out/production/freezedry" />
 	<property name="dist" location="dist" />
 	<property name="release" location="FreezeDry_v${version}" />
@@ -38,7 +39,7 @@
 	<!-- 
 		JSON
 	-->
-	<property name="json" value="json-20120228.jar" />
+	<property name="json" value="json/json-20120228.jar" />
 		
 
 	<!-- =====================================================================
@@ -49,10 +50,8 @@
 		the dependencies
 	-->
 	<property environment="env"/>
-    <!--<property name="java-libs" value="${env.JAVA_LIBS}" />-->
-    <property name="java-libs" value="../deps" />
+    <property name="java-libs" value="${dependencies}" />
     <!--<property name="json-libs" value="json"/>-->
-    <property name="json-libs" value=""/>
 	<property name="internal_class_path" value="${junit}
 												${log4j} 
 												${json}" />
@@ -88,7 +87,7 @@
 		<mkdir dir="${dist}/lib" />
 		<copy file="${java-libs}/${junit}" todir="${dist}/lib" />
 		<copy file="${java-libs}/${log4j}" todir="${dist}/lib" />
-		<copy file="${java-libs}/${json-libs}/${json}" todir="${dist}/lib" />
+		<copy file="${java-libs}/${json}" todir="${dist}/lib" />
 	</target>
 
 	<!--
@@ -160,7 +159,7 @@
 			<fileset dir="${build}" includes="${log4j_config}" />			
 			<zipfileset src="${java-libs}/${log4j}" excludes="META-INF/*" />
 			<zipfileset src="${java-libs}/${junit}" excludes="META-INF/*" />
-			<zipfileset src="${java-libs}/${json-libs}/${json}" excludes="META-INF/*" />
+			<zipfileset src="${java-libs}/${json}" excludes="META-INF/*" />
 
 			<manifest>
 				<attribute name="Ant" value="${user.name}" />
@@ -210,7 +209,7 @@
 		<copy file="${dist}/${jars}/${jar_file}" todir="${release}/${jars}" />
 		<copy file="${java-libs}/${junit}" todir="${release}/${jars}" />
 		<copy file="${java-libs}/${log4j}" todir="${release}/${jars}" />
-		<copy file="${java-libs}/${json-libs}/${json}" todir="${release}/${jars}" />
+		<copy file="${java-libs}/${json}" todir="${release}/${jars}" />
 		<zip destfile="${release}/${jars}/${app_name}_${version}.zip" basedir="${release}/${jars}" includes="*.*" />
 		
 		<!-- copy the soure files into the release source directory, and zip everything up -->
