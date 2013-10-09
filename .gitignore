@@ -24,6 +24,7 @@ build
 
 FreezeDry_*/*
 dist/*
+target/*
 
 # Logs and databases #
 ######################
