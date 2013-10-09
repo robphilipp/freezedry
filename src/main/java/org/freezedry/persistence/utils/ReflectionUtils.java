@@ -15,34 +15,15 @@
  */
 package org.freezedry.persistence.utils;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.RunnableScheduledFuture;
-
 import org.apache.log4j.Logger;
-import org.apache.log4j.xml.DOMConfigurator;
 import org.freezedry.persistence.annotations.Persist;
-import org.freezedry.persistence.builders.DoubleNodeBuilder;
 import org.freezedry.persistence.builders.NodeBuilder;
 import org.freezedry.persistence.containers.orderedseries.IntegerOrderedSeries;
 import org.freezedry.persistence.copyable.Copyable;
-import org.freezedry.persistence.tests.BadPerson;
 import org.freezedry.persistence.tree.InfoNode;
-import org.freezedry.persistence.utils.tests.Fconcrete;
-import org.freezedry.persistence.utils.tests.circle.A;
-import org.freezedry.persistence.utils.tests.circle.Aprime;
-import org.freezedry.persistence.utils.tests.circle.B;
-import org.freezedry.persistence.utils.tests.circle.D;
-import org.freezedry.persistence.utils.tests.circle.Econcrete;
-import org.freezedry.persistence.utils.tests.circle.Gconcrete;
+
+import java.lang.reflect.Field;
+import java.util.*;
 
 /**
  * Utilities used for common activities that require reflection
@@ -710,30 +691,30 @@ public class ReflectionUtils {
 
 	public static void main( String[] args ) throws NoSuchFieldException
 	{
-		DOMConfigurator.configure( "log4j.xml" );
-		
-		final List< Field > fields = getAllDeclaredFields( DoubleNodeBuilder.class );
-		for( Field field : fields )
-		{
-			System.out.println( field.getName() );
-		}
-		
-		System.out.println( getDeclaredField( BadPerson.class, "givenName" ) );
-		System.exit( 0 );
-
-		System.out.println( "List -> Collection: distance = " + calculateClassDistance( List.class, Collection.class, -1 ) );
-		System.out.println( "List -> Iterable: distance = " + calculateClassDistance( List.class, Iterable.class, -1 ) );
-		System.out.println( "RunnableScheduledFuture -> Comparable: distance = " + calculateClassDistance( RunnableScheduledFuture.class, Comparable.class, -1 ) );
-		System.out.println( "D -> A: distance = " + calculateClassDistance( D.class, A.class, -1 ) );
-		System.out.println( "D -> B: distance = " + calculateClassDistance( D.class, B.class, -1 ) );
-		System.out.println( "D -> Aprime: distance = " + calculateClassDistance( D.class, Aprime.class, -1 ) );
-		System.out.println( "Econcrete -> A: distance = " + calculateClassDistance( Econcrete.class, A.class, -1 ) );
-		System.out.println( "Econcrete -> B: distance = " + calculateClassDistance( Econcrete.class, B.class, -1 ) );
-		System.out.println( "Econcrete -> D: distance = " + calculateClassDistance( Econcrete.class, D.class, -1 ) );
-		System.out.println( "Econcrete -> Aprime: distance = " + calculateClassDistance( Econcrete.class, Aprime.class, -1 ) );
-		System.out.println( "Fconcrete -> A: distance = " + calculateClassDistance( Fconcrete.class, A.class, -1 ) );
-		System.out.println( "Econcrete -> Econcrete: distance = " + calculateClassDistance( Econcrete.class, Econcrete.class, -1 ) );
-		System.out.println( "Fconcrete -> Econcrete: distance = " + calculateClassDistance( Fconcrete.class, Econcrete.class, -1 ) );
-		System.out.println( "Gconcrete -> Econcrete: distance = " + calculateClassDistance( Gconcrete.class, Econcrete.class, -1 ) );
+//		DOMConfigurator.configure( "log4j.xml" );
+//
+//		final List< Field > fields = getAllDeclaredFields( DoubleNodeBuilder.class );
+//		for( Field field : fields )
+//		{
+//			System.out.println( field.getName() );
+//		}
+//
+//		System.out.println( getDeclaredField( BadPerson.class, "givenName" ) );
+//		System.exit( 0 );
+//
+//		System.out.println( "List -> Collection: distance = " + calculateClassDistance( List.class, Collection.class, -1 ) );
+//		System.out.println( "List -> Iterable: distance = " + calculateClassDistance( List.class, Iterable.class, -1 ) );
+//		System.out.println( "RunnableScheduledFuture -> Comparable: distance = " + calculateClassDistance( RunnableScheduledFuture.class, Comparable.class, -1 ) );
+//		System.out.println( "D -> A: distance = " + calculateClassDistance( D.class, A.class, -1 ) );
+//		System.out.println( "D -> B: distance = " + calculateClassDistance( D.class, B.class, -1 ) );
+//		System.out.println( "D -> Aprime: distance = " + calculateClassDistance( D.class, Aprime.class, -1 ) );
+//		System.out.println( "Econcrete -> A: distance = " + calculateClassDistance( Econcrete.class, A.class, -1 ) );
+//		System.out.println( "Econcrete -> B: distance = " + calculateClassDistance( Econcrete.class, B.class, -1 ) );
+//		System.out.println( "Econcrete -> D: distance = " + calculateClassDistance( Econcrete.class, D.class, -1 ) );
+//		System.out.println( "Econcrete -> Aprime: distance = " + calculateClassDistance( Econcrete.class, Aprime.class, -1 ) );
+//		System.out.println( "Fconcrete -> A: distance = " + calculateClassDistance( Fconcrete.class, A.class, -1 ) );
+//		System.out.println( "Econcrete -> Econcrete: distance = " + calculateClassDistance( Econcrete.class, Econcrete.class, -1 ) );
+//		System.out.println( "Fconcrete -> Econcrete: distance = " + calculateClassDistance( Fconcrete.class, Econcrete.class, -1 ) );
+//		System.out.println( "Gconcrete -> Econcrete: distance = " + calculateClassDistance( Gconcrete.class, Econcrete.class, -1 ) );
 	}
 }

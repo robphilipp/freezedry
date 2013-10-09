@@ -15,20 +15,16 @@
  */
 package org.freezedry.difference;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.xml.DOMConfigurator;
 import org.freezedry.persistence.PersistenceEngine;
 import org.freezedry.persistence.keyvalue.KeyValueBuilder;
 import org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer;
-import org.freezedry.persistence.tests.Division;
-import org.freezedry.persistence.tests.Person;
 import org.freezedry.persistence.tree.InfoNode;
-import org.freezedry.persistence.utils.DateUtils;
 import org.freezedry.persistence.writers.KeyValueMapWriter;
 
-import java.text.ParseException;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Calculates the difference between two object of the same type and lists the flattened properties that differ. Also
@@ -177,210 +173,6 @@ public class ObjectDifferenceCalculator {
 			builder.append( "Object: " ).append( object == null ? "[null]" : object.toString() ).append( "; " )
 					.append( "Reference Object: " ).append( referenceObject == null ? "[null]" : referenceObject.toString() );
 			return builder.toString();
-		}
-	}
-
-	public static void main( String...args ) throws ParseException
-	{
-		DOMConfigurator.configure( "log4j.xml" );
-		Logger.getRootLogger().setLevel( Level.WARN );
-
-		final Division division = new Division();
-		final Person johnny = new Person( "Hernandez", "Johnny", 13 );
-		johnny.addFriend( "Polly", "bird" );
-		johnny.addFriend( "Sparky", "dog" );
-		for( int i = 0; i < 10; ++i )
-		{
-			johnny.addMood( Math.sin( Math.PI / 4 * i ) );
-		}
-		Map< String, String > group = new LinkedHashMap<>();
-		group.put( "one", "ONE" );
-		group.put( "two", "TWO" );
-		group.put( "three", "THREE" );
-		johnny.addGroup( "numbers", group );
-
-		group = new LinkedHashMap<>();
-		group.put( "a", "AY" );
-		group.put( "b", "BEE" );
-		johnny.addGroup( "letters", group );
-
-		johnny.setBirthdate( DateUtils.createDateFromString( "1963-04-22", "yyyy-MM-dd" ) );
-
-		division.addPerson( johnny );
-
-		division.addPerson( new Person( "Prosky", "Julie", 15 ) );
-		division.addPerson( new Person( "Jones", "Janet", 13 ) );
-		division.addPerson( new Person( "Ghad", "Booda", 17 ) );
-
-		division.addMonth( "January", new HashSet<>( Arrays.asList( 1, 2, 3, 31 ) ) );
-		division.addMonth( "February", new HashSet<>( Arrays.asList( 1, 2, 3, 28 ) ) );
-		division.addMonth( "March", new HashSet<>( Arrays.asList( 1, 2, 3, 31 ) ) );
-		division.addMonth( "April", new HashSet<>( Arrays.asList( 1, 2, 3, 30 ) ) );
-
-		division.setCarNames( new String[] { "civic", "tsx", "accord" } );
-
-		int[][] arrayMatrix = { { 11, 12, 13 }, { 21, 22, 23 }, { 31, 32, 33 } };
-		division.setArrayMatrix( arrayMatrix );
-
-		List< List< Integer > > collectionMatrix = Arrays.asList(
-				Arrays.asList( 11, 12, 13 ),
-				Arrays.asList( 21, 22, 23 ),
-				Arrays.asList( 31, 32, 33 ) );
-		division.setCollectionMatrix( collectionMatrix );
-
-		List< Map< String, String > > listOfMaps = new ArrayList<>();
-		Map< String, String > map = new LinkedHashMap<>();
-		map.put( "color", "green" );
-		map.put( "size", "large" );
-		map.put( "condition", "used" );
-		listOfMaps.add( map );
-
-		map = new LinkedHashMap<>();
-		map.put( "color", "red" );
-		map.put( "size", "small" );
-		map.put( "condition", "new" );
-		listOfMaps.add( map );
-
-		map = new LinkedHashMap<>();
-		map.put( "color", "blue" );
-		map.put( "size", "medium" );
-		map.put( "condition", "good" );
-		listOfMaps.add( map );
-		division.setListOfMaps( listOfMaps );
-
-		Map< String, Person > personMap = new LinkedHashMap<>();
-		personMap.put( "funny", new Person( "Richard", "Pryor", 63 ) );
-		personMap.put( "sad", new Person( "Jenny", "Jones", 45 ) );
-		personMap.put( "pretty", new Person( "Ginder", "Mendez", 23 ) );
-		division.setPersonMap( personMap );
-
-
-
-		final Division division2 = new Division();
-		final Person johnny2 = new Person( "Hernandez", "Johnny", 13 );
-		johnny2.addFriend( "Sparky", "bird" );
-		johnny2.addFriend( "Polly", "dog" );
-		for( int i = 0; i < 10; ++i )
-		{
-			johnny2.addMood( Math.sin( Math.PI / 4 * i ) );
-		}
-		group = new LinkedHashMap<>();
-		group.put( "one", "ONE" );
-		group.put( "two", "TWO" );
-		group.put( "three", "THREE" );
-		johnny2.addGroup( "numbers", group );
-
-		group = new LinkedHashMap<>();
-		group.put( "a", "AY" );
-		group.put( "b", "BEE" );
-		johnny2.addGroup( "letters", group );
-
-		johnny2.setBirthdate( DateUtils.createDateFromString( "1963-04-22", "yyyy-MM-dd" ) );
-
-		division2.addPerson( johnny2 );
-
-		division2.addPerson( new Person( "Prosky", "Julie", 15 ) );
-		division2.addPerson( new Person( "Jones", "Janet", 13 ) );
-		division2.addPerson( new Person( "Ghad", "Booda", 17 ) );
-
-		division2.addMonth( "January", new HashSet<>( Arrays.asList( 1, 2, 3, 31 ) ) );
-		division2.addMonth( "February", new HashSet<>( Arrays.asList( 1, 2, 3, 28 ) ) );
-		division2.addMonth( "March", new HashSet<>( Arrays.asList( 1, 2, 3, 31 ) ) );
-		division2.addMonth( "April", new HashSet<>( Arrays.asList( 1, 2, 3, 30 ) ) );
-
-		division2.setCarNames( new String[] { "civic", "tsx", "accord" } );
-
-		int[][] arrayMatrix2 = { { 11, 12, 13 }, { 21, 22, 23 }, { 31, 32, 33 } };
-		division2.setArrayMatrix( arrayMatrix2 );
-
-		List< List< Integer > > collectionMatrix2 = Arrays.asList(
-				Arrays.asList( 11, 12, 13 ),
-				Arrays.asList( 21, 22, 23 ),
-				Arrays.asList( 31, 32, 33 ) );
-		division2.setCollectionMatrix( collectionMatrix2 );
-
-		List< Map< String, String > > listOfMaps2 = new ArrayList<>();
-		Map< String, String > map2 = new LinkedHashMap<>();
-		map2.put( "color", "green" );
-		map2.put( "size", "large" );
-		map2.put( "condition", "used" );
-		listOfMaps2.add( map2 );
-
-		map2 = new LinkedHashMap<>();
-		map2.put( "color", "red" );
-		map2.put( "size", "small" );
-		map2.put( "condition", "new" );
-		listOfMaps2.add( map2 );
-
-		map2 = new LinkedHashMap<>();
-		map2.put( "color", "blue" );
-		map2.put( "size", "medium" );
-		map2.put( "condition", "good" );
-		listOfMaps2.add( map2 );
-		division2.setListOfMaps( listOfMaps2 );
-
-		Map< String, Person > personMap2 = new LinkedHashMap<>();
-		personMap2.put( "funny", new Person( "Richard", "Pryor", 63 ) );
-		personMap2.put( "sad", new Person( "Jenny", "Jones", 45 ) );
-		personMap2.put( "pretty", new Person( "Ginder", "Mendez", 23 ) );
-		division2.setPersonMap( personMap2 );
-
-		//
-		System.out.println( "Complex Object" );
-		long start = System.currentTimeMillis();
-		final ObjectDifferenceCalculator diffCalc = new ObjectDifferenceCalculator( "." );
-		Map< String, Difference > difference = null;
-		long iters = 1_000;
-		for( int i = 0; i < iters; ++i )
-		{
-			difference = diffCalc.calculateDifference( division, division2 );
-		}
-		for( Map.Entry< String, Difference > entry : difference.entrySet() )
-		{
-			System.out.println( entry.getKey() + ": " + entry.getValue().toString() );
-		}
-		System.out.println( (double)( System.currentTimeMillis() - start ) / iters + " ms per comparison");
-
-		//
-		System.out.println( "Simple Object" );
-		Account account1 = new Account( 12345L, "firmABCD", "office123", "12345", "cash", "individual", "USD", "US", true, Calendar.getInstance().getTime() );
-		Account account2 = new Account( 12345L, "firmABC", "office123", "12345", "cash", "individual", "USD", "US", true, Calendar.getInstance().getTime() );
-		start = System.currentTimeMillis();
-		for( int i = 0; i < iters; ++i )
-		{
-			difference = diffCalc.calculateDifference( account1, account2 );
-		}
-		for( Map.Entry< String, Difference > entry : difference.entrySet() )
-		{
-			System.out.println( entry.getKey() + ": " + entry.getValue().toString() );
-		}
-		System.out.println( (double)( System.currentTimeMillis() - start ) / iters + " ms per comparison");
-	}
-
-	static class Account {
-		private Long accountId;
-		private String firmCode;
-		private String officeCode;
-		private String accountNumber;
-		private String accountType;
-		private String tradingType;
-		private String baseCurrency;
-		private String countryCode;
-		private Boolean accountActive;
-		private Date creationDate;
-
-		Account( Long accountId, String firmCode, String officeCode, String accountNumber, String accountType, String tradingType, String baseCurrency, String countryCode, Boolean accountActive, Date creationDate )
-		{
-			this.accountId = accountId;
-			this.firmCode = firmCode;
-			this.officeCode = officeCode;
-			this.accountNumber = accountNumber;
-			this.accountType = accountType;
-			this.tradingType = tradingType;
-			this.baseCurrency = baseCurrency;
-			this.countryCode = countryCode;
-			this.accountActive = accountActive;
-			this.creationDate = creationDate;
 		}
 	}
 }
