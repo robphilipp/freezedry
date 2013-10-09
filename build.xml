@@ -14,7 +14,7 @@
 	 -->
 	<property name="src" location="src/main/" />
     <property name="dependencies" location="/Users/rob/Documents/workspace/alm_system_libs" />
-	<property name="build" location="out/production/freezedry" />
+	<property name="build" location="target" />
 	<property name="dist" location="dist" />
 	<property name="release" location="FreezeDry_v${version}" />
 	<property name="libs" value="lib" />
