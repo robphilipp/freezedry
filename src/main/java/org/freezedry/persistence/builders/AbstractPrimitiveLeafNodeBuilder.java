@@ -46,7 +46,7 @@ public abstract class AbstractPrimitiveLeafNodeBuilder extends AbstractLeafNodeB
 	
 	/**
 	 * Copy constructor
-	 * @param builder
+	 * @param builder The {@link AbstractPrimitiveLeafNodeBuilder} to copy
 	 */
 	public AbstractPrimitiveLeafNodeBuilder( final AbstractPrimitiveLeafNodeBuilder builder )
 	{
@@ -64,11 +64,11 @@ public abstract class AbstractPrimitiveLeafNodeBuilder extends AbstractLeafNodeB
 		final Class< ? > clazz = object.getClass();
 		
 		// we must convert the object to the appropriate format
-		final InfoNode stringNode = InfoNode.createLeafNode( "value", object, "value", clazz );
+		final InfoNode primitiveNode = InfoNode.createLeafNode( "value", object, "value", clazz );
 
 		// create the root node and add the string rep of the date
 		final InfoNode node = InfoNode.createRootNode( persistName, clazz );
-		node.addChild( stringNode );
+		node.addChild( primitiveNode );
 		
 		// return the node
 		return node;

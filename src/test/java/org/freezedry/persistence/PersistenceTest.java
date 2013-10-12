@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.freezedry.persistence.tests;
+package org.freezedry.persistence;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -46,6 +46,10 @@ import org.apache.log4j.xml.DOMConfigurator;
 import org.freezedry.persistence.PersistenceEngine;
 import org.freezedry.persistence.readers.JsonReader;
 import org.freezedry.persistence.readers.XmlReader;
+import org.freezedry.persistence.tests.BadPerson;
+import org.freezedry.persistence.tests.Division;
+import org.freezedry.persistence.tests.MapMagic;
+import org.freezedry.persistence.tests.Person;
 import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.DateUtils;
 import org.freezedry.persistence.writers.JsonWriter;
@@ -59,7 +63,7 @@ import org.junit.Test;
  */
 public class PersistenceTest {
 
-	private static final String PATH = "src/org/freezedry/persistence/tests/";
+	private static final String PATH = "src/test/output/";
 	
 	private final PersistenceEngine engine;
 	

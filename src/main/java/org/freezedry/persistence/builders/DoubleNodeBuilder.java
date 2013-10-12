@@ -40,7 +40,7 @@ public class DoubleNodeBuilder extends AbstractPrimitiveLeafNodeBuilder {
 	
 	/**
 	 * Copy constructor
-	 * @param builder
+	 * @param builder The {@link DoubleNodeBuilder} to copy
 	 */
 	public DoubleNodeBuilder( final DoubleNodeBuilder builder )
 	{
@@ -70,14 +70,14 @@ public class DoubleNodeBuilder extends AbstractPrimitiveLeafNodeBuilder {
 		
 		// here it is a bit complicated. recall that this method is called for root nodes, and so
 		// value seems to jump between Double and String, and because "1.0" could be "1", also Integer
-		Double value = null;
+		Double value;
 		if( nodeValue instanceof Double )
 		{
 			value = (Double)nodeValue;
 		}
 		else if( nodeValue instanceof Integer )
 		{
-			value = Double.valueOf( (int)nodeValue );
+			value = (double) (int) nodeValue;
 		}
 		else
 		{

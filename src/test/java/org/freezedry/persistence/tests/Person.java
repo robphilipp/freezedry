@@ -30,7 +30,8 @@ import org.freezedry.persistence.utils.DateUtils;
 
 
 public class Person {
-	
+
+	@Persist( ignore = true )
 	private volatile int hashCode;
 
 //	@Persist( persistenceName = "FirstName" )

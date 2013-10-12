@@ -59,15 +59,24 @@ public class DoubleDecorator implements Decorator {
 	{
 		this.formatter = decorator.formatter;
 	}
+
+	/**
+	 * Sets the formatter for the {@link Double}. Overwrites the default formatter
+	 * @param formatter The {@link DecimalFormat} for formatting the decimal
+	 */
+	public void setFormatter( final DecimalFormat formatter )
+	{
+		this.formatter = formatter;
+	}
 	
 	/*
 	 * (non-Javadoc)
 	 * @see org.freezedry.persistence.keyvalue.renderers.decorators.Decorator#decorate(java.lang.Object)
 	 */
 	@Override
-	public String decorate( Object object )
+	public String decorate( final Object object )
 	{
-		return formatter.format( (Number)object );
+		return object.toString();
 	}
 
 	/*

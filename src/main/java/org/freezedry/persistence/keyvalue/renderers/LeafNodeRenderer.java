@@ -40,9 +40,9 @@ public class LeafNodeRenderer extends AbstractPersistenceRenderer {
 	 * @param decorators The mapping between the classes and their {@link Decorator}s. The {@link Decorator}s format the
 	 * strings, ints, doubles, etc. For example, by default, strings are surrounded by quotes.
 	 */
-	public LeafNodeRenderer( final KeyValueBuilder writer, final Map< Class< ? >, Decorator > decorators )
+	public LeafNodeRenderer( final KeyValueBuilder builder, final Map< Class< ? >, Decorator > decorators )
 	{
-		super( writer, decorators );
+		super( builder, decorators );
 	}
 	
 	/**
@@ -52,9 +52,9 @@ public class LeafNodeRenderer extends AbstractPersistenceRenderer {
 	 * this class' {@link #buildKeyValuePair(InfoNode, String, List, boolean)} as part of the recursive
 	 * algorithm to flatten the semantic model
 	 */
-	public LeafNodeRenderer( final KeyValueBuilder writer )
+	public LeafNodeRenderer( final KeyValueBuilder builder )
 	{
-		super( writer );
+		super( builder );
 	}
 	
 	/**

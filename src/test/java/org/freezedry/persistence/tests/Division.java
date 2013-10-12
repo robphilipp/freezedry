@@ -15,11 +15,7 @@
  */
 package org.freezedry.persistence.tests;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.freezedry.persistence.annotations.Persist;
 import org.freezedry.persistence.utils.Constants;
@@ -27,21 +23,21 @@ import org.freezedry.persistence.utils.Constants;
 
 public class Division {
 
-	@Persist( instantiateAs = ArrayList.class )
-	private List< Person > people;
-	
-	private Map< String, Set< Integer > > months;
-	
+	@Persist(instantiateAs = ArrayList.class)
+	private List<Person> people;
+
+	private Map<String, Set<Integer>> months;
+
 	private String[] carNames;
-	
+
 	private int[][] arrayMatrix;
-	
-	private List< List< Integer > > collectionMatrix;
-	
-	private Map< String, Person > personMap;
-	
-	private List< Map< String, String > > listOfMaps;
-		
+
+	private List<List<Integer>> collectionMatrix;
+
+	private Map<String, Person> personMap;
+
+	private List<Map<String, String>> listOfMaps;
+
 	public void addPerson( final Person person )
 	{
 		if( people == null )
@@ -62,8 +58,8 @@ public class Division {
 		}
 		return null;
 	}
-	
-	public void addMonth( final String name, final Set< Integer > days )
+
+	public void addMonth( final String name, final Set<Integer> days )
 	{
 		if( months == null )
 		{
@@ -71,32 +67,32 @@ public class Division {
 		}
 		months.put( name, days );
 	}
-	
+
 	public void setCarNames( final String[] names )
 	{
 		carNames = names;
 	}
-	
+
 	public void setArrayMatrix( final int[][] matrix )
 	{
 		this.arrayMatrix = matrix;
 	}
-	
-	public void setCollectionMatrix( final List< List< Integer > > matrix )
+
+	public void setCollectionMatrix( final List<List<Integer>> matrix )
 	{
 		this.collectionMatrix = matrix;
 	}
-	
-	public void setPersonMap( final Map< String, Person > map )
+
+	public void setPersonMap( final Map<String, Person> map )
 	{
 		this.personMap = map;
 	}
-	
-	public void setListOfMaps( final List< Map< String, String > > listOfMaps )
+
+	public void setListOfMaps( final List<Map<String, String>> listOfMaps )
 	{
 		this.listOfMaps = listOfMaps;
 	}
-	
+
 	public String toString()
 	{
 		final StringBuffer buffer = new StringBuffer();
@@ -111,7 +107,7 @@ public class Division {
 		if( months != null )
 		{
 			buffer.append( "months: " + Constants.NEW_LINE );
-			for( Map.Entry< String, Set< Integer > > entry : months.entrySet() )
+			for( Map.Entry<String, Set<Integer>> entry : months.entrySet() )
 			{
 				buffer.append( "  " + entry.toString() + Constants.NEW_LINE );
 			}
@@ -124,11 +120,11 @@ public class Division {
 				buffer.append( "  " + name + Constants.NEW_LINE );
 			}
 		}
-		
+
 		if( collectionMatrix != null )
 		{
 			buffer.append( "collectionMatrix: " + Constants.NEW_LINE );
-			for( List< Integer > row : collectionMatrix )
+			for( List<Integer> row : collectionMatrix )
 			{
 				for( int column : row )
 				{
@@ -150,24 +146,55 @@ public class Division {
 				buffer.append( Constants.NEW_LINE );
 			}
 		}
-		
+
 		if( personMap != null )
 		{
 			buffer.append( "personMap: " + Constants.NEW_LINE );
-			for( Map.Entry< String, Person > entry : personMap.entrySet() )
+			for( Map.Entry<String, Person> entry : personMap.entrySet() )
 			{
 				buffer.append( "  " + entry.getKey() + ": " + entry.getValue() + Constants.NEW_LINE );
 			}
 		}
-		
+
 		if( listOfMaps != null )
 		{
 			buffer.append( "listOfMaps: " + Constants.NEW_LINE );
-			for( Map< String, String > map : listOfMaps )
+			for( Map<String, String> map : listOfMaps )
 			{
 				buffer.append( "  Map " + listOfMaps.indexOf( map ) + ": " + map.toString() + Constants.NEW_LINE );
 			}
 		}
 		return buffer.toString();
+	}
+
+	@Override
+	public boolean equals( Object o )
+	{
+		if( this == o ) return true;
+		if( o == null || getClass() != o.getClass() ) return false;
+
+		Division division = (Division) o;
+
+		if( !Arrays.equals( carNames, division.carNames ) ) return false;
+		if( collectionMatrix != null ? !collectionMatrix.equals( division.collectionMatrix ) : division.collectionMatrix != null )
+			return false;
+		if( listOfMaps != null ? !listOfMaps.equals( division.listOfMaps ) : division.listOfMaps != null ) return false;
+		if( months != null ? !months.equals( division.months ) : division.months != null ) return false;
+		if( people != null ? !people.equals( division.people ) : division.people != null ) return false;
+		if( personMap != null ? !personMap.equals( division.personMap ) : division.personMap != null ) return false;
+
+		return true;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		int result = people != null ? people.hashCode() : 0;
+		result = 31 * result + (months != null ? months.hashCode() : 0);
+		result = 31 * result + (carNames != null ? Arrays.hashCode( carNames ) : 0);
+		result = 31 * result + (collectionMatrix != null ? collectionMatrix.hashCode() : 0);
+		result = 31 * result + (personMap != null ? personMap.hashCode() : 0);
+		result = 31 * result + (listOfMaps != null ? listOfMaps.hashCode() : 0);
+		return result;
 	}
 }
