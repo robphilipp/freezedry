@@ -15,65 +15,86 @@
  */
 package org.freezedry.persistence.utils;
 
-import org.apache.log4j.xml.DOMConfigurator;
+import junit.framework.Assert;
 import org.freezedry.persistence.builders.DoubleNodeBuilder;
 import org.freezedry.persistence.tests.BadPerson;
+import org.freezedry.persistence.tests.Fconcrete;
+import org.freezedry.persistence.tests.circle.*;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.RunnableScheduledFuture;
 
 /**
- *
+ * Class hierarchy for the tests
+ *            A
+ *           /|\
+ *          B | \
+ *          |/ | \
+ *          C /  Aprime
+ *          |/
+ *          D
+ *          |
+ *          Econcrete
+ *          |     \
+ *          |      \
+ *          |   A   \
+ *          |  / \  |
+ *          | / Fconcrete
+ *          |/
+ *          Gconcrete
  */
 public class ReflectionUtilsTest {
+
 	@Before
 	public void setUp() throws Exception
 	{
-		DOMConfigurator.configure( "log4j.xml" );
-
-		final List< Field > fields = ReflectionUtils.getAllDeclaredFields( DoubleNodeBuilder.class );
-		for( Field field : fields )
-		{
-			System.out.println( field.getName() );
-		}
-
-		System.out.println( ReflectionUtils.getDeclaredField( BadPerson.class, "givenName" ) );
-		System.exit( 0 );
-
-//		System.out.println( "List -> Collection: distance = " + ReflectionUtils.calculateClassDistance( List.class, Collection.class, -1 ) );
-//		System.out.println( "List -> Iterable: distance = " + ReflectionUtils.calculateClassDistance( List.class, Iterable.class, -1 ) );
-//		System.out.println( "RunnableScheduledFuture -> Comparable: distance = " + ReflectionUtils.calculateClassDistance( RunnableScheduledFuture.class, Comparable.class, -1 ) );
-//		System.out.println( "D -> A: distance = " + ReflectionUtils.calculateClassDistance( D.class, A.class, -1 ) );
-//		System.out.println( "D -> B: distance = " + ReflectionUtils.calculateClassDistance( D.class, B.class, -1 ) );
-//		System.out.println( "D -> Aprime: distance = " + ReflectionUtils.calculateClassDistance( D.class, Aprime.class, -1 ) );
-//		System.out.println( "Econcrete -> A: distance = " + ReflectionUtils.calculateClassDistance( Econcrete.class, A.class, -1 ) );
-//		System.out.println( "Econcrete -> B: distance = " + ReflectionUtils.calculateClassDistance( Econcrete.class, B.class, -1 ) );
-//		System.out.println( "Econcrete -> D: distance = " + ReflectionUtils.calculateClassDistance( Econcrete.class, D.class, -1 ) );
-//		System.out.println( "Econcrete -> Aprime: distance = " + ReflectionUtils.calculateClassDistance( Econcrete.class, Aprime.class, -1 ) );
-//		System.out.println( "Fconcrete -> A: distance = " + ReflectionUtils.calculateClassDistance( Fconcrete.class, A.class, -1 ) );
-//		System.out.println( "Econcrete -> Econcrete: distance = " + ReflectionUtils.calculateClassDistance( Econcrete.class, Econcrete.class, -1 ) );
-//		System.out.println( "Fconcrete -> Econcrete: distance = " + ReflectionUtils.calculateClassDistance( Fconcrete.class, Econcrete.class, -1 ) );
-//		System.out.println( "Gconcrete -> Econcrete: distance = " + ReflectionUtils.calculateClassDistance( Gconcrete.class, Econcrete.class, -1 ) );
+//		DOMConfigurator.configure( "log4j.xml" );
+//		Logger.getRootLogger().setLevel( Level.ERROR );
 	}
 
 	@Test
 	public void testIsClassOrSuperclass() throws Exception
 	{
-
+		Assert.assertTrue( ReflectionUtils.isClassOrSuperclass( A.class, A.class ) );
+		Assert.assertTrue( ReflectionUtils.isClassOrSuperclass( A.class, B.class ) );
+		Assert.assertTrue( ReflectionUtils.isClassOrSuperclass( A.class, Gconcrete.class ) );
+		Assert.assertTrue( ReflectionUtils.isClassOrSuperclass( Gconcrete.class, Gconcrete.class ) );
+		Assert.assertFalse( ReflectionUtils.isClassOrSuperclass( Gconcrete.class, Fconcrete.class ) );
+		Assert.assertFalse( ReflectionUtils.isClassOrSuperclass( Aprime.class, Fconcrete.class ) );
 	}
 
 	@Test
 	public void testIsSuperclass() throws Exception
 	{
-
+		Assert.assertFalse( ReflectionUtils.isSuperclass( A.class, A.class ) );
+		Assert.assertTrue( ReflectionUtils.isSuperclass( A.class, B.class ) );
+		Assert.assertTrue( ReflectionUtils.isSuperclass( A.class, Gconcrete.class ) );
+		Assert.assertFalse( ReflectionUtils.isSuperclass( Gconcrete.class, Gconcrete.class ) );
+		Assert.assertFalse( ReflectionUtils.isSuperclass( Gconcrete.class, Fconcrete.class ) );
+		Assert.assertFalse( ReflectionUtils.isSuperclass( Aprime.class, Fconcrete.class ) );
 	}
 
 	@Test
 	public void testCalculateClassDistance() throws Exception
 	{
-
+		Assert.assertEquals( 1, ReflectionUtils.calculateClassDistance( List.class, Collection.class, -1 ) );
+		Assert.assertEquals( 2, ReflectionUtils.calculateClassDistance( List.class, Iterable.class, -1 ) );
+		Assert.assertEquals( 3, ReflectionUtils.calculateClassDistance( RunnableScheduledFuture.class, Comparable.class, -1 ) );
+		Assert.assertEquals( 3,ReflectionUtils.calculateClassDistance( D.class, A.class, -1 ) );
+		Assert.assertEquals( 2, ReflectionUtils.calculateClassDistance( D.class, B.class, -1 ) );
+		Assert.assertEquals( -1, ReflectionUtils.calculateClassDistance( D.class, Aprime.class, -1 ) );
+		Assert.assertEquals( 4, ReflectionUtils.calculateClassDistance( Econcrete.class, A.class, -1 ) );
+		Assert.assertEquals( 3, ReflectionUtils.calculateClassDistance( Econcrete.class, B.class, -1 ) );
+		Assert.assertEquals( 1, ReflectionUtils.calculateClassDistance( Econcrete.class, D.class, -1 ) );
+		Assert.assertEquals( -1, ReflectionUtils.calculateClassDistance( Econcrete.class, Aprime.class, -1 ) );
+		Assert.assertEquals( 5, ReflectionUtils.calculateClassDistance( Fconcrete.class, A.class, -1 ) );
+		Assert.assertEquals( 0, ReflectionUtils.calculateClassDistance( Econcrete.class, Econcrete.class, -1 ) );
+		Assert.assertEquals( 1, ReflectionUtils.calculateClassDistance( Fconcrete.class, Econcrete.class, -1 ) );
+		Assert.assertEquals( 1, ReflectionUtils.calculateClassDistance( Gconcrete.class, Econcrete.class, -1 ) );
 	}
 
 	@Test

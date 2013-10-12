@@ -13,13 +13,6 @@ import org.junit.Test;
 import java.text.ParseException;
 import java.util.*;
 
-/**
- * Created with IntelliJ IDEA.
- * User: rob
- * Date: 10/7/13
- * Time: 8:41 PM
- * To change this template use File | Settings | File Templates.
- */
 public class ObjectDifferenceCalculatorTest {
 
 	private Division division1;
@@ -28,6 +21,9 @@ public class ObjectDifferenceCalculatorTest {
 	@Before
 	public void init()
 	{
+		DOMConfigurator.configure( "log4j.xml" );
+		Logger.getRootLogger().setLevel( Level.ERROR );
+
 		try
 		{
 			division1 = createDivisionOne();

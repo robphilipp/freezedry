@@ -15,6 +15,8 @@
  */
 package org.freezedry.persistence;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.freezedry.persistence.tests.Division;
 import org.freezedry.persistence.tests.Person;
@@ -40,6 +42,7 @@ public class AbstractPersistenceTest {
 		try
 		{
 			DOMConfigurator.configure( "log4j.xml" );
+			Logger.getRootLogger().setLevel( Level.ERROR );
 
 			// create the object to persist
 			division = new Division();

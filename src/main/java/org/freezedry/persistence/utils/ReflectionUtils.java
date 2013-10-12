@@ -116,7 +116,7 @@ public class ReflectionUtils {
 	 * hierarchy of the target class
 	 * @see #calculateClassDistance(Class, Class, int)
 	 */
-	private static int calculateClassDistance( final Class< ? > clazz, final Class< ? > targetClass, final int level )
+	static int calculateClassDistance( final Class<?> clazz, final Class<?> targetClass, final int level )
 	{
 		// there are 3 possible cases we have to look at:
 		// 1. both the clazz and the target class are interfaces

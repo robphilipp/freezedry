@@ -13,8 +13,8 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.freezedry.persistence.utils.tests.circle;
+package org.freezedry.persistence.tests.circle;
 
-public interface D extends C, A {
+public class Gconcrete extends Econcrete implements A {
 
 }

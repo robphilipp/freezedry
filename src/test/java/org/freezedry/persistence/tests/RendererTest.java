@@ -1,4 +1,4 @@
-package org.freezedry.persistence.keyvalue.renderers.tests;
+package org.freezedry.persistence.tests;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
