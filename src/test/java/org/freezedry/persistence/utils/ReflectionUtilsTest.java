@@ -19,6 +19,7 @@ import junit.framework.Assert;
 import org.freezedry.persistence.builders.DoubleNodeBuilder;
 import org.freezedry.persistence.tests.BadPerson;
 import org.freezedry.persistence.tests.Fconcrete;
+import org.freezedry.persistence.tests.MapMagic;
 import org.freezedry.persistence.tests.circle.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -100,7 +101,8 @@ public class ReflectionUtilsTest {
 	@Test
 	public void testGetPersistenceName() throws Exception
 	{
-
+		Assert.assertEquals( "otherMap", ReflectionUtils.getPersistenceName( MapMagic.class, "mapTwo" ) );
+		Assert.assertEquals( "mapOne", ReflectionUtils.getPersistenceName( MapMagic.class, "mapOne" ) );
 	}
 
 	@Test

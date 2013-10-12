@@ -299,7 +299,7 @@ public class ReflectionUtils {
 	 */
 	public static String getPersistenceName( final Class< ? > clazz, final String fieldName )
 	{
-		String persistName = null; 
+		String persistName;
 		try
 		{
 			// try for the field, if it isn't there it'll throw an exception.
