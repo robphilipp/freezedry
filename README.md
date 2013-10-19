@@ -78,6 +78,7 @@ engine. Mostly this work was done for the Diffusive project.
    PersistenceBuilder for the reader then used a different mapping, in some cases 
    causing errors. This was a disconnect. Renamed the method, and now the user must 
    explicitly set both (until I can find a better solution).
+
 -----------------------------------------------------------------------------------
    Changes from version 0.1.0 to version 0.2.0
 -----------------------------------------------------------------------------------
