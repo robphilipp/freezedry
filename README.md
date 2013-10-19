@@ -6,7 +6,7 @@ Java persistence framework: no need for binding files, no-arg constructors, or a
 -----------------------------------------------------------------------------------
    Website Has Documentation
 -----------------------------------------------------------------------------------
-Please see the Website (http://freezedried.sourceforge.net) for documentation.
+Please see the Website (http://robphilipp.github.io/freezedry) for documentation.
 
 1. The "Overview Guide" page describes the framework and its usage.
 2. The "Quick Start" page describes the various files, which ones to use, how 
@@ -78,6 +78,7 @@ engine. Mostly this work was done for the Diffusive project.
    PersistenceBuilder for the reader then used a different mapping, in some cases 
    causing errors. This was a disconnect. Renamed the method, and now the user must 
    explicitly set both (until I can find a better solution).
+
 -----------------------------------------------------------------------------------
    Changes from version 0.1.0 to version 0.2.0
 -----------------------------------------------------------------------------------
