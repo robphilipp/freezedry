@@ -45,7 +45,8 @@
     </developers>
 
     <scm>
-        <url>https://github.com/robphilipp/freezedry.git</url>
+        <url>http://github.com/robphilipp/freezedry</url>
+        <connection>https://github.com/robphilipp/freezedry.git</connection>
     </scm>
 
     <build>
