@@ -8,11 +8,45 @@
     <packaging>jar</packaging>
 
     <name>freezedry</name>
-    <url>http://maven.apache.org</url>
+    <url>http://robphilipp.github.io/freezedry/</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+            <comments>Use as you wish. Contribute as you wish. Karma.</comments>
+        </license>
+    </licenses>
+
+    <organization>
+        <name>closure, llc</name>
+        <url>http://www.closure-sys.com</url>
+    </organization>
+
+    <developers>
+        <developer>
+            <id>rob.philipp</id>
+            <name>Rob Philipp</name>
+            <email>rob.philipp@closure-sys.com</email>
+            <url>http://www.closure-sys.com</url>
+            <organization>closure, llc</organization>
+            <organizationUrl>http://www.closure-sys.com</organizationUrl>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+            </roles>
+            <timezone>-4</timezone>
+        </developer>
+    </developers>
+
+    <scm>
+        <url>https://github.com/robphilipp/freezedry.git</url>
+    </scm>
 
     <build>
         <resources>
@@ -39,6 +73,38 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <!--To sign the artifact for deploying to maven central, use release:perform or build using: -->
+        <!--  mvn -P release-sign-artifacts clean install-->
+        <profile>
+            <id>release-sign-artifacts</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <dependencies>
         <dependency>
