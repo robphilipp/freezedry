@@ -250,7 +250,7 @@
                 manages the <b class="class">PersistenceEngine</b>, and then there is an <b class="class">AbstractFileBasedPersistence</b>
                 class which defines and implements a <b>read</b> and <b>write</b> method for file-based actions.</p>
 
-            <table>
+            <table class="table">
                 <tr><th>Class</th><th>Description</th></tr>
                 <tr><td><b class="class">Persistence</b></td><td>The interface defining what a <b class="class">Persistence</b> class must provide</td></tr>
                 <tr><td><b class="class">AbstractPersistence</b></td><td>Manages the <b class="class">PersistenceEngine</b></td></tr>
@@ -266,7 +266,7 @@
                 In addition, each of the concrete <b class="class">Persistence</b> implementation provide customization that would
                 typically be needed for dealing with that specified persistence form.</p>
 
-            <table>
+            <table class="table">
                 <tr><th>Class</th><th>Customization</th></tr>
                 <tr><td><b class="class">XmlPersistence</b></td><td><b>setDisplayTypeInfo(boolean)</b> allows user to specify
                     that the type info should be added to the XML elements as attributes.</td></tr>
@@ -375,7 +375,7 @@
             <p>Let's take a look at what information an <b class="class">InfoNode</b> holds, aside from knowing
                 about its parent and its children.</p>
 
-            <table>
+            <table class="table">
                 <tr><th>Field</th><th>Type</th><th>Description</th></tr>
                 <tr><td>nodeType</td><td><b class="class">NodeType</b></td><td>enum: node is a ROOT, COMPOUND, or LEAF</td></tr>
                 <tr><td>fieldName</td><td><b class="class">String</b></td><td>the name of the object's field this node represents</td></tr>
@@ -551,7 +551,7 @@
 
             <p><b>FreezeDry</b> currently provides three <b class="class">PersistenceReaders</b> and three <b class="class">PersistenceWriters</b>.</p>
 
-            <table>
+            <table class="table">
                 <tr><th>Name</th><th>Persisted Form</th><th>Description</th></tr>
                 <tr><td><b class="class">XmlReader</b></td><td>XML</td><td>reads from XML sources and produces a semantic model</td></tr>
                 <tr><td><b class="class">XmlWriter</b></td><td>XML</td><td>writes an object to an XML persisted form</td></tr>
@@ -623,7 +623,7 @@
                 The values in this example are simple. The keys may appear a bit complex. Notice that each key is
                 composed of elements, which are separated by a ".".</p>
 
-            <table>
+            <table class="table">
                 <tr><th>Separator Name</th><th>Description</th></tr>
                 <tr><td>Key Separator</td><td>Separates the elements of the key</td></tr>
                 <tr><td>Key-Value Separator</td><td>Separates the key from the value</td></tr>
@@ -654,7 +654,7 @@
                 true if the key-string passed to it matches the format of something that it renderers.
                 <b>FreezeDry</b> provides the following renderers:</p>
 
-            <table>
+            <table class="table">
                 <tr><th>Name</th><th>Description</th></tr>
                 <tr><td><b class="class">PersistenceRenderer</b></td><td>Interface defining what a persistence renderer must have</td></tr>
                 <tr><td><b class="class">AbstractPersistenceRenderer</b></td><td>Manages the *KeyValueBuilder* and the mapping between the types and the *Decorator*s. Also provides some come utilities needed by the renderers.</td></tr>
@@ -674,7 +674,7 @@
 
             <p><b>FreezeDry</b> provides the following out of the box:</p>
 
-            <table>
+            <table class="table">
                 <tr><th>Name</th><th>Description</th></tr>
                 <tr>
                     <td><b class="class">Decorator</b></td>
@@ -777,7 +777,7 @@
 
             <p>The following custom annotations are already available within <b>FreezeDry</b>.</p>
 
-            <table>
+            <table class="table">
                 <tr><th>Annotation</th><th>NodeBuilder</th><th>Customizations</th></tr>
                 <tr><td>PeristCollection</td><td><b class="class">CollectionNodeBuilder</b></td><td>elementPersistName, elementType</td></tr>
                 <tr><td>PersistMap</td><td><b class="class">MapNodeBuilder</b></td><td>entryPersistName, keyPersistName, keyType, valuePersistName, valueType</td></tr>
