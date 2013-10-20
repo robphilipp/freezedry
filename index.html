@@ -1,96 +1,155 @@
 <!DOCTYPE html>
 <html lang=en>
 <head>
-	<meta charset=utf-8>
-	<link rel="stylesheet" type="text/css" href="freezedry.css"/>
+    <meta charset=utf-8>
 
-	<!-- Code Syntax Highlighting -->
-	<script type="text/javascript" src="scripts/syntax_highlight/shCore.js"></script>
-	<script type="text/javascript" src="scripts/syntax_highlight/shBrushJava.js"></script>
-	<script type="text/javascript" src="scripts/syntax_highlight/shBrushXml.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="FreezeDry programming highlights">
+    <meta name="author" content="Robert Philipp">
 
-    <script src="scripts/toc-creator.js"></script>
-    <script src="scripts/sizing.js"></script>
+    <link rel="stylesheet" type="text/css" href="themes/jquery-ui-1.9.2.custom.css">
 
-    <script src="scripts/jquery-1.8.2.js"></script>
+    <link rel="stylesheet" type="text/css" href="scripts/syntax_highlight/shCore.css" />
+    <link rel="stylesheet" type="text/css" href="scripts/syntax_highlight/shThemeEclipse.css" />
+
+    <!-- Le styles -->
+    <link href="scripts/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+        body {
+            position: relative;
+            padding-top: 81px;
+            padding-bottom: 20px;
+        }
+        div.sidebar-nav {
+            background: white;
+            border: none;
+            padding: 5px 0;
+        }
+        ul.header-nav-bar {
+            padding-left: 5px;
+            padding-top: 35px;
+        }
+    </style>
+    <link href="scripts/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="freezedry.css"/>
+
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <script src="scripts/jquery-1.8.3.js"></script>
+    <script src="scripts/ui/jquery-ui-1.9.2.custom.js"></script>
+
+    <!-- Code Syntax Highlighting -->
+    <script src="scripts/syntax_highlight/shCore.js"></script>
+    <script src="scripts/syntax_highlight/shBrushJava.js"></script>
+
+    <!-- Twitter bootstrap -->
+    <script src="scripts/bootstrap/js/bootstrap.js"></script>
+
+    <!--<script src="scripts/toc-creator.js"></script>-->
+    <script src="scripts/scroll-adjust.js"></script>
+    <script src="scripts/setup.js"></script>
     <script>
-        var tocBounds = { minWidth: 100, maxWidth: 225, minHeight: 400, maxHeight: 400 };
-        var articleBounds = { minWidth: 100, maxWidth: 775, minHeight: 400, maxHeight: 1000 };
         $(document).ready( function() {
 
-            // syntax highlighting for the code
-            SyntaxHighlighter.defaults['gutter'] = false;
-            SyntaxHighlighter.defaults['toolbar'] = false;
-            SyntaxHighlighter.all();
+            $(function() {
+                $( "#accordion" ).accordion( {
+                    autoHeight: false,
+                    header: "h3",
+                    collapsible: true,
+                    active: false
+                } );
+                $( "#whats-new-accordion" ).accordion( { autoHeight: false } );
+            });
 
-            // adjust the article window size
-            adjustSizes( tocBounds, articleBounds );
-        } );
-
-        window.onresize = function() {
-            adjustSizes( tocBounds, articleBounds );
-        };
-
+            setup();
+        }, false );
     </script>
-
-	<link rel="stylesheet" type="text/css" href="scripts/syntax_highlight/shCore.css" />
-	<link rel="stylesheet" type="text/css" href="scripts/syntax_highlight/shThemeEclipse.css" />
 
 	<title>FreezeDry</title>
 </head>
 
 <body>
 
-<header>
-	<img src="images/web_banner.png">
-</header>
-
-<nav>
-	<a href="overview_guide.html">Overview</a>
-	<a href="quick_start.html">Quick Start</a>
-	<a href="javadocs/index.html" target="tab">Java Docs</a>
-	<a href="https://github.com/robphilipp/freezedry" target="tab">Code (git)</a>
-	<a href="https://sourceforge.net/projects/freezedried/files/" target="tab">Downloads</a>
-	<a href="https://github.com/robphilipp/freezedry/wiki" target="tab">Wiki</a>
-	<a href="https://github.com/robphilipp/freezedry/issues" target="tab">Issues</a>
-	<!--<a href="https://sourceforge.net/p/freezedried/discussion/" target="tab">Discussion</a>-->
+<nav class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container-fluid">
+            <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="brand" href="#"><img src="images/web_banner.png"></a>
+            <div class="nav-collapse collapse">
+                <ul class="nav header-nav-bar">
+                    <li><a href="overview_guide.html">Overview</a></li>
+                    <li><a href="quick_start.html">Quick Start</a></li>
+                    <li><a href="javadoc/index.html" target="tab">Java Docs</a></li>
+                    <li><a href="https://github.com/robphilipp/freezedry" target="tab">Code (git)</a></li>
+                    <!--<li><a href="downloads.html" target="tab">Downloads</a></li>-->
+                    <li><a href="https://sourceforge.net/projects/freezedried/files/" target="tab">Downloads</a></li>
+                    <li><a href="https://github.com/robphilipp/freezedry/wiki" target="tab">Wiki</a></li>
+                    <li><a href="https://github.com/robphilipp/freezedry/issues" target="tab">Tickets</a></li>
+                    <!--<li><a href="resume.html" target="tab">About</a></li>-->
+                </ul>
+            </div><!--/.nav-collapse -->
+        </div>
+    </div>
 </nav>
 
-<article>
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="span3">
+            <!--<div class="well sidebar-nav">-->
+                <!--&lt;!&ndash; toc-creator will add the list of contents here &ndash;&gt;-->
+            <!--</div>-->
+        </div>
+        <div class="span9">
+            <h2 id="goals" class="no-show"><a href="#goals" class="scroll-offset">FreezeDry</a></h2>
+            <p><b>FreezeDry</b> provides an easy mechanism for converting Java objects into a persisted form such as XML,
+                JSON, or lists of key-value pairs. And then incredibly, from that persisted form, back into a Java object.</p>
 
-<p><b>FreezeDry</b> provides an easy mechanism for converting Java objects into a persisted form such as XML, 
-JSON, or lists of key-value pairs. And then incredibly, from that persisted form, back into a Java object.</p>
+            <p class="image">
+                <img src="images/architecture_overview.png" title="FreezeDry Architecture Overview"/>
+            </p>
 
-<p class="image">
-<img src="images/architecture_overview.png" title="FreezeDry Architecture Overview"/>
-</p>
+            <p>"Ok" you smile to yourself, "Yet <em>another</em> persistence framework. Why should I care? I'll just go
+                back to drinking my beer!"</p>
 
-<p>"Ok" you smile to yourself, "Yet <em>another</em> persistence framework. Why should I care? I'll just go
-back to drinking my beer!"</p>  
+            <p>Well now. FreezeDry is really simple to use, right out of the box. Look. Here's how simple it is to persist an object to XML:</p>
 
-<p>Well now. FreezeDry is really simple to use, right out of the box. Look. Here's how simple it is to persist an object to XML:</p>
+            <pre class="brush: java">
+                new XmlPersistence().write( division, "person.xml" );
+            </pre>
 
-<pre class="brush: java">
-    new XmlPersistence().write( division, "person.xml" );
-</pre>
+            <p>And then to reconstitute the object from XML:</p>
 
-<p>And then to reconstitute the object from XML:</p>
+            <pre class="brush: java">
+                Division division = new XmlPersistence().read( Division.class, "person.xml" );
+            </pre>
 
-<pre class="brush: java">
-    Division division = new XmlPersistence().read( Division.class, "person.xml" );
-</pre>
+            <p>FreezeDry provides a few interesting and useful features. And, of course it isn't for everyone.
+                Nope. It's not. But the thing works right out of the box. If you need to persist an object and you don't care
+                too much how the XML, JSON, or key-values are formed, then you can persist the object in one line of code. And
+                load it back with another line of code. That's it. It's just that simple. And if you need to customize the way
+                the object is persisted, you can do that too. But instead of dealing with tedious XML binding files, you can
+                make simple customizations with annotations, and more complex customizations through extension to the code. I mean,
+                you are a developer, right, not a config file junkie. So FreezeDry let's you do what you love: write code!</p>
 
-<p>FreezeDry provides a few interesting and useful features. And, of course it isn't for everyone.
-Nope. It's not. But the thing works right out of the box. If you need to persist an object and you don't care
-too much how the XML, JSON, or key-values are formed, then you can persist the object in one line of code. And
-load it back with another line of code. That's it. It's just that simple. And if you need to customize the way
-the object is persisted, you can do that too. But instead of dealing with tedious XML binding files, you can
-make simple customizations with annotations, and more complex customizations through extension to the code. I mean,
-you are a developer, right, not a config file junkie. So FreezeDry let's you do what you love: write code!</p>
+            <p>To learn more about <b>FreezeDry</b>, its structure, how to modify the way objects are persisted, and what
+                comes with the current version, please see the <a href="overview_guide.html">[Overview]</a></p>
+        </div>
+    </div>
+</div>
+</div>
 
-<p>To learn more about <b>FreezeDry</b>, its structure, how to modify the way objects are persisted, and what
-comes with the current version, please see the <a href="overview_guide.html">[Overview]</a></p>
-</article>
+<footer>
+    <p>&copy; Robert Philipp 2012</p>
+</footer>
+
+<!--</article>-->
 
 </body>
 

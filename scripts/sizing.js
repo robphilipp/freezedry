@@ -97,7 +97,6 @@ function adjustSizes( tocBounds, articleBounds, minWidth )
 {
     var toc = window.document.getElementById( 'toc' );
     var article = window.document.getElementsByTagName( 'article' )[ 0 ];
-    var header = window.document.getElementsByTagName( 'header' )[ 0 ];
 
     // grab the size of the view port
     var viewPort = getViewPortSize( window );
@@ -112,7 +111,6 @@ function adjustSizes( tocBounds, articleBounds, minWidth )
             sheets[ i ].disabled = true;
         }
         if( article ) article.clientWidth = minWidth;
-        if( header ) header.clientWidth = minWidth;
     }
     else
     {
@@ -123,12 +121,11 @@ function adjustSizes( tocBounds, articleBounds, minWidth )
             var loadCssLink = document.createElement( 'link' );
             loadCssLink.setAttribute( 'rel', 'stylesheet' );
             loadCssLink.setAttribute( 'type', 'text/css' );
-            loadCssLink.setAttribute( 'href', 'freezedry.css' );
+            loadCssLink.setAttribute( 'href', 'diffusive.css' );
             document.getElementsByTagName( "head" )[ 0 ].appendChild( loadCssLink );
         }
         // set the size of the TOC and article contents
         if( toc ) setElementSize( toc, tocBounds, 30, window );
         if( article ) setElementSize( article, articleBounds, 40, window );
     }
-    if( header ) header.style.width = article.clientWidth + "px";
 }
