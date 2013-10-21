@@ -2,10 +2,6 @@ header, nav, footer, article {
     display:block;
 }
 
-/*body {*/
-/*background-color: #151515;*/
-/*}*/
-
 footer {
     text-align: center;
     padding: 10px;
@@ -32,6 +28,7 @@ dt code {
 p.image, #image
 {
     padding: 10px 10px 10px 10px;
+    /*background-color: #839496;*/
 }
 
 p.key-point {
@@ -52,13 +49,13 @@ p.download {
 
 b.class
 {
-    color: #0F4DA8;
+    color: #93a1a1;
     font-family: monospace;
 }
 
 b.tt
 {
-    color: #585858;
+    color: #93a1a1;
     font-family: monospace;
 }
 
@@ -111,32 +108,6 @@ b.tt
     -moz-box-shadow: inset 1px 0 0 rgba(0,0,0,.1), inset -1px 0 0 rgba(0,0,0,.1);
     box-shadow: inset 1px 0 0 rgba(0,0,0,.1), inset -1px 0 0 rgba(0,0,0,.1);
 }
-/*Chevrons*/
-/*.sidebar-nav .icon-chevron-right {*/
-/*float: right;*/
-/*margin-top: 2px;*/
-/*margin-right: -6px;*/
-/*opacity: .25;*/
-/*}*/
-/*.sidebar-nav > li > a:hover {*/
-/*background-color: #f5f5f5;*/
-/*}*/
-/*.sidebar-nav a:hover .icon-chevron-right {*/
-/*opacity: .5;*/
-/*}*/
-/*.sidebar-nav .active .icon-chevron-right,*/
-/*.sidebar-nav .active a:hover .icon-chevron-right {*/
-/*background-image: url(scripts/bootstrap/img/glyphicons-halflings-white.png);*/
-/*opacity: 1;*/
-/*}*/
-/*.sidebar-nav.affix {*/
-/*top: 40px;*/
-/*}*/
-/*.sidebar-nav.affix-bottom {*/
-/*position: absolute;*/
-/*top: auto;*/
-/*bottom: 270px;*/
-/*}*/
 
 /* desktop: large */
 @media (min-width: 1200px) {
