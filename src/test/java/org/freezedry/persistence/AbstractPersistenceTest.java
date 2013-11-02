@@ -20,9 +20,12 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.freezedry.persistence.tests.Division;
 import org.freezedry.persistence.tests.Person;
+import org.freezedry.persistence.utils.Constants;
 import org.freezedry.persistence.utils.DateUtils;
 import org.junit.Before;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -33,6 +36,8 @@ import java.util.*;
  */
 public class AbstractPersistenceTest {
 
+	private static final Logger LOGGER = Logger.getLogger( AbstractPersistenceTest.class );
+
 	protected final static String OUTPUT_DIR = "src/test/output/";
 	protected Division division;
 
@@ -42,7 +47,23 @@ public class AbstractPersistenceTest {
 		try
 		{
 			DOMConfigurator.configure( "log4j.xml" );
-			Logger.getRootLogger().setLevel( Level.ERROR );
+			Logger.getRootLogger().setLevel( Level.INFO );
+
+			// make sure the directory exists, if it doesn't, then create it
+			final File file = new File( OUTPUT_DIR ).getParentFile();
+			if( !file.exists() )
+			{
+				final boolean isCreated = file.mkdirs();
+				if( !isCreated )
+				{
+					final StringBuilder error = new StringBuilder();
+					error.append( "Test output directory doesn't exist, and unable to create the directory: " ).append( Constants.NEW_LINE )
+							.append( "  Directory: " ).append( file.toString() ).append( Constants.NEW_LINE );
+					throw new IOException( error.toString() );
+				}
+				LOGGER.info( "Create directory: " + file.toString() );
+			}
+			LOGGER.info( "Test output directory: " + file.toString() );
 
 			// create the object to persist
 			division = new Division();

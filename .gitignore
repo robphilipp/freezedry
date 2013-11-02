@@ -2,6 +2,10 @@
 *.project
 *.classpath
 
+# maven release generated files
+pom.xml.releaseBackup
+release.properties
+
 # Compiled source #
 ###################
 *.class

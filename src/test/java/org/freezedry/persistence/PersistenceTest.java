@@ -19,15 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.Reader;
+import java.io.*;
 import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -51,8 +43,10 @@ import org.freezedry.persistence.tests.Division;
 import org.freezedry.persistence.tests.MapMagic;
 import org.freezedry.persistence.tests.Person;
 import org.freezedry.persistence.tree.InfoNode;
+import org.freezedry.persistence.utils.Constants;
 import org.freezedry.persistence.utils.DateUtils;
 import org.freezedry.persistence.writers.JsonWriter;
+import org.freezedry.persistence.writers.PersistenceWriter;
 import org.freezedry.persistence.writers.XmlWriter;
 import org.junit.Test;
 
@@ -178,17 +172,27 @@ public class PersistenceTest {
 	 */
 	private void writeXml( final InfoNode node, final String fileName, final boolean isDisplayTypeInfo ) throws IOException
 	{
-		// write out XML
-		try( final PrintWriter printWriter = new PrintWriter( new FileWriter( PATH + fileName ) ) )
-		{
-			final XmlWriter writer = new XmlWriter();
-			writer.setDisplayTypeInfo( isDisplayTypeInfo );
-			writer.write( node, printWriter );
-		}
-		catch( IOException e )
-		{
-			throw new IOException( e );
-		}
+//		// write out XML
+//		final File file = new File( PATH + fileName );
+//		if( !file.exists() )
+//		{
+//			file.mkdirs();
+//		}
+//		try( final PrintWriter printWriter = new PrintWriter( file ) )
+////		try( final PrintWriter printWriter = new PrintWriter( new FileWriter( PATH + fileName ) ) )
+//		{
+//			final XmlWriter writer = new XmlWriter();
+//			writer.setDisplayTypeInfo( isDisplayTypeInfo );
+//			writer.write( node, printWriter );
+//		}
+//		catch( IOException e )
+//		{
+//			throw new IOException( e );
+//		}
+
+		final XmlWriter writer = new XmlWriter();
+		writer.setDisplayTypeInfo( isDisplayTypeInfo );
+		writeFile( node, fileName, writer );
 	}
 	
 	/**
@@ -214,10 +218,43 @@ public class PersistenceTest {
 	 */
 	private void writeJson( final InfoNode node, final String fileName ) throws IOException
 	{
-		// write out XML
-		try( final PrintWriter printWriter = new PrintWriter( new FileWriter( PATH + fileName ) ) )
+//		// write out JSON
+//		final File file = new File( PATH + fileName );
+//		if( !file.exists() )
+//		{
+//			file.mkdirs();
+//		}
+//		try( final PrintWriter printWriter = new PrintWriter( file ) )
+////		try( final PrintWriter printWriter = new PrintWriter( new FileWriter( PATH + fileName ) ) )
+//		{
+//			final JsonWriter writer = new JsonWriter();
+//			writer.write( node, printWriter );
+//		}
+//		catch( IOException e )
+//		{
+//			throw new IOException( e );
+//		}
+		writeFile( node, fileName, new JsonWriter() );
+	}
+
+	private void writeFile( final InfoNode node, final String fileName, final PersistenceWriter writer ) throws IOException
+	{
+		// write out JSON
+		final File file = new File( PATH + fileName );//.getParentFile();
+		if( !file.exists() )
 		{
-			final JsonWriter writer = new JsonWriter();
+			final boolean isCreated = file.mkdirs();
+			if( !isCreated )
+			{
+				final StringBuilder error = new StringBuilder();
+				error.append( "Test output directory doesn't exist, and unable to create the directory: " ).append( Constants.NEW_LINE )
+						.append( "  Directory: " ).append( file.toString() ).append( Constants.NEW_LINE )
+						.append( "  File Name: " ).append( fileName ).append( Constants.NEW_LINE );
+				throw new IOException( error.toString() );
+			}
+		}
+		try( final PrintWriter printWriter = new PrintWriter( file ) )
+		{
 			writer.write( node, printWriter );
 		}
 		catch( IOException e )
