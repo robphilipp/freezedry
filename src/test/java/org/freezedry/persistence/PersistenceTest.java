@@ -240,7 +240,7 @@ public class PersistenceTest {
 	private void writeFile( final InfoNode node, final String fileName, final PersistenceWriter writer ) throws IOException
 	{
 		// write out JSON
-		final File file = new File( PATH + fileName );//.getParentFile();
+		final File file = new File( PATH );
 		if( !file.exists() )
 		{
 			final boolean isCreated = file.mkdirs();
@@ -253,7 +253,7 @@ public class PersistenceTest {
 				throw new IOException( error.toString() );
 			}
 		}
-		try( final PrintWriter printWriter = new PrintWriter( file ) )
+		try( final PrintWriter printWriter = new PrintWriter( PATH + fileName ) )
 		{
 			writer.write( node, printWriter );
 		}

@@ -50,7 +50,7 @@ public class AbstractPersistenceTest {
 			Logger.getRootLogger().setLevel( Level.INFO );
 
 			// make sure the directory exists, if it doesn't, then create it
-			final File file = new File( OUTPUT_DIR ).getParentFile();
+			final File file = new File( OUTPUT_DIR );
 			if( !file.exists() )
 			{
 				final boolean isCreated = file.mkdirs();
