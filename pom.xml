@@ -2,6 +2,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <!-- Sonatype POM as parent so that we can deploy to their maven repo -->
+    <!-- To cut a release:
+            1. mvn clean install (make sure it builds properly)
+            2. mvn release:clean
+            3. mvn release:prepare (to set up the release and tag it)
+            4. mvn release:perform (uploads files to sonatype repository) -->
     <parent>
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
