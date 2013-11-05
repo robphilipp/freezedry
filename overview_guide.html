@@ -786,12 +786,33 @@
             </table>
 
 
-            <h2 id="whats_new"><a href="#overview" class=""scroll-offset">What's New</a></h2>
+            <h2 id="whats_new"><a href="#overview" class=scroll-offset">What's New</a></h2>
 
             <p>This section describes the larger changes. More detailed changes can be found in the README
                 file in the file download area. Most updates will contain bug fixes and minor code refactoring.</p>
 
             <div id="whats-new-accordion" class="my-accordion">
+            <h4>Version 0.2.7 (from version 0.2.5)</h4>
+                <div>
+                    <p>Updates to the build and the use of FreezeDry, and added an object difference utility.</p>
+                    <ol>
+                        <li>Converted from Ant build to maven.</li>
+                        <li>FreezeDry is now available through maven central.
+                            <pre class="brush: java">
+                                <dependency>
+                                    <groupId>com.closure-sys</groupId>
+                                    <artifactId>freezedry</artifactId>
+                                    <version>0.2.7</version>
+                                </dependency>
+                            </pre>
+                        </li>
+                        <li>Added <b class="class">ObjectDifferenceCalculator</b> that compares two objects of the same
+                            type and shows which fields are different. Uses FreezeDry's key-value pair writer to generate
+                            the comparison.
+                        </li>
+                    </ol>
+
+                </div>
             <h4>Version 0.2.5 (from version 0.2.4)</h4>
                 <div>
                     <p>Mainly improved the use of FreezeDry for serialization of objects that have an associated <b class="class">NodeBuilder</b>.</p>
