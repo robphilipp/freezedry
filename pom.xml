@@ -1,0 +1,142 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Sonatype POM as parent so that we can deploy to their maven repo -->
+    <!-- To cut a release:
+            1. mvn clean install (make sure it builds properly)
+            2. mvn release:clean
+            3. mvn release:prepare (to set up the release and tag it)
+            4. mvn release:perform (uploads files to sonatype repository) -->
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
+    <groupId>com.closure-sys</groupId>
+    <artifactId>freezedry</artifactId>
+    <version>0.2.8-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>freezedry</name>
+    <url>http://robphilipp.github.io/freezedry/</url>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+            <comments>Use as you wish. Contribute as you wish. Karma.</comments>
+        </license>
+    </licenses>
+
+    <organization>
+        <name>closure, llc</name>
+        <url>http://www.closure-sys.com</url>
+    </organization>
+
+    <developers>
+        <developer>
+            <id>rob.philipp</id>
+            <name>Rob Philipp</name>
+            <email>rob.philipp@closure-sys.com</email>
+            <url>http://www.closure-sys.com</url>
+            <organization>closure, llc</organization>
+            <organizationUrl>http://www.closure-sys.com</organizationUrl>
+            <roles>
+                <role>architect</role>
+                <role>developer</role>
+            </roles>
+            <timezone>-4</timezone>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git@github.com:robphilipp/freezedry.git</connection>
+        <developerConnection>scm:git:git@github.com:robphilipp/freezedry.git</developerConnection>
+        <url>git@github.com:robphilipp/freezedry.git</url>
+    </scm>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.4</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <!--To sign the artifact for deploying to maven central, use release:perform or build using: -->
+        <!--  mvn -P release-sign-artifacts clean install-->
+        <profile>
+            <id>release-sign-artifacts</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.1</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20090211</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+</project>

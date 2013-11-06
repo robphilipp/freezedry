@@ -2,6 +2,10 @@
 *.project
 *.classpath
 
+# maven release generated files
+pom.xml.releaseBackup
+release.properties
+
 # Compiled source #
 ###################
 *.class
@@ -24,6 +28,8 @@ build
 
 FreezeDry_*/*
 dist/*
+target/*
+src/test/output/*
 
 # Logs and databases #
 ######################
