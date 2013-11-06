@@ -117,7 +117,7 @@
                 <img src="images/architecture_overview.png" title="FreezeDry Architecture Overview"/>
             </p>
 
-            <p>Version 0.2.0 adds a set of convenient classes to the <b>FreezeDry</b> framework that makes it much easier to
+            <p>Version 0.2.0 added a set of convenient classes to the <b>FreezeDry</b> framework that makes it much easier to
                 persist objects and reconstituting them from their persisted form. These new classes, derived from the <b class="class">Persistence</b>
                 interface, remove the need for you to deal directly with the <b class="class">Persistence Engine</b>. The <b class="class">Persistence</b>
                 classes allow a fair amount of flexibility, but if they don't meet your needs, you can still use the <b class="class">PersistenceEngine</b>
@@ -132,7 +132,7 @@
                 persistence.write( division, "person.xml" );
             </pre>
 
-                        <p>And to reconstitute the <b>division</b> object from the "person.xml" file, all you need to do is:</p>
+            <p>And to reconstitute the <b>division</b> object from the "person.xml" file, all you need to do is:</p>
 
             <pre class="brush: java">
                 final XmlPersistence persistence = new XmlPersistence();
