@@ -74,7 +74,7 @@ public class SerializerFactory {
 	 * @return the {@link Class} of the {@link Serializer} associated with the serializer name
 	 * @see SerializerType
 	 */
-	public synchronized static final Class< ? extends Serializer > getSerializerClass( final String name )
+	public synchronized static Class< ? extends Serializer > getSerializerClass( final String name )
 	{
 		return getInstance().serializerClasses.get( name );
 	}
@@ -84,7 +84,7 @@ public class SerializerFactory {
 	 * @param clazz The {@link Class} of the {@link Serializer} for which to return the name
 	 * @return the serializer name associated with the {@link Serializer} {@link Class}
 	 */
-	public synchronized static final String getSerializerName( final Class< ? extends Serializer > clazz )
+	public synchronized static String getSerializerName( final Class< ? extends Serializer > clazz )
 	{
 		String name = null;
 		for( Map.Entry< String, Class< ? extends Serializer > > entry : getInstance().serializerClasses.entrySet() )
@@ -101,7 +101,7 @@ public class SerializerFactory {
 	/**
 	 * @return The names of the {@link Serializer}s as represented by this factory
 	 */
-	public synchronized static final Set< String > getSerializerNames()
+	public synchronized static Set< String > getSerializerNames()
 	{
 		return getInstance().serializerClasses.keySet();
 	}
@@ -131,13 +131,13 @@ public class SerializerFactory {
 		final Class< ? extends Serializer > clazz = serializerClasses.get( name );
 		if( clazz == null )
 		{
-			final StringBuffer message = new StringBuffer();
-			message.append( "Unable to create a serializer of the specified name because there is no associated class." + Constants.NEW_LINE );
-			message.append( "  Specified Name: " + name + Constants.NEW_LINE );
-			message.append( "  Available Names: " + Constants.NEW_LINE );
+			final StringBuilder message = new StringBuilder();
+			message.append( "Unable to create a serializer of the specified name because there is no associated class." ).append( Constants.NEW_LINE );
+			message.append( "  Specified Name: " ).append( name ).append( Constants.NEW_LINE );
+			message.append( "  Available Names: " ).append( Constants.NEW_LINE );
 			for( Map.Entry< String, Class< ? extends Serializer > > entry : serializerClasses.entrySet() )
 			{
-				message.append( "    " + entry.getKey() + ": " + entry.getValue().getName() + Constants.NEW_LINE );
+				message.append( "    " ).append( entry.getKey() ).append( ": " ).append( entry.getValue().getName() ).append( Constants.NEW_LINE );
 			}
 			LOGGER.error( message.toString() );
 			throw new IllegalArgumentException( message.toString() );
@@ -151,9 +151,9 @@ public class SerializerFactory {
 		}
 		catch( InstantiationException | IllegalAccessException e )
 		{
-			final StringBuffer message = new StringBuffer();
-			message.append( "Failed to create a serializer of the specified name." + Constants.NEW_LINE );
-			message.append( "  Specified Name: " + name + Constants.NEW_LINE );
+			final StringBuilder message = new StringBuilder();
+			message.append( "Failed to create a serializer of the specified name." ).append( Constants.NEW_LINE );
+			message.append( "  Specified Name: " ).append( name ).append( Constants.NEW_LINE );
 			LOGGER.error( message.toString(), e );
 			throw new IllegalStateException( message.toString(), e );
 		} 
