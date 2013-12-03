@@ -26,6 +26,57 @@ a "log4j.xml" configuration file that may be used if you want to use logging.
    0.2.0 also has the directories for individual file downloads.
 
 -----------------------------------------------------------------------------------
+   Changes from version 0.2.7 to version 0.2.8
+-----------------------------------------------------------------------------------
+1. Added serialization capabilities that allows objects to be marshaled and
+   unmarshaled to and from XML, JSON, or key-value pairs. A standard Java object
+   serializer is thrown in for good measure. (This are the serializer classes
+   used in diffusive (http://github.com/robphilipp/diffusive).
+2. Fixed MapRenderer so that the map's keys can take on values other than the
+   regex [a-zA-Z_0-9] would allow. Now any printable character can be used as
+   a map key.
+3. Added test cases for serialization and persistance.
+
+-----------------------------------------------------------------------------------
+   Changes from version 0.2.5 to version 0.2.7
+-----------------------------------------------------------------------------------
+Updates to the build and the use of FreezeDry, and added an object difference utility.
+
+1. Converted from Ant build to maven.
+   FreezeDry is now available through maven central.
+
+```
+<dependency>
+    <groupid>com.closure-sys</groupid>
+    <artifactid>freezedry</artifactid>
+    <version>0.2.7</version>
+</dependency></code></pre>
+```
+
+2. Added ObjectDifferenceCalculator that compares two objects of the same type and
+   shows which fields are different. Uses FreezeDry's key-value pair writer to generate
+   the comparison.
+
+-----------------------------------------------------------------------------------
+   Changes from version 0.2.4 to version 0.2.5
+-----------------------------------------------------------------------------------
+Mainly improved the use of FreezeDry for serialization of objects that have an
+associated NodeBuilder.
+
+1. Added the ability to persist objects that have an associated NodeBuilder as root
+   objects as described by the NodeBuilder. For example, when persisting an ArrayList
+   as a member of another object, the ArrayList uses the CollectionNodeBuilder to
+   create and parse the InfoNode objects. In version 0.2.4, however, when the
+   ArrayList was the root object (i.e. not a member of another object) then the
+   ArrayList was persisted as if it were any other object, rather than by using
+   the CollectionNodeBuilder. Version 0.2.5 fixes this.
+
+2. Changed the NodeBuilder interface to have two additional methods that override the
+   createInfoNode(Class, Object, String) method and the createObject(Class, Class,
+   InfoNode) method. These new methods are called when an object has an associated
+   NodeBuilder and is a root object.
+
+-----------------------------------------------------------------------------------
    Changes from version 0.2.3 to version 0.2.4
 -----------------------------------------------------------------------------------
 Mainly bug fix related to inheritance, completed TODO for setting the persist
