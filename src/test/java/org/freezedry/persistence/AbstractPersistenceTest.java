@@ -23,6 +23,7 @@ import org.freezedry.persistence.tests.Person;
 import org.freezedry.persistence.utils.Constants;
 import org.freezedry.persistence.utils.DateUtils;
 import org.junit.Before;
+import org.junit.BeforeClass;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,14 +42,18 @@ public class AbstractPersistenceTest {
 	protected final static String OUTPUT_DIR = "src/test/output/";
 	protected Division division;
 
+	@BeforeClass
+	public static void init()
+	{
+		DOMConfigurator.configure( "log4j.xml" );
+		Logger.getRootLogger().setLevel( Level.INFO );
+	}
+
 	@Before
 	public void setUp() throws Exception
 	{
 		try
 		{
-			DOMConfigurator.configure( "log4j.xml" );
-			Logger.getRootLogger().setLevel( Level.INFO );
-
 			// make sure the directory exists, if it doesn't, then create it
 			final File file = new File( OUTPUT_DIR );
 			if( !file.exists() )
@@ -68,7 +73,7 @@ public class AbstractPersistenceTest {
 			// create the object to persist
 			division = new Division();
 			final Person johnny = new Person( "Hernandez", "Johnny", 13 );
-			johnny.addFriend( "Polly", "bird" );
+			johnny.addFriend( "Polly (A)", "bird" );
 			johnny.addFriend( "Sparky", "dog" );
 			for( int i = 0; i < 10; ++i )
 			{

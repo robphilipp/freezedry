@@ -33,13 +33,13 @@ import org.freezedry.persistence.utils.ReflectionUtils;
 
 /**
  * Renders the subtree of the semantic model that represents a {@link Map}. {@link Map}s are rendered
- * as the map's persistence name followed by the decorated key. For example, a {@code Map< String, Double >}
+ * as the map's persistence name followed by the decorated key. For example, a {@code Map&lt; String, Double >}
  * would be persisted in the following format when using the default decorator and settings:
  * <code><pre>
  * Person.friends{"Polly"} = "bird"
  * Person.friends{"Sparky"} = "dog"
  * </pre></code>
- * or for a more complicated map such as {@code Map< String, Map< String, String > >}:
+ * or for a more complicated map such as {@code Map&lt; String, Map&lt; String, String > >}:
  * <code><pre>
  * Person.groups{"numbers"}{"one"} = "ONE"
  * Person.groups{"numbers"}{"two"} = "TWO"
@@ -54,8 +54,8 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 
 	private static final Logger LOGGER = Logger.getLogger( MapRenderer.class );
 
-	private static String OPEN = "{";
-	private static String CLOSE = "}";
+	public static final String OPEN = "{";
+	public static final String CLOSE = "}";
 	
 	private String mapEntryName = PersistMap.ENTRY_PERSIST_NAME;
 	private String mapKeyName = PersistMap.KEY_PERSIST_NAME;
@@ -68,11 +68,15 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 	private final Pattern validationPattern;
 
 	/**
-	 * Constructs a key-value {@link MapRenderer} for renderering the key-values for a {@link Map}
+	 * Constructs a key-value {@link MapRenderer} for rendering the key-values for a {@link Map}
 	 * @param builder The {@link KeyValueBuilder} that makes calls to this renderer. Recall that this
 	 * is part of a recursive algorithm.
-	 * @param keyDecorator The decorator for the key. For example, it may surround the key with "<code>{</code>"
-	 * and "<code>}</code>". 
+	 * @param openKey The decorator for the key that represents the beginning of the key. For example, if
+	 *                the key is surrounded by "<code>{</code>" and "<code>}</code>", then the {@code openKey}
+	 *                would be "<code>{</code>".
+	 * @param closeKey The decorator for the key that represents the end of the key. For example, if
+	 *                the key is surrounded by "<code>{</code>" and "<code>}</code>", then the {@code openKey}
+	 *                would be "<code>}</code>".
 	 */
 	public MapRenderer( final KeyValueBuilder builder, final String openKey, final String closeKey )
 	{
@@ -88,7 +92,7 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 		final String close = Pattern.quote( closeKey );
 		
 		// create and compile the regex pattern for the decoration
-		decorationRegex = open + "\\p{Punct}?\\w+\\p{Punct}?" + close;
+		decorationRegex = open + "[\\p{Graph}\\p{Space}]+" + close;
 		decorationPattern = Pattern.compile( decorationRegex );
 		
 		// create and compile the regex pattern for validating the complete key
@@ -124,7 +128,7 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 
 	/**
 	 * @param name the persistence name in the {@link InfoNode}s representing {@link Map.Entry}
-	 * The default value is {@link PersistMap.ENTRY_PERSIST_NAME} 
+	 * The default value is {@link PersistMap#ENTRY_PERSIST_NAME}
 	 */
 	public void setMapEntryName( final String name )
 	{
@@ -141,7 +145,7 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 
 	/**
 	 * @param name the persistence name in the {@link InfoNode}s representing {@link Map} keys
-	 * The default value is {@link PersistMap.KEY_PERSIST_NAME}
+	 * The default value is {@link PersistMap#KEY_PERSIST_NAME}
 	 */
 	public void setMapKeyName( final String name )
 	{
@@ -158,7 +162,7 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 
 	/**
 	 * @param name the persistence name in the {@link InfoNode}s representing {@link Map} values
-	 * The default value is {@link PersistMap.VALUE_PERSIST_NAME}
+	 * The default value is {@link PersistMap#VALUE_PERSIST_NAME}
 	 */
 	public void setMapValueName( final String name )
 	{
