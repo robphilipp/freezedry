@@ -45,11 +45,13 @@ Updates to the build and the use of FreezeDry, and added an object difference ut
 1. Converted from Ant build to maven.
    FreezeDry is now available through maven central.
 
-    <dependency>
-        <groupid>com.closure-sys</groupid>
-        <artifactid>freezedry</artifactid>
-        <version>0.2.7</version>
-    </dependency>
+```
+<dependency>
+    <groupid>com.closure-sys</groupid>
+    <artifactid>freezedry</artifactid>
+    <version>0.2.7</version>
+</dependency></code></pre>
+```
 
 2. Added ObjectDifferenceCalculator that compares two objects of the same type and
    shows which fields are different. Uses FreezeDry's key-value pair writer to generate
