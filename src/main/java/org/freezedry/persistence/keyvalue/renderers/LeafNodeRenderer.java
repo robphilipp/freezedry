@@ -32,7 +32,7 @@ public class LeafNodeRenderer extends AbstractPersistenceRenderer {
 	private static final Logger LOGGER = Logger.getLogger( LeafNodeRenderer.class );
 	
 	/**
-	 * Constructs a {@link CollectionRenderer} that is used to render {@link InfoNode} representing
+	 * Constructs a {@link LeafNodeRenderer} that is used to render {@link InfoNode} representing
 	 * leaf {@link InfoNode}s into key value pairs.
 	 * @param builder The {@link KeyValueBuilder} used to flatten the semantic model. The builder calls
 	 * this class' {@link #buildKeyValuePair(InfoNode, String, List, boolean)} as part of the recursive

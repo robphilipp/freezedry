@@ -27,17 +27,6 @@ public class KeyValuePersistenceTest extends AbstractPersistenceTest {
 	@Test
 	public void testPersistence() throws Exception
 	{
-//		final String output = OUTPUT_DIR + "division.txt";
-//		final Person johnny = new Person( "Hernandez", "Johnny", 13 );
-//		johnny.addFriend( "Polly A", "bird" );
-//		johnny.addFriend( "Sparky", "dog" );
-//
-//		persistence.setKeySeparator( "." );
-//		persistence.write( johnny, output );
-//
-//		final Person reJohnny = persistence.read( Person.class, output );
-//
-//		Assert.assertTrue( johnny.equals( reJohnny ) );
 		final String output = OUTPUT_DIR + "division.txt";
 
 		persistence.setKeySeparator( "." );

@@ -78,7 +78,7 @@ public abstract class AbstractPersistenceRenderer implements PersistenceRenderer
 		this.builder = renderer.builder;
 		
 		// make a deep copy of the decorators
-		decorators = new HashMap< Class< ? >, Decorator >();
+		decorators = new HashMap<>();
 		for( final Map.Entry< Class< ? >, Decorator > entry : renderer.decorators.entrySet() )
 		{
 			decorators.put( entry.getKey(), entry.getValue().getCopy() );
