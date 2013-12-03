@@ -793,6 +793,17 @@
                 file in the file download area. Most updates will contain bug fixes and minor code refactoring.</p>
 
             <div id="whats-new-accordion" class="my-accordion">
+            <h4>Version 0.2.8 (from version 0.2.7)</h4>
+                <div>
+                    <ol>
+                        <li>Added serialization capabilities that allows objects to be marshaled and unmarshaled to and from XML, JSON,
+                            or key-value pairs. A standard Java object serializer is thrown in for good measure. (This are the serializer
+                            classes used in diffusive (http://github.com/robphilipp/diffusive).</li>
+                        <li>Fixed MapRenderer so that the map's keys can take on values other than the regex [a-zA-Z_0-9] would allow.
+                            Now any printable character can be used as a map key.</li>
+                        <li>Added test cases for serialization and persistance.</li>
+                    </ol>
+                </div>
             <h4>Version 0.2.7 (from version 0.2.5)</h4>
                 <div>
                     <p>Updates to the build and the use of FreezeDry, and added an object difference utility.</p>
