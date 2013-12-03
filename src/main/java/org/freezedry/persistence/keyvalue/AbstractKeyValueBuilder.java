@@ -19,11 +19,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.freezedry.persistence.keyvalue.renderers.CollectionRenderer;
 import org.freezedry.persistence.keyvalue.renderers.LeafNodeRenderer;
 import org.freezedry.persistence.keyvalue.renderers.MapRenderer;
 import org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer;
 import org.freezedry.persistence.tree.InfoNode;
+import org.freezedry.persistence.utils.Constants;
 import org.freezedry.persistence.utils.ReflectionUtils;
 
 /**
@@ -34,6 +36,8 @@ import org.freezedry.persistence.utils.ReflectionUtils;
  * @author Robert Philipp
  */
 public abstract class AbstractKeyValueBuilder implements KeyValueBuilder {
+
+	private static final Logger LOGGER = Logger.getLogger( AbstractKeyValueBuilder.class );
 
 	public static final String KEY_ELEMENT_SEPARATOR = ":";
 
@@ -221,16 +225,34 @@ public abstract class AbstractKeyValueBuilder implements KeyValueBuilder {
 	 */
 	public PersistenceRenderer getRenderer( final String key )
 	{
-		PersistenceRenderer matchingRenderer = null;
 		for( PersistenceRenderer renderer : renderers.values() )
 		{
 			if( renderer.isRenderer( key ) )
 			{
-				matchingRenderer = renderer;
-				break;
+				if( LOGGER.isInfoEnabled() )
+				{
+					final StringBuilder message = new StringBuilder();
+					message.append( "Selected renderer, " ).append( renderer.getClass().getName() )
+							.append( ", for key, " ).append( key );
+					LOGGER.info( message.toString() );
+				}
+				return renderer;
 			}
 		}
-		return matchingRenderer;
+
+		// log the fact that no renderer was found
+		if( LOGGER.isInfoEnabled() )
+		{
+			final StringBuilder message = new StringBuilder();
+			message.append( "Unable to select renderer for key, " ).append( key ).append( ", tried:" );
+			for( PersistenceRenderer renderer : renderers.values() )
+			{
+				message.append( Constants.NEW_LINE ).append( "  " ).append( renderer.getClass().getName() );
+			}
+			LOGGER.info( message.toString() );
+		}
+
+		return null;
 	}
 
 	/**

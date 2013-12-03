@@ -26,7 +26,7 @@ public class XmlPersistenceTest  extends AbstractPersistenceTest {
 	@Test
 	public void testPersistence() throws Exception
 	{
-		final String output = OUTPUT_DIR + "division.json";
+		final String output = OUTPUT_DIR + "division.xml";
 
 		persistence.write( division, output );
 

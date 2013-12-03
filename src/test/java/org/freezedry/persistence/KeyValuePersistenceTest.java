@@ -16,6 +16,7 @@
 package org.freezedry.persistence;
 
 import org.freezedry.persistence.tests.Division;
+import org.freezedry.persistence.tests.Person;
 import org.junit.Assert;
 import org.junit.Test;
 
