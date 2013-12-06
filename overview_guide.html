@@ -45,6 +45,7 @@
     <script src="scripts/syntax_highlight/shCore.js"></script>
     <script src="scripts/syntax_highlight/shBrushJava.js"></script>
     <script src="scripts/syntax_highlight/shBrushXml.js"></script>
+    <script src="scripts/syntax_highlight/shBrushJScript.js"></script>
 
     <!-- Twitter bootstrap -->
     <script src="scripts/bootstrap/js/bootstrap.js"></script>
@@ -111,7 +112,9 @@
             <h2 id="overview" class="no-show"><a href="#overview" class="scroll-offset">Overview</a></h2>
 
             <p><b>FreezeDry</b> provides an easy mechanism for converting Java objects into a persisted
-                form and then back again. And there is no need for creating binding files.</p>
+                form and then back again. And there is no need for creating binding files. New in version 0.2.8
+                FreezeDry can serialize objects into an output stream and deserialize object from an input stream. And
+                version 0.2.7 added a convenient object difference calculator.</p>
 
             <p class="image">
                 <img src="images/architecture_overview.png" title="FreezeDry Architecture Overview"/>
@@ -119,8 +122,8 @@
             </p>
 
             <p>Version 0.2.0 added a set of convenient classes to the <b>FreezeDry</b> framework that makes it much easier to
-                persist objects and reconstituting them from their persisted form. These new classes, derived from the <b class="class">Persistence</b>
-                interface, remove the need for you to deal directly with the <b class="class">Persistence Engine</b>. The <b class="class">Persistence</b>
+                persist objects and reconstitute them from their persisted form. These new classes, derived from the <b class="class">Persistence</b>
+                interface, remove the need for you to deal directly with the <b class="class">PersistenceEngine</b>. The <b class="class">Persistence</b>
                 classes allow a fair amount of flexibility, but if they don't meet your needs, you can still use the <b class="class">PersistenceEngine</b>
                 directly as before.</p>
 
@@ -207,7 +210,8 @@
 
             <ul>
                 <li>A set of <b class="class">Persistence</b> classes responsible for converting between Java objects
-                    and their persisted forms.</li>
+                    and their persisted forms (which could be serialized to an output stream or deserialized from and
+                    input stream).</li>
                 <li>A <b>Persistence Engine</b> responsible for converting between Java objects and the <b>Semantic Model</b>.</li>
                 <li>A <b>Semantic Model</b> composed of <b class="class">InfoNode</b> objects, each of which hold information
                     about a particular field within the object that is to be persisted or reconstituted.</li>
@@ -219,6 +223,8 @@
                     convert it to a <b>Semantic Model</b>.</li>
                 <li>And optionally, <em>annotations</em> that provide custom instructions to the <b class="class">PersistenceEngine</b>
                     for converting between Java objects and the <b>Semantic Model</b>.</li>
+                <li>An object difference calculator that returns a list of key-value pairs containing the fields that have changed
+                    between two objects of the same class.</li>
             </ul>
 
             <p><b>FreezeDry</b> is set up to work right out of the box for most needs. And it mostly does that. In cases where you
@@ -240,7 +246,7 @@
                 new XmlPersistence().write( division, "person.xml" );
             </pre>
 
-                        <p>and you can also reconstitute the <b>division</b> object from the "person.xml" file in one simple, but more complex, line of code:</p>
+            <p>and you can also reconstitute the <b>division</b> object from the "person.xml" file in one simple, but more complex, line of code:</p>
 
             <pre class="brush: java">
                 Division redivision = new XmlPersistence().read( Division.class, "person.xml" );
@@ -276,6 +282,64 @@
                     <b>setKeyValueSeparator(...)</b> allows the user to set the separator between the elements of the key,
                     and between the key and the values.</td></tr>
             </table>
+
+            <p><b>FreezeDry</b> provides an easy way to persist Java objects to XML, JSON, and lists of key-value pairs. And to be
+
+            <h4 id="serialization"><a href="#overview" class="scroll-offset">Serialization</a></h4>
+            <p><b>FreezeDry</b> can also be used to serialize/deserialize objects as XML, JSON, or Java's basic object serialization.
+                As a simple example, we can serialize an object to a <b class="class">FileOutputStream</b>:</p>
+
+            <pre class="brush: java">
+                new JsonPersistenceSerializer().serialize( person, new FileOutputStream( filename ) );
+            </pre>
+
+            <p>which effectively persists the object to a file as JSON. But you could replace the <b class="class">FileOutputStream</b>
+                with an <b class="class">ObjectOutputStream</b> as well. And then to deserialize an object:</p>
+
+            <pre class="brush: java">
+                new JsonPersistenceSerializer().deserialize( new FileInputStream( filename ), Person.class );
+            </pre>
+
+            <p>which loads the object from the file. But, the object could be deserialized from any<b class="class">InputStream</b>.</p>
+
+            <p>FreezeDry currently support serializion of objects in four formats:</p>
+            <table class="table">
+                <tr><th>Class</th><th>Description</th></tr>
+                <tr><td><b class="class">XmlPersistenceSerializer</b></td><td>Serializes/Deserializes as XML</td></tr>
+                <tr><td><b class="class">JsonPersistenceSerializer</b></td><td>Serializes/Deserializes as JSON</b></td></tr>
+                <tr><td><b class="class">KeyValuePersistenceSerializer</b></td><td>Serializes/Deserializes as key-value pairs</td></tr>
+                <tr><td><b class="class">ObjectSerializer</b></td><td>Java's basic serialization (added for convenience)</td></tr>
+            </table>
+
+            <p>All of FreezeDry's serializers implement the <b class="class">Serializer</b> interface by extending the
+                <b class="class">PersistenceSerializer</b> class. The <b class="class">PersistenceSerializer</b> contains the common
+                methods and implements pretty much all of the serialization/deserialization capabilities.</p>
+
+            <h4 id="object_diff"><a href="#overview" class="scroll-offset">Object Difference</a></h4>
+            <p>FreezeDry 0.2.7 added an object difference calculator. The difference calcualtor compares two objects of the same
+                class and returns the fields that differ between the two objects. The following code snippet shows how to calculate
+                the difference between two objects of the <b class="class">Division</b> class, <b class="class">division1</b>
+                and <b class="class">division2</b>:</p>
+
+            <pre class="brush: java">
+                private Division division1;
+                private Division division2;
+                .
+                .
+                .
+                new ObjectDifferenceCalculator().calculateDifference( division1, division2 );
+            </pre>
+
+            <p>which returns a map containing the field names that differ, associated with the details of the difference.</p>
+
+            <pre class="brush: js">
+                {
+                    Division.people[0].Person.age => Object: 13; Reference Object: 37,
+                    Division.people[0].Person.birthDate => Object: 1963-04-22; Reference Object: 2013-12-05
+                }
+            </pre>
+
+            <p>In this case, the age and birth date of the first person in the list of people differed between the two divisions.</p>
 
 
             <h4 id="behavior_mod"><a href="#overview" class="scroll-offset">Behavior Modification</a></h4>
