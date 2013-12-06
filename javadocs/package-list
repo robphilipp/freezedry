@@ -1,3 +1,4 @@
+org.freezedry.difference
 org.freezedry.persistence
 org.freezedry.persistence.annotations
 org.freezedry.persistence.builders
@@ -7,12 +8,11 @@ org.freezedry.persistence.copyable
 org.freezedry.persistence.keyvalue
 org.freezedry.persistence.keyvalue.renderers
 org.freezedry.persistence.keyvalue.renderers.decorators
-org.freezedry.persistence.keyvalue.renderers.tests
 org.freezedry.persistence.keyvalue.utils
 org.freezedry.persistence.readers
 org.freezedry.persistence.tests
+org.freezedry.persistence.tests.circle
 org.freezedry.persistence.tree
 org.freezedry.persistence.utils
-org.freezedry.persistence.utils.tests
-org.freezedry.persistence.utils.tests.circle
 org.freezedry.persistence.writers
+org.freezedry.serialization
