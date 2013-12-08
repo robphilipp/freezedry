@@ -16,7 +16,7 @@
     <groupId>com.closure-sys</groupId>
     <artifactId>freezedry</artifactId>
     <version>0.2.9-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
 
     <name>freezedry</name>
     <url>http://robphilipp.github.io/freezedry/</url>
@@ -84,7 +84,36 @@
                     <target>1.7</target>
                 </configuration>
             </plugin>
+
+            <!-- osgi bundle plugin-->
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Export-Package>
+                            org.freezedry.difference.*,
+                            org.freezedry.persistence.*,
+                            org.freezedry.serialization.*
+                        </Export-Package>
+                        <Private-Package>
+                            org.freezedry.*
+                        </Private-Package>
+                    </instructions>
+                </configuration>
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<id>bundle-manifest</id>-->
+                        <!--<phase>process-classes</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>manifest</goal>-->
+                        <!--</goals>-->
+                    <!--</execution>-->
+                <!--</executions>-->
+            </plugin>
         </plugins>
+
     </build>
 
     <profiles>
@@ -132,17 +161,34 @@
             <version>1.2.17</version>
             <scope>compile</scope>
         </dependency>
+        <!-- The commented out version is the straight jar version. If you aren't using OSGi, you can use this one.
+             If, however, you are planning to use freezedry in an OSGi container, then you need to install the bundle
+             version into your OSGi container. -->
+        <!--<dependency>-->
+            <!--<groupId>org.json</groupId>-->
+            <!--<artifactId>json</artifactId>-->
+            <!--<version>20090211</version>-->
+            <!--<scope>compile</scope>-->
+        <!--</dependency>-->
         <dependency>
-            <groupId>org.json</groupId>
+            <groupId>org.apache.geronimo.bundles</groupId>
             <artifactId>json</artifactId>
-            <version>20090211</version>
+            <version>20090211_1</version>
             <scope>compile</scope>
         </dependency>
-
+        <!-- The commented out version is the straight jar version. If you aren't using OSGi, you can use this one.
+             If, however, you are planning to use freezedry in an OSGi container, then you need to install the bundle
+             version into your OSGi container. -->
+        <!--<dependency>-->
+            <!--<groupId>org.apache.commons</groupId>-->
+            <!--<artifactId>commons-io</artifactId>-->
+            <!--<version>1.3.2</version>-->
+        <!--</dependency>-->
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>1.3.2</version>
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.commons-io</artifactId>
+            <version>1.4_3</version>
         </dependency>
+
     </dependencies>
 </project>
