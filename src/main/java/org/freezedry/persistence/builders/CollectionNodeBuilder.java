@@ -30,7 +30,8 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.freezedry.persistence.PersistenceEngine;
 import org.freezedry.persistence.annotations.PersistCollection;
 import org.freezedry.persistence.containers.Pair;
@@ -50,7 +51,7 @@ import org.freezedry.persistence.utils.ReflectionUtils;
  */
 public class CollectionNodeBuilder extends AbstractNodeBuilder {
 
-	private static final Logger LOGGER = Logger.getLogger( CollectionNodeBuilder.class );
+	private static final Logger LOGGER = LoggerFactory.getLogger( CollectionNodeBuilder.class );
 	
 	/**
 	 * Constructs the {@link NodeBuilder} for going between {@link Collection}s and 

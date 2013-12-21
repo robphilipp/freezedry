@@ -15,14 +15,15 @@
  */
 package org.freezedry.persistence.utils;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JsonUtils {
 
-	private static final Logger LOGGER = Logger.getLogger( JsonUtils.class );
+	private static final Logger LOGGER = LoggerFactory.getLogger( JsonUtils.class );
 
 	public static JsonType getType( final JSONObject object, final String key )
 	{

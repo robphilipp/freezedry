@@ -30,8 +30,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.xml.DOMConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.freezedry.persistence.PersistenceEngine;
 import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.Constants;
@@ -48,7 +48,7 @@ import org.w3c.dom.Node;
  */
 public class XmlWriter implements PersistenceWriter {
 	
-	private static final Logger LOGGER = Logger.getLogger( XmlWriter.class );
+	private static final Logger LOGGER = LoggerFactory.getLogger( XmlWriter.class );
 	
 	public static final String TYPE_ATTRIBUTE = "type";
 	
@@ -195,8 +195,6 @@ public class XmlWriter implements PersistenceWriter {
 	 */
 	public static void main( String[] args ) throws ParserConfigurationException, ReflectiveOperationException, IOException
 	{
-		DOMConfigurator.configure( "log4j.xml" );
-
 //		final Division division = new Division();
 //		final PersistenceEngine engine = new PersistenceEngine();
 //		final InfoNode rootNode = engine.createSemanticModel( division );

@@ -24,7 +24,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.Reader;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.freezedry.persistence.utils.Constants;
 
 /**
@@ -40,7 +41,7 @@ import org.freezedry.persistence.utils.Constants;
  */
 public abstract class AbstractFileBasedPersistence extends AbstractPersistence {
 
-	private static final Logger LOGGER = Logger.getLogger( XmlPersistence.class );
+	private static final Logger LOGGER = LoggerFactory.getLogger( XmlPersistence.class );
 
 	/**
 	 * Writes the specified object into the file using the persistence mechanism implemented in

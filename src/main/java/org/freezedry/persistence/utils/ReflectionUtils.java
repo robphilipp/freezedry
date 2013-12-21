@@ -15,7 +15,8 @@
  */
 package org.freezedry.persistence.utils;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.freezedry.persistence.annotations.Persist;
 import org.freezedry.persistence.builders.NodeBuilder;
 import org.freezedry.persistence.containers.orderedseries.IntegerOrderedSeries;
@@ -32,7 +33,7 @@ import java.util.*;
  */
 public class ReflectionUtils {
 	
-	private static final Logger LOGGER = Logger.getLogger( ReflectionUtils.class );
+	private static final Logger LOGGER = LoggerFactory.getLogger( ReflectionUtils.class );
 
 	private static Map< Class< ? >, Class< ? > > PRIMITIVE_TYPE_MAP = new HashMap<>();
 	static {
@@ -687,34 +688,5 @@ public class ReflectionUtils {
 			return (T)object;
 		}
 		return clazz.cast( object );
-	}
-
-	public static void main( String[] args ) throws NoSuchFieldException
-	{
-//		DOMConfigurator.configure( "log4j.xml" );
-//
-//		final List< Field > fields = getAllDeclaredFields( DoubleNodeBuilder.class );
-//		for( Field field : fields )
-//		{
-//			System.out.println( field.getName() );
-//		}
-//
-//		System.out.println( getDeclaredField( BadPerson.class, "givenName" ) );
-//		System.exit( 0 );
-//
-//		System.out.println( "List -> Collection: distance = " + calculateClassDistance( List.class, Collection.class, -1 ) );
-//		System.out.println( "List -> Iterable: distance = " + calculateClassDistance( List.class, Iterable.class, -1 ) );
-//		System.out.println( "RunnableScheduledFuture -> Comparable: distance = " + calculateClassDistance( RunnableScheduledFuture.class, Comparable.class, -1 ) );
-//		System.out.println( "D -> A: distance = " + calculateClassDistance( D.class, A.class, -1 ) );
-//		System.out.println( "D -> B: distance = " + calculateClassDistance( D.class, B.class, -1 ) );
-//		System.out.println( "D -> Aprime: distance = " + calculateClassDistance( D.class, Aprime.class, -1 ) );
-//		System.out.println( "Econcrete -> A: distance = " + calculateClassDistance( Econcrete.class, A.class, -1 ) );
-//		System.out.println( "Econcrete -> B: distance = " + calculateClassDistance( Econcrete.class, B.class, -1 ) );
-//		System.out.println( "Econcrete -> D: distance = " + calculateClassDistance( Econcrete.class, D.class, -1 ) );
-//		System.out.println( "Econcrete -> Aprime: distance = " + calculateClassDistance( Econcrete.class, Aprime.class, -1 ) );
-//		System.out.println( "Fconcrete -> A: distance = " + calculateClassDistance( Fconcrete.class, A.class, -1 ) );
-//		System.out.println( "Econcrete -> Econcrete: distance = " + calculateClassDistance( Econcrete.class, Econcrete.class, -1 ) );
-//		System.out.println( "Fconcrete -> Econcrete: distance = " + calculateClassDistance( Fconcrete.class, Econcrete.class, -1 ) );
-//		System.out.println( "Gconcrete -> Econcrete: distance = " + calculateClassDistance( Gconcrete.class, Econcrete.class, -1 ) );
 	}
 }

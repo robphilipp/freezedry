@@ -22,7 +22,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.freezedry.persistence.annotations.PersistMap;
 import org.freezedry.persistence.containers.Pair;
 import org.freezedry.persistence.keyvalue.KeyValueBuilder;
@@ -52,7 +53,7 @@ import org.freezedry.persistence.utils.ReflectionUtils;
  */
 public class MapRenderer extends AbstractPersistenceRenderer {
 
-	private static final Logger LOGGER = Logger.getLogger( MapRenderer.class );
+	private static final Logger LOGGER = LoggerFactory.getLogger( MapRenderer.class );
 
 	public static final String OPEN = "{";
 	public static final String CLOSE = "}";

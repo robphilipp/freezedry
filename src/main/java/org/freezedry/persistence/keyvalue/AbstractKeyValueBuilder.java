@@ -19,7 +19,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.freezedry.persistence.keyvalue.renderers.CollectionRenderer;
 import org.freezedry.persistence.keyvalue.renderers.LeafNodeRenderer;
 import org.freezedry.persistence.keyvalue.renderers.MapRenderer;
@@ -37,7 +38,7 @@ import org.freezedry.persistence.utils.ReflectionUtils;
  */
 public abstract class AbstractKeyValueBuilder implements KeyValueBuilder {
 
-	private static final Logger LOGGER = Logger.getLogger( AbstractKeyValueBuilder.class );
+	private static final Logger LOGGER = LoggerFactory.getLogger( AbstractKeyValueBuilder.class );
 
 	public static final String KEY_ELEMENT_SEPARATOR = ":";
 

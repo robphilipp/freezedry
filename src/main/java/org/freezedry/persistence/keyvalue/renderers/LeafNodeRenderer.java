@@ -20,7 +20,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.freezedry.persistence.containers.Pair;
 import org.freezedry.persistence.keyvalue.KeyValueBuilder;
 import org.freezedry.persistence.keyvalue.renderers.decorators.Decorator;
@@ -29,7 +30,7 @@ import org.freezedry.persistence.utils.Constants;
 
 public class LeafNodeRenderer extends AbstractPersistenceRenderer {
 	
-	private static final Logger LOGGER = Logger.getLogger( LeafNodeRenderer.class );
+	private static final Logger LOGGER = LoggerFactory.getLogger( LeafNodeRenderer.class );
 	
 	/**
 	 * Constructs a {@link LeafNodeRenderer} that is used to render {@link InfoNode} representing

@@ -15,7 +15,8 @@
  */
 package org.freezedry.persistence;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.freezedry.persistence.annotations.Persist;
 import org.freezedry.persistence.annotations.PersistCollection;
 import org.freezedry.persistence.annotations.PersistDateAs;
@@ -81,7 +82,7 @@ import java.util.*;
  */
 public class PersistenceEngine {
 	
-	private static final Logger LOGGER = Logger.getLogger( PersistenceEngine.class );
+	private static final Logger LOGGER = LoggerFactory.getLogger( PersistenceEngine.class );
 	
 	private static final Map< Class< ? >, Object > PRIMITIVE_TYPES = createPrimitives();
 	private static final Set< Class< ? > > NON_ROOT_OBJECTS = nonRootObjects();

@@ -30,7 +30,8 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.freezedry.persistence.PersistenceEngine;
 import org.freezedry.persistence.annotations.PersistArray;
 import org.freezedry.persistence.tree.InfoNode;
@@ -48,7 +49,7 @@ import org.freezedry.persistence.utils.ReflectionUtils;
  */
 public class ArrayNodeBuilder extends AbstractNodeBuilder {
 	
-	private static final Logger LOGGER = Logger.getLogger( ArrayNodeBuilder.class );
+	private static final Logger LOGGER = LoggerFactory.getLogger( ArrayNodeBuilder.class );
 	
 	public static final String COMPOUND_ARRAY_NAME_SUFFIX = "Array";
 	

@@ -26,8 +26,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.xml.DOMConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.freezedry.persistence.PersistenceEngine;
 import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.Constants;
@@ -49,7 +49,7 @@ import org.xml.sax.SAXException;
  */
 public class XmlReader implements PersistenceReader {
 
-	private static final Logger LOGGER = Logger.getLogger( XmlReader.class );
+	private static final Logger LOGGER = LoggerFactory.getLogger( XmlReader.class );
 	
 	private boolean isRemoveEmptyTextNodes;
 	
@@ -413,8 +413,6 @@ public class XmlReader implements PersistenceReader {
 	 */
 	public static void main( String[] args ) throws ParserConfigurationException, SAXException, IOException, SecurityException, ReflectiveOperationException
 	{
-		DOMConfigurator.configure( "log4j.xml" );
-		
 //		final XmlReader reader = new XmlReader();
 ////		reader.setRemoveEmptyTextNodes( false );
 //		final InputStream inputStream = new BufferedInputStream( new FileInputStream( "person.xml" ) );

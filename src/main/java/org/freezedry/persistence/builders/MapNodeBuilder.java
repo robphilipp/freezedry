@@ -23,7 +23,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.freezedry.persistence.PersistenceEngine;
 import org.freezedry.persistence.annotations.PersistMap;
 import org.freezedry.persistence.containers.Pair;
@@ -40,7 +41,7 @@ import org.freezedry.persistence.utils.ReflectionUtils;
  */
 public class MapNodeBuilder extends AbstractNodeBuilder {
 	
-	private static final Logger LOGGER = Logger.getLogger( MapNodeBuilder.class );
+	private static final Logger LOGGER = LoggerFactory.getLogger( MapNodeBuilder.class );
 	
 	// for maps that are root objects, these are the key and value prefixes so that upon reconstruction
 	// there is a way to know which node contains the key, and which node contains the value

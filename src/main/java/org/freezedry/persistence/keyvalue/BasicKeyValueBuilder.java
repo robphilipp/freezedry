@@ -22,7 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.freezedry.persistence.containers.Pair;
 import org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer;
 import org.freezedry.persistence.keyvalue.utils.KeyValueUtils;
@@ -37,7 +38,7 @@ import org.freezedry.persistence.utils.Constants;
  */
 public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 
-	private static final Logger LOGGER = Logger.getLogger( BasicKeyValueBuilder.class );
+	private static final Logger LOGGER = LoggerFactory.getLogger( BasicKeyValueBuilder.class );
 
 	private boolean useClassAsRootKey = false;
 

@@ -15,15 +15,14 @@
  */
 package org.freezedry.persistence;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.xml.DOMConfigurator;
 import org.freezedry.persistence.tests.Division;
 import org.freezedry.persistence.tests.Person;
 import org.freezedry.persistence.utils.Constants;
 import org.freezedry.persistence.utils.DateUtils;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,7 +36,7 @@ import java.util.*;
  */
 public class AbstractPersistenceTest {
 
-	private static final Logger LOGGER = Logger.getLogger( AbstractPersistenceTest.class );
+	private static final Logger LOGGER = LoggerFactory.getLogger( AbstractPersistenceTest.class );
 
 	protected final static String OUTPUT_DIR = "src/test/output/";
 	protected Division division;
@@ -45,8 +44,6 @@ public class AbstractPersistenceTest {
 	@BeforeClass
 	public static void init()
 	{
-		DOMConfigurator.configure( "log4j.xml" );
-		Logger.getRootLogger().setLevel( Level.INFO );
 	}
 
 	@Before

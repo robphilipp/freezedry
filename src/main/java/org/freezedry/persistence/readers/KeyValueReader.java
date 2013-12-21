@@ -15,7 +15,6 @@
  */
 package org.freezedry.persistence.readers;
 
-import org.apache.log4j.Logger;
 import org.freezedry.persistence.containers.Pair;
 import org.freezedry.persistence.keyvalue.AbstractKeyValueBuilder;
 import org.freezedry.persistence.keyvalue.BasicKeyValueBuilder;
@@ -24,6 +23,8 @@ import org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer;
 import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.Constants;
 import org.freezedry.persistence.writers.KeyValueWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -36,7 +37,7 @@ import java.util.regex.Pattern;
 
 public class KeyValueReader implements PersistenceReader {
 
-	private static final Logger LOGGER = Logger.getLogger( KeyValueReader.class );
+	private static final Logger LOGGER = LoggerFactory.getLogger( KeyValueReader.class );
 	private static final String KEY_VALUE_SEPARATOR = KeyValueWriter.KEY_VALUE_SEPARATOR;
 	
 	private KeyValueBuilder builder;
@@ -206,29 +207,5 @@ public class KeyValueReader implements PersistenceReader {
 		}
 		
 		return pairs;
-	}
-	
-	/**
-	 * 
-	 * @param args
-	 * @throws FileNotFoundException
-	 */
-	public static void main( String[] args ) throws FileNotFoundException
-	{
-//		DOMConfigurator.configure( "log4j.xml" );
-//
-//		final KeyValueReader reader = new KeyValueReader();
-//		reader.setKeyElementSeparator( "." );
-////		reader.setRemoveEmptyTextNodes( false );
-//		final KeyValueBuilder builder = reader.getBuilder();
-//		builder.putRenderer( Collection.class, new FlatteningCollectionRenderer( builder ) );
-//		final InputStream inputStream = new BufferedInputStream( new FileInputStream( "person.txt" ) );
-//		final Reader input = new InputStreamReader( inputStream );
-//		final InfoNode infoNode = reader.read( Division.class, input );
-//		System.out.println( infoNode.simpleTreeToString() );
-//
-//		final PersistenceEngine engine = new PersistenceEngine();
-//		final Object reperson = engine.parseSemanticModel( Division.class, infoNode );
-//		System.out.println( reperson );
 	}
 }

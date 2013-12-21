@@ -21,7 +21,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.freezedry.persistence.PersistenceEngine;
 import org.freezedry.persistence.annotations.PersistDateAs;
 import org.freezedry.persistence.tree.InfoNode;
@@ -38,7 +39,7 @@ import org.freezedry.persistence.utils.ReflectionUtils;
  */
 public class DateNodeBuilder extends AbstractLeafNodeBuilder {
 
-	private static final Logger LOGGER = Logger.getLogger( DateNodeBuilder.class );
+	private static final Logger LOGGER = LoggerFactory.getLogger( DateNodeBuilder.class );
 	
 	public static final String ISO_8601_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 	

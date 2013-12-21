@@ -53,8 +53,6 @@ public class ReflectionUtilsTest {
 	@Before
 	public void setUp() throws Exception
 	{
-//		DOMConfigurator.configure( "log4j.xml" );
-//		Logger.getRootLogger().setLevel( Level.ERROR );
 	}
 
 	@Test

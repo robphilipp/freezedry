@@ -1,6 +1,5 @@
 package org.freezedry.persistence.writers;
 
-import org.apache.log4j.xml.DOMConfigurator;
 import org.freezedry.persistence.PersistenceEngine;
 import org.freezedry.persistence.keyvalue.KeyValueBuilder;
 import org.freezedry.persistence.keyvalue.renderers.FlatteningCollectionRenderer;
@@ -24,8 +23,6 @@ public class KeyValueMapWriterTest {
 	@Before
 	public void setUp() throws Exception
 	{
-		DOMConfigurator.configure( "log4j.xml" );
-
 		final Division division = new Division();
 		final Person johnny = new Person( "Hernandez", "Johnny", 13 );
 		johnny.addFriend( "Polly", "bird" );

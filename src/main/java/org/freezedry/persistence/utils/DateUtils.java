@@ -26,14 +26,15 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Robert Philipp
  */
 public class DateUtils {
 	
-	private static final Logger LOGGER = Logger.getLogger( DateUtils.class );
+	private static final Logger LOGGER = LoggerFactory.getLogger( DateUtils.class );
 
 	/**
 	 * Returns a Calendar object based on the String representation of the date

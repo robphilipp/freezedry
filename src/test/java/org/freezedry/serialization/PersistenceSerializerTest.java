@@ -2,8 +2,8 @@ package org.freezedry.serialization;
 
 import junit.framework.Assert;
 import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.xml.DOMConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.freezedry.persistence.tests.BadPerson;
 import org.freezedry.persistence.tests.Division;
 import org.freezedry.persistence.tests.Person;
@@ -26,7 +26,7 @@ import java.util.*;
  */
 public class PersistenceSerializerTest {
 
-	private static final Logger LOGGER = Logger.getLogger( PersistenceSerializerTest.class );
+	private static final Logger LOGGER = LoggerFactory.getLogger( PersistenceSerializerTest.class );
 
 	protected final static String OUTPUT_DIR = "src/test/output/";
 
@@ -41,8 +41,6 @@ public class PersistenceSerializerTest {
 	@BeforeClass
 	public static void init()
 	{
-		DOMConfigurator.configure( "log4j.xml" );
-		Logger.getRootLogger().setLevel( Level.WARN );
 	}
 
 	@Before
