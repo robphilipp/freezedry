@@ -26,6 +26,7 @@
 
         <slf4j.version>1.7.5</slf4j.version>
         <log4j.version>1.2.17</log4j.version>
+        <qos.logback.version>1.0.13</qos.logback.version>
         <json.version>20090211_1</json.version>
         <apache.commons-io.version>1.4_3</apache.commons-io.version>
     </properties>
@@ -181,11 +182,16 @@
         </dependency>
 
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>${log4j.version}</version>
-            <scope>compile</scope>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${qos.logback.version}</version>
         </dependency>
+        <!--<dependency>-->
+            <!--<groupId>log4j</groupId>-->
+            <!--<artifactId>log4j</artifactId>-->
+            <!--<version>${log4j.version}</version>-->
+            <!--<scope>compile</scope>-->
+        <!--</dependency>-->
         <!-- end of logging -->
 
         <!-- json marshal/unmarshalling -->
