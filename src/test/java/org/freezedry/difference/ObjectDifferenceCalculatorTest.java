@@ -1,13 +1,11 @@
 package org.freezedry.difference;
 
 import junit.framework.Assert;
-import org.apache.log4j.Level;
 import org.freezedry.persistence.tests.Division;
 import org.freezedry.persistence.tests.Person;
 import org.freezedry.persistence.utils.DateUtils;
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.util.*;

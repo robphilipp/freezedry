@@ -278,7 +278,7 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 			if( keyValue.size() != 2 )
 			{
 				final StringBuffer message = new StringBuffer();
-				message.append( "The info node for this map must have two nodes. But snap! It doesn't" + Constants.NEW_LINE );
+				message.append( "The info node for this map must have two nodes. Aw snap! But it doesn't" + Constants.NEW_LINE );
 				message.append( "  Number of nodes: " + keyValue.size() + Constants.NEW_LINE );
 				message.append( "  Node names: " + Constants.NEW_LINE );
 				for( InfoNode childNode : keyValue )

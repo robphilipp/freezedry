@@ -202,7 +202,7 @@ public class KeyValueReader implements PersistenceReader {
 			if( !line.trim().isEmpty() )
 			{
 				final String[] keyValue = line.split( Pattern.quote( keyValueSeparator ) );
-				pairs.add( new Pair< String, String >( keyValue[ 0 ].trim(), keyValue[ 1 ].trim() ) );
+				pairs.add( new Pair<>( keyValue[ 0 ].trim(), keyValue[ 1 ].trim() ) );
 			}
 		}
 		

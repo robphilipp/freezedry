@@ -71,7 +71,8 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 	 * @param builder The {@link KeyValueBuilder} used to flatten the semantic model. The builder calls
 	 * this class' {@link #buildKeyValuePair(InfoNode, String, List, boolean)} as part of the recursive
 	 * algorithm to flatten the semantic model
-	 * @param indexDecorator The {@link Decorator} for the index.
+	 * @param openIndex The {@link Decorator} for the opening symbol for the index.
+	 * @param closeIndex The {@link Decorator} for the closing symbol for the index.
 	 */
 	public CollectionRenderer( final KeyValueBuilder builder, final String openIndex, final String closeIndex )
 	{
@@ -278,11 +279,10 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 
 	/**
 	 * Creates a key for a node collection. For example, if the persist name for a {@link List} is
-	 * {@code people}, which is a <code>{@link List}< {@link Person} ></code>, then the key will be {@code people[i].Person}
+	 * {@code people}, which is a <code>{@link List}< {@code Person} ></code>, then the key will be {@code people[i].Person}
 	 * where the {@code i} is the index of the list.
 	 * @param key The current key to which to append the persisted name and decorated index
 	 * @param parentNode The parent node, which holds the name of the field (in this example, "{@code people}")
-	 * @param node The current node (in this example, "{@code Person}")
 	 * @param index The index of the element in the {@link List}
 	 * @return The key
 	 */

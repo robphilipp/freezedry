@@ -84,18 +84,18 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 		super( builder );
 		
 		// create the decorator for the key
-		this.keyDecorator = new StringDecorator( openKey, closeKey );
+		keyDecorator = new StringDecorator( openKey, closeKey );
 		
 		// create the regular expression that determines if a string is renderered by this class
 		// people[0] is a collection, but people{"test"}[0] is a map< string, list< integer > >
 		// so we want to check that only word characters precede the "["
 		final String open = Pattern.quote( openKey );
 		final String close = Pattern.quote( closeKey );
-		
+
 		// create and compile the regex pattern for the decoration
 		decorationRegex = open + "[\\p{Graph}\\p{Space}]+" + close;
 		decorationPattern = Pattern.compile( decorationRegex );
-		
+
 		// create and compile the regex pattern for validating the complete key
 		validationRegex = "\\w+" + decorationRegex + "|^" + decorationRegex;
 		validationPattern = Pattern.compile( validationRegex );
@@ -178,9 +178,17 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 		return mapValueName;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer#buildKeyValuePair(org.freezedry.persistence.tree.InfoNode, java.lang.String, java.util.List)
+	/**
+	 * Builds a key-value pair and adds it to the list of key-value pairs. If the
+	 * {@link InfoNode} is compound, then the {@link PersistenceRenderer} may refer back to
+	 * the {@link KeyValueBuilder} to build out the compound node.
+	 * @param infoNode The current {@link InfoNode} in the semantic model.
+	 * @param key The current key. The key is constructed by appending persistence names, which
+	 * may or may not be decorated, to the current key. In this way it represents a flattening
+	 * of the semantic model.
+	 * @param keyValues The current list of key-value pairs
+	 * @param isWithholdPersistName true if the renderer implementation should not append the
+	 * {@link InfoNode}'s persistence name to the key.
 	 */
 	@Override
 	public void buildKeyValuePair( final InfoNode infoNode, 
@@ -192,6 +200,7 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 		// [Division:months{January}[1], 2]
 		// [Division:systems{ALM}, "Investments and Capital Markets Division"]
 		// [Division:systems{SAP}, "Single Family Division"]
+		// [Division.people[0].Person.groups{"numbers"}{"one"} = "ONE"]
 		for( InfoNode node : infoNode.getChildren() )
 		{
 			// the node should be a MapEntry class, if not, then we've got problems, which
@@ -203,17 +212,17 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 				final List< InfoNode > entryNodes = node.getChildren();
 				if( entryNodes.size() != 2 )
 				{
-					final StringBuffer message = new StringBuffer();
-					message.append( "The MapRenderer expects MapEntry nodes to have exactly 2 subnodes." + Constants.NEW_LINE );
-					message.append( "  Number of subnodes: " + entryNodes.size() + Constants.NEW_LINE );
-					message.append( "  Persist Name: " + node.getPersistName() );
+					final StringBuilder message = new StringBuilder();
+					message.append( "The MapRenderer expects MapEntry nodes to have exactly 2 subnodes." ).append( Constants.NEW_LINE );
+					message.append( "  Number of subnodes: " ).append( entryNodes.size() ).append( Constants.NEW_LINE );
+					message.append( "  Persist Name: " ).append( node.getPersistName() );
 					LOGGER.error( message.toString() );
 					throw new IllegalStateException( message.toString() );
 				}
 				
 				// find the info node that holds the key, and the info node that holds the value
-				InfoNode keyNode = null;
-				InfoNode valueNode = null;
+				InfoNode keyNode;
+				InfoNode valueNode;
 				final String name1 = entryNodes.get( 0 ).getPersistName(); 
 				final String name2 = entryNodes.get( 1 ).getPersistName();
 				if( name1.equals( mapKeyName ) && name2.equals( mapValueName ) )
@@ -228,12 +237,12 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 				}
 				else
 				{
-					final StringBuffer message = new StringBuffer();
-					message.append( "The MapRenderer expects MapEntry nodes to have a key subnode and a value subnode." + Constants.NEW_LINE );
-					message.append( "  Required Key Subnode Persist Name: " + mapKeyName + Constants.NEW_LINE );
-					message.append( "  Required Value Subnode Persist Name: " + mapValueName + Constants.NEW_LINE );
-					message.append( "  First Node's Persist Name: " + name1 + Constants.NEW_LINE );
-					message.append( "  Second Node's Persist Name: " + name2 );
+					final StringBuilder message = new StringBuilder();
+					message.append( "The MapRenderer expects MapEntry nodes to have a key subnode and a value subnode." ).append( Constants.NEW_LINE );
+					message.append( "  Required Key Subnode Persist Name: " ).append( mapKeyName ).append( Constants.NEW_LINE );
+					message.append( "  Required Value Subnode Persist Name: " ).append( mapValueName ).append( Constants.NEW_LINE );
+					message.append( "  First Node's Persist Name: " ).append( name1 ).append( Constants.NEW_LINE );
+					message.append( "  Second Node's Persist Name: " ).append( name2 );
 					LOGGER.error( message.toString() );
 					throw new IllegalStateException( message.toString() );
 				}
@@ -258,9 +267,9 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 				else
 				{
 					// TODO currently we have a slight problem here for compound keys.
-					final StringBuffer message = new StringBuffer();
-					message.append( "The MapRenderer doesn't allow compound (composite) keys at this point." + Constants.NEW_LINE );
-					message.append( "  Current Key: " + newKey + Constants.NEW_LINE );
+					final StringBuilder message = new StringBuilder();
+					message.append( "The MapRenderer doesn't allow compound (composite) keys at this point." ).append( Constants.NEW_LINE );
+					message.append( "  Current Key: " ).append( newKey ).append( Constants.NEW_LINE );
 					LOGGER.error( message.toString() );
 					throw new IllegalStateException( message.toString() );
 				}
@@ -276,10 +285,10 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 			}
 			else
 			{
-				final StringBuffer message = new StringBuffer();
-				message.append( "The MapRenderer expects the root node of the map to have only subnodes of type MapEntry." + Constants.NEW_LINE );
-				message.append( "  InfoNode Type: " + (node.getClazz() == null ? "[null]" : node.getClazz().getName()) + Constants.NEW_LINE );
-				message.append( "  Persist Name: " + node.getPersistName() );
+				final StringBuilder message = new StringBuilder();
+				message.append( "The MapRenderer expects the root node of the map to have only subnodes of type MapEntry." ).append( Constants.NEW_LINE );
+				message.append( "  InfoNode Type: " ).append( (node.getClazz() == null ? "[null]" : node.getClazz().getName()) ).append( Constants.NEW_LINE );
+				message.append( "  Persist Name: " ).append( node.getPersistName() );
 				LOGGER.error( message.toString() );
 				throw new IllegalStateException( message.toString() );
 			}
@@ -327,13 +336,16 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 		// we simply create it here and add it to the collection node
 		final String compoundRegex = "^" + group + decorationRegex;
 		final Pattern compoundPattern = Pattern.compile( compoundRegex );
-		
+
 		final String leafRegex = compoundRegex + "$";
+//		final String leafRegex = compoundRegex + "$|" + compoundRegex + Pattern.quote( getPersistenceBuilder().getSeparator() );
 		final Pattern leafPattern = Pattern.compile( leafRegex );
 		
 		// we want to have groups by the map key. the map key is the map key in the key-value pair that.
 		// for example, in friends{"Polly"}, the map key is "Polly" (including the quotes). then we
 		// can parse each group into its proper node.
+		// TODO if the we have friends{"Polly"}{"happiness"} then the key is "happiness" and we need to
+		// call the renderer again.
 		final Map< String, List< Pair< String, String > > > mapKeyGroups = getMapKeyGroups( keyValues );
 		for( Map.Entry< String, List< Pair< String, String > > > entry : mapKeyGroups.entrySet() )
 		{
@@ -363,7 +375,8 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 				// we must figure out whether this is a compound node or a leaf node
 				final Matcher compoundMatcher = compoundPattern.matcher( key );
 				final Matcher leafMatcher = leafPattern.matcher( key );
-				if( leafMatcher.find() )
+//				final String trimmedKey = key.replaceAll( " ", "" );
+				if( leafMatcher.find() )// && !trimmedKey.contains( "\"}{\"" ) )
 				{
 					// its a leaf, create the key node
 					final String rawMapKey = getDecorator( mapKey ).undecorate( mapKey );
@@ -401,11 +414,11 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 							// 1. for something like months{"April"}[1] we remove all but the [1]
 							// 2. for something like months{"April"}.Date we remove all but the Date
 							// 3. for something like months{"April"}[1].Mood we remove all but [1].Mood
+							// 4. TODO for something like months{"April"}{"happiness"} we need to remove all but {"happiness"}
 							final String strippedKey = mapValueName + stripFirstElement( copiedKey, separator );
-//							final String strippedKey = valueName + stripFirstElement( copiedKey, separator );
-							
+
 							// add the key to the list of keys that belong to the compound node
-							mapValueKeyValues.add( new Pair< String, String >( strippedKey, copiedKeyValue.getSecond() ) );
+							mapValueKeyValues.add( new Pair<>( strippedKey, copiedKeyValue.getSecond() ) );
 							
 							// and remove the element from the list of key values
 							copiedKeyValues.remove( copiedKeyValue );
@@ -422,10 +435,10 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 				else
 				{
 					// error
-					final StringBuffer message = new StringBuffer();
-					message.append( "The key neither represents a leaf node nor a compound node. This is a real problem!" + Constants.NEW_LINE );
-					message.append( "  Parent Node Persistence Name: " + parentNode.getPersistName() + Constants.NEW_LINE );
-					message.append( "  Key: " + key + Constants.NEW_LINE );
+					final StringBuilder message = new StringBuilder();
+					message.append( "The key neither represents a leaf node nor a compound node. This is a real problem!" ).append( Constants.NEW_LINE );
+					message.append( "  Parent Node Persistence Name: " ).append( parentNode.getPersistName() ).append( Constants.NEW_LINE );
+					message.append( "  Key: " ).append( key ).append( Constants.NEW_LINE );
 					LOGGER.error( message.toString() );
 					throw new IllegalArgumentException( message.toString() );
 				}
@@ -433,7 +446,7 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 		}
 	}
 	
-	/*
+	/**
 	 * Extracts the map keys and creates a {@link Map} that has as its keys these map keys. The values are the
 	 * key-value pairs associated with each of these map keys. For leaf nodes, the list of key-value pairs will
 	 * be of size one. For compound nodes, the list will have a size greater than or equal to one.
@@ -445,14 +458,14 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 		final Map< String, List< Pair< String, String > > > keyGroups = new LinkedHashMap<>();
 		for( Pair< String, String > keyValue : keyValues )
 		{
-			final String mapKey = extractMapKey( keyValue.getFirst() );
+			final String mapKey = extractGroupMapKey( keyValue.getFirst() );
 			if( keyGroups.containsKey( mapKey ) )
 			{
 				keyGroups.get( mapKey ).add( keyValue );
 			}
 			else
 			{
-				final List< Pair< String, String > > keyValueList = new ArrayList<>();//Arrays.asList( keyValue );
+				final List< Pair< String, String > > keyValueList = new ArrayList<>();
 				keyValueList.add( keyValue );
 				keyGroups.put( mapKey, keyValueList );
 			}
@@ -460,25 +473,31 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 		return keyGroups;
 	}
 	
-	/*
+	/**
 	 * Extracts the map key from the key. For example, if the key is <code>months{"January"}[0]</code>, then this method
 	 * will return the {@link String} <code>"January"</code> (including the quotes). Or, for example, if the key is <code>id{234}</code>
 	 * this method will return the {@link String} <code>234</code>.
 	 * @param key The key from which to extract the map key
 	 * @return the map key as a {@link String}.
 	 */
-	private String extractMapKey( final String key )
+	private String extractGroupMapKey( final String key )
 	{
 		String mapKey = null;
 		final Matcher matcher = decorationPattern.matcher( key );
 		if( matcher.find() )
 		{
+//			int end = matcher.end();
+//			if( key.replaceAll( " ", "" ).contains( "\"}{\"" ) )
+//			{
+//				end = key.indexOf( "}" ) + 1;
+//			}
+//			mapKey = keyDecorator.undecorate( key.substring( matcher.start(), end ) );
 			mapKey = keyDecorator.undecorate( key.substring( matcher.start(), matcher.end() ) );
 		}
 		return mapKey;
 	}
 	
-	/*
+	/**
 	 * Extracts the map key part from the key. For example, if the key is <code>months{"January"}[0]</code>
 	 * this method will return <code>months{"January"}</code>.
 	 * @param key The key from which to extract the map-key part
@@ -495,7 +514,7 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 		return mapKey;
 	}
 	
-	/*
+	/**
 	 * Removes the map key part from the key. For example, if the key is <code>months{"January"}[0]</code>
 	 * this method will return <code>[0]</code>.
 	 * @param key The key from which to strip the map-key part
@@ -511,13 +530,20 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 		}
 		return keyRemainder;
 	}
-	
+
+	/**
+	 * Strips the first element from a compound element. For example, if the key is {@code groups\{"numbers"\}\{"one"\}}
+	 * then strips off and returns {@code groups\{"numbers"\}}
+	 * @param key The key to process
+	 * @param separator The decorator (i.e. "{")
+	 * @return The first element
+	 */
 	private String stripFirstElement( final String key, final String separator )
 	{
-		final String remainder = removeMapKeyPart( key );
+		String remainder = removeMapKeyPart( key );
 		if( remainder.startsWith( separator ) )
 		{
-			remainder.replaceAll( "^" + Pattern.quote( separator ), "" );
+			remainder = remainder.replaceAll( "^" + Pattern.quote( separator ), "" );
 		}
 		return remainder;
 	}
