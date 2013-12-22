@@ -116,7 +116,7 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 				message.append( "Field not found in containing class:" + Constants.NEW_LINE );
 				message.append( "  Containing class: " + containingClass.getName() + Constants.NEW_LINE );
 				message.append( "  Field name: " + fieldName + Constants.NEW_LINE );
-				LOGGER.info( message.toString() );
+				LOGGER.debug( message.toString() );
 			}
 		}
 		if( persistName == null || persistName.isEmpty() )
@@ -157,7 +157,7 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 			message.append( "Field not found in containing class:" + Constants.NEW_LINE );
 			message.append( "  Containing class: " + containingClass.getName() + Constants.NEW_LINE );
 			message.append( "  Field name: " + fieldName + Constants.NEW_LINE );
-			LOGGER.info( message.toString() );
+			LOGGER.debug( message.toString() );
 		}
 		
 		// run through the Map entries, recursively calling createNode(...) to create

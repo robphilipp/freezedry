@@ -130,7 +130,7 @@ public class CollectionNodeBuilder extends AbstractNodeBuilder {
 				message.append( "Field not found in containing class:" + Constants.NEW_LINE );
 				message.append( "  Containing class: " + containingClass.getName() + Constants.NEW_LINE );
 				message.append( "  Field name: " + fieldName + Constants.NEW_LINE );
-				LOGGER.info( message.toString() );
+				LOGGER.debug( message.toString() );
 			}
 		}
 		
