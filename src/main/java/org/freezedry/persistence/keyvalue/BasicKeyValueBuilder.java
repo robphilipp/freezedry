@@ -187,7 +187,7 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 			}
 		}
 		
-		// if we're withholding the persistence name, then don't add it to the key
+		// if we're not withholding the persistence name, then add it to the key
 		if( !isWithholdPersitName )
 		{
 			newKey.append( infoNode.getPersistName() );

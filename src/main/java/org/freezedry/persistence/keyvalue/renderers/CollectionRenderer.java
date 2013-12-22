@@ -37,7 +37,7 @@ import org.freezedry.persistence.utils.ReflectionUtils;
 
 /**
  * Renders the subtree of the semantic model that represents a {@link Collection}. {@link Collection}s are rendered
- * as the collection's persistence name followed by the decorated index. For example, a {@code List< String >}
+ * as the collection's persistence name followed by the decorated index. For example, a {@code List&lt; String >}
  * would be persisted in the following format when using the default decorator and settings:
  * <code><pre>
  * Division.carNames[0] = "civic"
@@ -107,7 +107,7 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 	 * {@link Collection}s into key value pairs. Uses the default the index decorator which prepends
 	 * a "{@code [}" onto the index and appends a "{@code ]}" to the end of the index. For example,
 	 * if the {@code index=1} then the index would be decorated to look like {@code [1]}.
-	 * @param builder
+	 * @param builder The builder for converting into and out of {@link org.freezedry.persistence.tree.InfoNode} objects
 	 */
 	public CollectionRenderer( final KeyValueBuilder builder )
 	{
@@ -151,9 +151,9 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 	 * Tells the renderer to withhold the persistence name for the specified {@link Class} in
 	 * instances where the {@link Collection} element is compound, and that compound element
 	 * is the specified {@link Class} or a subclass of the specified {@link Class}. For example,
-	 * when we have a {@code List< Map< String, String > >} called {@code listOfMaps}, then for each
+	 * when we have a {@code List&lt; Map&lt; String, String > >} called {@code listOfMaps}, then for each
 	 * list element, we have a {@link Map}, and so we would want to render it as <code>listOfMap[i]{key}</code>.
-	 * Similarly, if we have a {@code List< List< Double > >} called {@code matrix}, we would want to 
+	 * Similarly, if we have a {@code List&lt; List&lt; Double > >} called {@code matrix}, we would want to
 	 * render it as {@code matrix[i][j]}.
 	 * <p>For arrays, see the {@link #withholdArrayPersistName} method.
 	 * @param clazz The specified {@link Class} for which to withhold the persistence name
@@ -203,13 +203,13 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 			if( node.isLeafNode() )
 			{
 				// create the key-value pair and return it
-				final String newKey = createNodeKey( key, infoNode, index );
+				final String newKey = createNodeKey( key, infoNode, index, isWithholdPersistName );
 				getPersistenceBuilder().createKeyValuePairs( node, newKey, keyValues, true );
 			}
 			else
 			{
 				// create the key-value pair and return it
-				final String newKey = createNodeKey( key, infoNode, index );
+				final String newKey = createNodeKey( key, infoNode, index, isWithholdPersistName );
 				boolean hidePersistName = false;
 				
 				// next we need to check whether the group name for the key is empty. for example,
@@ -239,9 +239,9 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 	/**
 	 * Returns true if we have specified that when the collection element is a compound
 	 * element of the certain types, then we zero out the node's persistence name. For example,
-	 * when we have a {@code List< Map< String, String > >} called {@code listOfMaps}, then for each
+	 * when we have a {@code List&lt; Map&lt; String, String > >} called {@code listOfMaps}, then for each
 	 * list element, we have a {@link Map}, and so we would want to render it as <code>listOfMap[i]{key}</code>.
-	 * Similarly, if we have a {@code List< List< Double > >} called {@code matrix}, we would want to 
+	 * Similarly, if we have a {@code List&lt; List&lt; Double > >} called {@code matrix}, we would want to
 	 * render it as {@code matrix[i][j]}.
 	 * @param node The node containing the compound collection element
 	 * @return true if the persistence name of the node should be zeroed out. 
@@ -284,16 +284,19 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 	 * @param key The current key to which to append the persisted name and decorated index
 	 * @param parentNode The parent node, which holds the name of the field (in this example, "{@code people}")
 	 * @param index The index of the element in the {@link List}
+	 * @param isHidePersistName set to {@code true} if the persistence name should be hidded; {@code false} to show it
 	 * @return The key
 	 */
-	protected final String createNodeKey( final String key, final InfoNode parentNode, final int index )
+	protected final String createNodeKey( final String key, final InfoNode parentNode, final int index, final boolean isHidePersistName )
 	{
 		// grab the key-element separator
 		final String separator = getPersistenceBuilder().getSeparator();
 
 		// if the parent node has a persistence name then add it
 		String newKey = key;
-		if( parentNode.getPersistName() != null && !parentNode.getPersistName().isEmpty() )
+		if( parentNode.getPersistName() != null &&
+			!parentNode.getPersistName().isEmpty() &&
+			!isHidePersistName )
 		{
 			newKey += separator + parentNode.getPersistName();
 		}
@@ -383,7 +386,7 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 						final String strippedKey = stripFirstElement( copiedKey, separator );
 						
 						// add the key to the list of keys that belong to the compound node
-						elementKeyValues.add( new Pair< String, String >( strippedKey, copiedKeyValue.getSecond() ) );
+						elementKeyValues.add( new Pair<>( strippedKey, copiedKeyValue.getSecond() ) );
 						
 						// and remove the element from the list of key values
 						copiedKeyValues.remove( copiedKeyValue );
@@ -399,10 +402,10 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 			else
 			{
 				// error
-				final StringBuffer message = new StringBuffer();
-				message.append( "The key neither represents a leaf node nor a compound node. This is a real problem!" + Constants.NEW_LINE );
-				message.append( "  Parent Node Persistence Name: " + parentNode.getPersistName() + Constants.NEW_LINE );
-				message.append( "  Key: " + key + Constants.NEW_LINE );
+				final StringBuilder message = new StringBuilder();
+				message.append( "The key neither represents a leaf node nor a compound node. This is a real problem!" ).append( Constants.NEW_LINE );
+				message.append( "  Parent Node Persistence Name: " ).append( parentNode.getPersistName() ).append( Constants.NEW_LINE );
+				message.append( "  Key: " ).append( key ).append( Constants.NEW_LINE );
 				LOGGER.error( message.toString() );
 				throw new IllegalArgumentException( message.toString() );
 			}
@@ -448,7 +451,6 @@ public class CollectionRenderer extends AbstractPersistenceRenderer {
 		String remainder = removeElementKeyPart( key );
 		if( remainder.startsWith( separator ) )
 		{
-//			remainder.replaceFirst( Pattern.quote( separator ) + "?", "" );
 			remainder = remainder.substring( 1 );
 		}
 		return remainder;

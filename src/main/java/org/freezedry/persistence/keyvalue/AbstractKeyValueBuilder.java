@@ -97,7 +97,6 @@ public abstract class AbstractKeyValueBuilder implements KeyValueBuilder {
 	{
 		final Map< Class< ? >, PersistenceRenderer > renderers = new HashMap<>();
 		renderers.put( Collection.class, new CollectionRenderer( this ) );
-//		renderers.put( Collection.class, new FlatteningCollectionRenderer( this ) );
 		renderers.put( Map.class, new MapRenderer( this ) );
 
 		renderers.put( String.class, new LeafNodeRenderer( this ) );
@@ -230,12 +229,9 @@ public abstract class AbstractKeyValueBuilder implements KeyValueBuilder {
 		{
 			if( renderer.isRenderer( key ) )
 			{
-				if( LOGGER.isInfoEnabled() )
+				if( LOGGER.isDebugEnabled() )
 				{
-					final StringBuilder message = new StringBuilder();
-					message.append( "Selected renderer, " ).append( renderer.getClass().getName() )
-							.append( ", for key, " ).append( key );
-					LOGGER.info( message.toString() );
+					LOGGER.debug( "Selected renderer, " + renderer.getClass().getName() + ", for key, " + key );
 				}
 				return renderer;
 			}
