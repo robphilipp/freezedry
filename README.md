@@ -9,21 +9,14 @@ Java persistence framework: no need for binding files, no-arg constructors, or a
 Please see the Website (http://robphilipp.github.io/freezedry) for documentation.
 
 1. The "Overview Guide" page describes the framework and its usage.
-2. The "Quick Start" page describes the various files, which ones to use, how 
-   to get running in Eclipse
+2. The "Quick Start" page describes the various files and how to get up and 
+   running quickly.
 
 -----------------------------------------------------------------------------------
-   File Overview and Directories
+   Contiuous Integration
 -----------------------------------------------------------------------------------
-The directories provide three options for downloading FreezeDry. All options provide
-a "log4j.xml" configuration file that may be used if you want to use logging.
-1. A JAR containing all the dependencies conveniently packaged into one JAR file. 
-   This is found in the directory "single_jar".
-2. A set of JAR files. The FreezeDry_vx.x.x.jar contains the FreezeDry framework. The
-   additional JAR files are the require dependencies.
-3. The source code and an Ant build.xml file for building the source code, and creating
-   the release package. The source code comes in a zip file, and starting with version
-   0.2.0 also has the directories for individual file downloads.
+I use cloudbees for CI. You can view the results of master and develop branch
+builds at https://robphilipp.ci.cloudbees.com/.
 
 -----------------------------------------------------------------------------------
    Changes from version 0.2.7 to version 0.2.8
