@@ -29,6 +29,7 @@
         <qos.logback.version>1.0.13</qos.logback.version>
         <json.version>20090211_1</json.version>
         <apache.commons-io.version>1.4_3</apache.commons-io.version>
+        <maven.surefire.version>2.16</maven.surefire.version>
     </properties>
 
     <licenses>
@@ -89,6 +90,11 @@
                     <source>1.7</source>
                     <target>1.7</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.surefire</groupId>
+                <artifactId>maven-surefire-common</artifactId>
+                <version>${maven.surefire.version}</version>
             </plugin>
 
             <!-- osgi bundle plugin-->
