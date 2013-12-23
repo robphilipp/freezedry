@@ -16,7 +16,8 @@
 package org.freezedry.persistence;
 
 import junit.framework.Assert;
-import org.apache.log4j.xml.DOMConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.freezedry.persistence.builders.NodeBuilder;
 import org.freezedry.persistence.builders.StringNodeBuilder;
 import org.freezedry.persistence.readers.JsonReader;

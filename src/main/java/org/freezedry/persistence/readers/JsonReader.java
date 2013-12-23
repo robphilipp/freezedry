@@ -15,19 +15,6 @@
  */
 package org.freezedry.persistence.readers;
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
-
-import org.apache.log4j.Logger;
-import org.apache.log4j.xml.DOMConfigurator;
 import org.freezedry.persistence.PersistenceEngine;
 import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.Constants;
@@ -35,6 +22,14 @@ import org.freezedry.persistence.utils.JsonUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
 
 /**
  * Reads the JSON string from the specifed {@link InputStream} and converts it to the semantic model.
@@ -75,7 +70,7 @@ import org.json.JSONObject;
  */
 public class JsonReader implements PersistenceReader {
 
-	private static final Logger LOGGER = Logger.getLogger( JsonReader.class );
+	private static final Logger LOGGER = LoggerFactory.getLogger( JsonReader.class );
 
 	/*
 	 * (non-Javadoc)
@@ -344,8 +339,6 @@ public class JsonReader implements PersistenceReader {
 	
 	public static void main( String[] args ) throws FileNotFoundException
 	{
-		DOMConfigurator.configure( "log4j.xml" );
-		
 //		final InputStream inputStream = new BufferedInputStream( new FileInputStream( "person.json" ) );
 //		final Reader input = new InputStreamReader( inputStream );
 //		final JsonReader reader = new JsonReader();

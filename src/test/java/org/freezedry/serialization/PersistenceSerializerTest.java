@@ -1,9 +1,7 @@
 package org.freezedry.serialization;
 
 import junit.framework.Assert;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.xml.DOMConfigurator;
+import org.freezedry.difference.ObjectDifferenceCalculator;
 import org.freezedry.persistence.tests.BadPerson;
 import org.freezedry.persistence.tests.Division;
 import org.freezedry.persistence.tests.Person;
@@ -12,9 +10,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.*;
 import java.text.ParseException;
 import java.util.*;
 
@@ -25,10 +21,6 @@ import java.util.*;
  *         12/1/13 3:04 PM
  */
 public class PersistenceSerializerTest {
-
-	private static final Logger LOGGER = Logger.getLogger( PersistenceSerializerTest.class );
-
-	protected final static String OUTPUT_DIR = "src/test/output/";
 
 	private Person person;
 	private BadPerson badPerson;
@@ -41,8 +33,6 @@ public class PersistenceSerializerTest {
 	@BeforeClass
 	public static void init()
 	{
-		DOMConfigurator.configure( "log4j.xml" );
-		Logger.getRootLogger().setLevel( Level.WARN );
 	}
 
 	@Before
@@ -52,6 +42,15 @@ public class PersistenceSerializerTest {
 		person.addFriend( "james henley", "buddy buddy" );
 		person.addFriend( "castor heliopolis", "buddy" );
 		person.addFriend( "janis joplin", "music" );
+//		Map< String, String > group = new LinkedHashMap<>();
+//		group.put( "one", "ONE" );
+//		group.put( "two", "TWO" );
+//		group.put( "three", "THREE" );
+//		person.addGroup( "numbers", group );
+//		group = new LinkedHashMap<>();
+//		group.put( "a", "AY" );
+//		group.put( "b", "BEE" );
+//		person.addGroup( "letters", group );
 
 		badPerson = new BadPerson( "henley", "james", 42 );
 		badPerson.addEvilDoing( "Added semicolon after the closing parenthesis of colleague's code." );
@@ -114,49 +113,49 @@ public class PersistenceSerializerTest {
 	}
 
 	@Test
-	public void testSerializeXml() throws Exception
+	public void testDeserializeSerializeXml() throws Exception
 	{
-		serializeDeserialize( OUTPUT_DIR + "person_test.xml", xmlSerializer, person, Person.class );
-		serializeDeserialize( OUTPUT_DIR + "bad_person_test.xml", xmlSerializer, badPerson, BadPerson.class );
-		serializeDeserialize( OUTPUT_DIR + "division_test.xml", xmlSerializer, division, Division.class );
+		serializeDeserialize( xmlSerializer, person, Person.class );
+		serializeDeserialize( xmlSerializer, badPerson, BadPerson.class );
+		serializeDeserialize( xmlSerializer, division, Division.class );
 	}
 
 	@Test
-	public void testSerializeJson() throws Exception
+	public void testDeserializeSerializeJson() throws Exception
 	{
-		serializeDeserialize( OUTPUT_DIR + "person_test.json", jsonSerializer, person, Person.class );
-		serializeDeserialize( OUTPUT_DIR + "bad_person_test.json", jsonSerializer, badPerson, BadPerson.class );
-		serializeDeserialize( OUTPUT_DIR + "division_test.json", jsonSerializer, division, Division.class );
+		serializeDeserialize( jsonSerializer, person, Person.class );
+		serializeDeserialize( jsonSerializer, badPerson, BadPerson.class );
+		serializeDeserialize( jsonSerializer, division, Division.class );
 	}
 
 	@Test
-	public void testSerializeKeyValue() throws Exception
+	public void testSerializeDeserializeKeyValue() throws Exception
 	{
-		serializeDeserialize( OUTPUT_DIR + "person_test.txt", keyValueSerializer, person, Person.class );
-		serializeDeserialize( OUTPUT_DIR + "bad_person_test.txt", keyValueSerializer, badPerson, BadPerson.class );
-		serializeDeserialize( OUTPUT_DIR + "division_test.txt", keyValueSerializer, division, Division.class );
+		serializeDeserialize( keyValueSerializer, person, Person.class );
+		serializeDeserialize( keyValueSerializer, badPerson, BadPerson.class );
+		serializeDeserialize( keyValueSerializer, division, Division.class );
 	}
 
-	private < T > void serializeDeserialize( final String filename,
-										final Serializer serializer,
-										final T object,
-										final Class< T > clazz ) throws FileNotFoundException
+	/**
+	 * Serializes the object into a byte[] and then reconstructes that object and compares it
+	 * @param serializer The serializer to use for serializing and deserializing
+	 * @param object The object to serialize and deserialized
+	 * @param clazz The type of the oject being serialized/deserialized
+	 * @param <T> The object type
+	 * @throws FileNotFoundException
+	 */
+	private < T > void serializeDeserialize( final Serializer serializer,
+											 final T object,
+											 final Class< T > clazz ) throws FileNotFoundException
 	{
-		try
-		{
-			serializer.serialize( object, new FileOutputStream( filename ) );
-			final T reObject = serializer.deserialize( new FileInputStream( filename ), clazz );
-			Assert.assertEquals( "Deserialized object not equal to original: " + object.getClass().getName(), object, reObject );
-		}
-		catch( FileNotFoundException e )
-		{
-			Assert.fail( "Could not find serialized Person in file: " + e );
-		}
-	}
+		final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		serializer.serialize( object, outputStream );
 
-	@Test
-	public void testDeserialize() throws Exception
-	{
+		final byte[] serializedBytes = outputStream.toByteArray();
+		final T reObject = serializer.deserialize( new ByteArrayInputStream( serializedBytes ), clazz );
 
+		final ObjectDifferenceCalculator calculator = new ObjectDifferenceCalculator();
+		final Map< String, ObjectDifferenceCalculator.Difference > differences = calculator.calculateDifference( reObject, object );
+		Assert.assertTrue( differences == null || differences.isEmpty() );
 	}
 }

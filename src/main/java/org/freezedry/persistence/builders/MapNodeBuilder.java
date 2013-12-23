@@ -23,7 +23,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.freezedry.persistence.PersistenceEngine;
 import org.freezedry.persistence.annotations.PersistMap;
 import org.freezedry.persistence.containers.Pair;
@@ -40,7 +41,7 @@ import org.freezedry.persistence.utils.ReflectionUtils;
  */
 public class MapNodeBuilder extends AbstractNodeBuilder {
 	
-	private static final Logger LOGGER = Logger.getLogger( MapNodeBuilder.class );
+	private static final Logger LOGGER = LoggerFactory.getLogger( MapNodeBuilder.class );
 	
 	// for maps that are root objects, these are the key and value prefixes so that upon reconstruction
 	// there is a way to know which node contains the key, and which node contains the value
@@ -115,7 +116,7 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 				message.append( "Field not found in containing class:" + Constants.NEW_LINE );
 				message.append( "  Containing class: " + containingClass.getName() + Constants.NEW_LINE );
 				message.append( "  Field name: " + fieldName + Constants.NEW_LINE );
-				LOGGER.info( message.toString() );
+				LOGGER.debug( message.toString() );
 			}
 		}
 		if( persistName == null || persistName.isEmpty() )
@@ -156,7 +157,7 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 			message.append( "Field not found in containing class:" + Constants.NEW_LINE );
 			message.append( "  Containing class: " + containingClass.getName() + Constants.NEW_LINE );
 			message.append( "  Field name: " + fieldName + Constants.NEW_LINE );
-			LOGGER.info( message.toString() );
+			LOGGER.debug( message.toString() );
 		}
 		
 		// run through the Map entries, recursively calling createNode(...) to create
@@ -277,7 +278,7 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 			if( keyValue.size() != 2 )
 			{
 				final StringBuffer message = new StringBuffer();
-				message.append( "The info node for this map must have two nodes. But snap! It doesn't" + Constants.NEW_LINE );
+				message.append( "The info node for this map must have two nodes. Aw snap! But it doesn't" + Constants.NEW_LINE );
 				message.append( "  Number of nodes: " + keyValue.size() + Constants.NEW_LINE );
 				message.append( "  Node names: " + Constants.NEW_LINE );
 				for( InfoNode childNode : keyValue )

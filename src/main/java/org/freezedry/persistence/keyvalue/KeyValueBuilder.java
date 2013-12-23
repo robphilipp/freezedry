@@ -35,7 +35,7 @@ public interface KeyValueBuilder {
 	 * Sets the mapping of {@link Class}es to their {@link PersistenceRenderer}s.
 	 * @param renderers The mapping of {@link Class}es to their {@link PersistenceRenderer}s.
 	 */
-	void setRenderers( final Map< Class< ? >, PersistenceRenderer > renderers );
+	void setRenderers( Map< Class< ? >, PersistenceRenderer > renderers );
 	
 	/**
 	 * Puts an association between a {@link Class} and a {@link PersistenceRenderer} into the mapping.
@@ -45,7 +45,7 @@ public interface KeyValueBuilder {
 	 * @return the {@link PersistenceRenderer} that was previously associated with the specified {@link Class}
 	 * or null if no association existed.
 	 */
-	PersistenceRenderer putRenderer( final Class< ? > clazz, final PersistenceRenderer renderer );
+	PersistenceRenderer putRenderer( Class< ? > clazz, PersistenceRenderer renderer );
 	
 	/**
 	 * Removes the {@link Class} from any association with the {@link PersistenceRenderer}. Use this method if you
@@ -54,18 +54,25 @@ public interface KeyValueBuilder {
 	 * @return the {@link PersistenceRenderer} that was associated with the specified {@link Class} so that it
 	 * can be dealt with properly, or null if no such association existed, and this was a false accusation.
 	 */
-	PersistenceRenderer removeRenderer( final Class< ? > clazz );
+	PersistenceRenderer removeRenderer( Class< ? > clazz );
 	
 	/**
 	 * Sets the {@link PersistenceRenderer} to be used for renderering and parsing arrays
 	 * @param renderer The {@link PersistenceRenderer} to be used for renderering and parsing arrays
 	 */
-	void setArrayRenderer( final PersistenceRenderer renderer );
+	void setArrayRenderer( PersistenceRenderer renderer );
 	
 	/**
 	 * @return the {@link PersistenceRenderer} to be used for renderering and parsing arrays
 	 */
 	PersistenceRenderer getArrayRenderer();
+
+	/**
+	 * Returns {@code true} if the buider contains a renderer for the specifed class; {@code false} otherwise
+	 * @param clazz The class for which to check for a renderer
+	 * @return {@code true} if the buider contains a renderer for the specifed class; {@code false} otherwise
+	 */
+	boolean containsRenderer( Class< ? > clazz );
 
 	/**
 	 * The entry point for building the {@link List} of key-value pairs from the semantic model,
@@ -75,7 +82,7 @@ public interface KeyValueBuilder {
 	 * @return the {@link List} of key-value pairs 
 	 * @see #buildKeyValuePairs(InfoNode, String, List)
 	 */
-	List< Pair< String, Object > > buildKeyValuePairs( final InfoNode rootInfoNode );
+	List< Pair< String, Object > > buildKeyValuePairs( InfoNode rootInfoNode );
 	
 	/**
 	 * The recursive algorithm for flattening the semantic model into a {@link List} of key-value pairs.
@@ -83,7 +90,7 @@ public interface KeyValueBuilder {
 	 * @param key The current key, which has accumulated the parents persistence names as part of the flattening
 	 * @param keyValues The current list of key-values to which to add the ones created in this algorithm.
 	 */
-	void buildKeyValuePairs( final InfoNode infoNode, final String key, final List< Pair< String, Object > > keyValues );
+	void buildKeyValuePairs( InfoNode infoNode, String key, List< Pair< String, Object > > keyValues );
 	
 	/**
 	 * Creates the actual key-value pair, though for compound nodes, it calls back its calling method, 
@@ -95,7 +102,7 @@ public interface KeyValueBuilder {
 	 * This parameter allows {@link PersistenceRenderer}s to suppress the persistence name when it is appropriate. For
 	 * example, in a {@link List} of {@link String}, you may not want to at "{@code String}" to the key.
 	 */
-	void createKeyValuePairs( final InfoNode infoNode, final String key, final List< Pair< String, Object > > keyValues, final boolean isWithholdPersitName );
+	void createKeyValuePairs( InfoNode infoNode, String key, List< Pair< String, Object > > keyValues, boolean isWithholdPersitName );
 	
 	/**
 	 * @return The separator between the flattened key elements. For example, suppose that a {@code Division} has a {@link List}
@@ -117,7 +124,7 @@ public interface KeyValueBuilder {
 	 * @param clazz The {@link Class} for which to return the renderer.
 	 * @return the renderer for the specified {@link Class} or null if the specified {@link Class}.
 	 */
-	PersistenceRenderer getRenderer( final Class< ? > clazz );
+	PersistenceRenderer getRenderer( Class< ? > clazz );
 	
 	/**
 	 * The separator between the flattened key elements. For example, suppose that a {@code Division} has a {@link List}
@@ -126,7 +133,7 @@ public interface KeyValueBuilder {
 	 * the "{@code :}" are separators.
 	 * @param separator The separator
 	 */
-	void setSeparator( final String separator );
+	void setSeparator( String separator );
 
 	/**
 	 * When set to true, the full key is persisted. So for example, normally, if there is a {@link List}
@@ -134,7 +141,7 @@ public interface KeyValueBuilder {
 	 * set to true, then the {@link List} would have a key of the form {@code names[i].String}
 	 * @param isShowFullKey true means that the full key will be persisted; false is default
 	 */
-	void setShowFullKey( final boolean isShowFullKey );
+	void setShowFullKey( boolean isShowFullKey );
 	
 	/**
 	 * When set to true, the full key is persisted. So for example, normally, if there is a {@link List}
@@ -150,7 +157,7 @@ public interface KeyValueBuilder {
 	 * @param keyValues The key-value pairs
 	 * @return The root {@link InfoNode} of the semantic model
 	 */
-	InfoNode buildInfoNode( final Class< ? > clazz, final List< Pair< String, String > > keyValues );
+	InfoNode buildInfoNode( Class< ? > clazz, List< Pair< String, String > > keyValues );
 	
 	/**
 	 * Recursively builds the semantic model. The keys in the key-value list should all have as their
@@ -158,9 +165,8 @@ public interface KeyValueBuilder {
 	 * @param parentNode The node to which to add the child nodes
 	 * @param keyValues The list of key-value pairs. The first key element of every key should match
 	 * the persistence name of the parent node.
-	 * @return the new info node
 	 */
-	void buildInfoNode( final InfoNode parentNode, final List< Pair< String, String > > keyValues );
+	void buildInfoNode( InfoNode parentNode, List< Pair< String, String > > keyValues );
 
 	/**
 	 * Creates an {@link InfoNode} based on the group name and the specified key-value pairs. Part of the 
@@ -171,14 +177,14 @@ public interface KeyValueBuilder {
 	 * the persistence name of the parent node.
 	 * @see #buildInfoNode(InfoNode, List)
 	 */
-	void createInfoNode( final InfoNode parentNode, final String groupName, final List< Pair< String, String > > keyValues );
+	void createInfoNode( InfoNode parentNode, String groupName, List< Pair< String, String > > keyValues );
 	
 	/**
-	 * Returns the root key. If the {@code useClassAsRootKey} default was set via the constructor or the {@link #setRootKey(String)}
-	 * method, then it returns that root key. Otherwise, it pulls the first key element from each key, ensures that
+	 * Returns the root key. If the {@code useClassAsRootKey} default was set via the constructor, then it
+	 * returns that root key. Otherwise, it pulls the first key element from each key, ensures that
 	 * they are all the same, and then returns that root key.
 	 * @param keyValues The list of key-value pairs
 	 * @return the root key.
 	 */
-	String getRootKey( final List< Pair< String, String > > keyValues, final Class< ? > clazz );
+	String getRootKey( List< Pair< String, String > > keyValues, Class< ? > clazz );
 }

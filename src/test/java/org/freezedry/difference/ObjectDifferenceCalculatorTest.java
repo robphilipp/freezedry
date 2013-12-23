@@ -1,9 +1,6 @@
 package org.freezedry.difference;
 
 import junit.framework.Assert;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.xml.DOMConfigurator;
 import org.freezedry.persistence.tests.Division;
 import org.freezedry.persistence.tests.Person;
 import org.freezedry.persistence.utils.DateUtils;
@@ -21,9 +18,6 @@ public class ObjectDifferenceCalculatorTest {
 	@Before
 	public void init()
 	{
-		DOMConfigurator.configure( "log4j.xml" );
-		Logger.getRootLogger().setLevel( Level.ERROR );
-
 		try
 		{
 			division1 = createDivisionOne();
@@ -134,10 +128,6 @@ public class ObjectDifferenceCalculatorTest {
 
 	public static void main( String...args ) throws ParseException
 	{
-		DOMConfigurator.configure( "log4j.xml" );
-		Logger.getRootLogger().setLevel( Level.WARN );
-
-		//
 //		System.out.println( "Complex Object" );
 //		long start = System.currentTimeMillis();
 //		final ObjectDifferenceCalculator diffCalc = new ObjectDifferenceCalculator( "." );
