@@ -91,6 +91,11 @@
                     <target>1.7</target>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.surefire</groupId>
+                <artifactId>maven-surefire-common</artifactId>
+                <version>${maven.surefire.version}</version>
+            </plugin>
 
             <!-- osgi bundle plugin-->
             <plugin>
@@ -163,13 +168,6 @@
             <version>4.8.1</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.maven.surefire</groupId>
-            <artifactId>maven-surefire-common</artifactId>
-            <version>${maven.surefire.version}</version>
-            <scope>test</scope>
-        </dependency>
-
         <!-- end of testing -->
 
         <!-- logging -->
