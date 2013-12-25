@@ -336,29 +336,4 @@ public class JsonReader implements PersistenceReader {
 		// create and return the root info node
 		return InfoNode.createRootNode( rootName, clazz );
 	}
-	
-	public static void main( String[] args ) throws FileNotFoundException
-	{
-//		final InputStream inputStream = new BufferedInputStream( new FileInputStream( "person.json" ) );
-//		final Reader input = new InputStreamReader( inputStream );
-//		final JsonReader reader = new JsonReader();
-//		final InfoNode infoNode = reader.read( Division.class, input );
-//		System.out.println( infoNode.simpleTreeToString() );
-//		
-//		final PersistenceEngine engine = new PersistenceEngine();
-//		final Object reperson = engine.parseSemanticModel( Division.class, infoNode );
-//		System.out.println( reperson );
-		
-		final InputStream inputStream = new BufferedInputStream( new FileInputStream( "test.json" ) );
-		final Reader input = new InputStreamReader( inputStream );
-		final JsonReader reader = new JsonReader();
-		final Class< ? > inputClazz = int[].class;
-		final InfoNode infoNode = reader.read( inputClazz, input );
-		System.out.println( infoNode.simpleTreeToString() );
-		
-		final PersistenceEngine engine = new PersistenceEngine();
-		final Object reperson = engine.parseSemanticModel( inputClazz, infoNode );
-		System.out.println( reperson );
-	}
-
 }

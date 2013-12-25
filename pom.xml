@@ -22,14 +22,25 @@
     <url>http://robphilipp.github.io/freezedry/</url>
 
     <properties>
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+        <!-- building OSGi bundles-->
+        <maven.bundle.plugin.version>2.4.0</maven.bundle.plugin.version>
+
+        <!-- logging -->
         <slf4j.version>1.7.5</slf4j.version>
-        <log4j.version>1.2.17</log4j.version>
-        <qos.logback.version>1.0.13</qos.logback.version>
+        <logback.version>1.0.13</logback.version>
+        <groovy.version>2.2.1</groovy.version>
+
+        <!-- testing -->
+        <junit.version>4.8.1</junit.version>
+        <maven.surefire.version>2.16</maven.surefire.version>
+
+        <!-- freezedry project dependencies -->
         <json.version>20090211_1</json.version>
         <apache.commons-io.version>1.4_3</apache.commons-io.version>
-        <maven.surefire.version>2.16</maven.surefire.version>
+
     </properties>
 
     <licenses>
@@ -101,6 +112,7 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
+                <version>${maven.bundle.plugin.version}</version>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
@@ -165,7 +177,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.8.1</version>
+            <version>${junit.version}</version>
             <scope>compile</scope>
         </dependency>
         <!-- end of testing -->
@@ -175,29 +187,26 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
+            <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>${slf4j.version}</version>
-        </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.slf4j</groupId>-->
-            <!--<artifactId>slf4j-log4j12</artifactId>-->
-            <!--<version>${slf4j.version}</version>-->
-        <!--</dependency>-->
 
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>${qos.logback.version}</version>
+            <version>${logback.version}</version>
+            <scope>provided</scope>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>log4j</groupId>-->
-            <!--<artifactId>log4j</artifactId>-->
-            <!--<version>${log4j.version}</version>-->
-            <!--<scope>compile</scope>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>${logback.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>${groovy.version}</version>
+        </dependency>
         <!-- end of logging -->
 
         <!-- json marshal/unmarshalling -->

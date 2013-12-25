@@ -296,7 +296,6 @@ public class ReflectionUtils {
 	 * @param fieldName The field name from which to extract the persistence name from the annotation
 	 * @return the persistence name for the specified {@link Field}, or the specified field name if 
 	 * no persistence name is specified in the annotation
-	 * @throws ReflectiveOperationException
 	 */
 	public static String getPersistenceName( final Class< ? > clazz, final String fieldName )
 	{
@@ -411,28 +410,22 @@ public class ReflectionUtils {
 		{
 			if( ReflectionUtils.calculateClassDistance( clazz, rootClass ) > 0  )
 			{
-				final StringBuffer message = new StringBuffer();
-				message.append( "The specified class derives from the class specified in the root node: using root node class."  + Constants.NEW_LINE);
-				message.append( "  Specified Class: " + clazz + Constants.NEW_LINE );
-				message.append( "  Root Node Class: " + rootClass + Constants.NEW_LINE );
-				LOGGER.info( message.toString() );
+				LOGGER.info( "The specified class derives from the class specified in the root node: using root node class." + Constants.NEW_LINE +
+						"  Specified Class: " + clazz + Constants.NEW_LINE +
+						"  Root Node Class: " + rootClass + Constants.NEW_LINE );
 				rootClass = clazz;
 			}
 			else if( ReflectionUtils.calculateClassDistance( rootClass, clazz ) > 0 )
 			{
-				final StringBuffer message = new StringBuffer();
-				message.append( "The class in the root node derives from the specified class: using specified class." + Constants.NEW_LINE );
-				message.append( "  Specified Class: " + clazz + Constants.NEW_LINE );
-				message.append( "  Root Node Class: " + rootClass + Constants.NEW_LINE );
-				LOGGER.info( message.toString() );
+				LOGGER.info( "The class in the root node derives from the specified class: using specified class." + Constants.NEW_LINE +
+						"  Specified Class: " + clazz + Constants.NEW_LINE +
+						"  Root Node Class: " + rootClass + Constants.NEW_LINE );
 			}
 			else
 			{
-				final StringBuffer message = new StringBuffer();
-				message.append( "Specified class and the class found in the root node differ: using class specified in the root node." + Constants.NEW_LINE );
-				message.append( "  Specified Class: " + clazz + Constants.NEW_LINE );
-				message.append( "  Root Node Class: " + rootClass + Constants.NEW_LINE );
-				LOGGER.warn( message.toString() );
+				LOGGER.info( "Specified class and the class found in the root node differ: using class specified in the root node." + Constants.NEW_LINE +
+						"  Specified Class: " + clazz + Constants.NEW_LINE +
+						"  Root Node Class: " + rootClass + Constants.NEW_LINE );
 			}
 		}
 		else
@@ -453,7 +446,7 @@ public class ReflectionUtils {
 	 */
 	public static Class< ? > getNodeBuilderClass( final Class< ? > clazz, final String fieldName )
 	{
-		Class< ? > nodeBuilderClass = null; 
+		Class< ? > nodeBuilderClass;
 		try
 		{
 			// try for the field, if it isn't there it'll throw an exception.
@@ -461,10 +454,10 @@ public class ReflectionUtils {
 		}
 		catch( ReflectiveOperationException e )
 		{
-			final StringBuffer message = new StringBuffer();
-			message.append( "The specified class does not have a field with the specified name."  + Constants.NEW_LINE);
-			message.append( "  Specified Class: " + clazz + Constants.NEW_LINE );
-			message.append( "  Specified Field Name: " + fieldName );
+			final StringBuilder message = new StringBuilder();
+			message.append( "The specified class does not have a field with the specified name."  ).append( Constants.NEW_LINE );
+			message.append( "  Specified Class: " ).append( clazz ).append( Constants.NEW_LINE );
+			message.append( "  Specified Field Name: " ).append( fieldName );
 			LOGGER.error( message.toString() );
 			throw new IllegalArgumentException( message.toString(), e );
 		}
@@ -512,7 +505,7 @@ public class ReflectionUtils {
 			final Class< ? > builderClass = getNodeBuilderClass( field );
 			hasAnnotation = ( builderClass != Persist.Null.class ) && ( builderClass != null );
 		}
-		catch( NoSuchFieldException e ) {}
+		catch( NoSuchFieldException e ) { /* empty on purpose */ }
 		return hasAnnotation;
 	}
 	
@@ -609,7 +602,7 @@ public class ReflectionUtils {
 	 * @param clazz The {@link Class} for which to return all the declared fields.
 	 * @return the declared fields from the specified {@link Class} and all it's parents.
 	 */
-	public static final List< Field > getAllDeclaredFields( final Class< ? > clazz ) 
+	public static List< Field > getAllDeclaredFields( final Class< ? > clazz )
 	{
 		// grab the list of fields from the class
 		final List< Field > fields = new ArrayList<>( Arrays.asList( clazz.getDeclaredFields() ) );
@@ -624,7 +617,7 @@ public class ReflectionUtils {
 	 * @param fields The list of fields for the specified class, to which we add the fields of the super class
 	 * @return the declared fields from the specified class and its super classes.
 	 */
-	private static final List< Field > getDeclaredFields( final Class< ? > clazz, final List< Field > fields )
+	private static List< Field > getDeclaredFields( final Class< ? > clazz, final List< Field > fields )
 	{
 		final Class< ? > superClazz = clazz.getSuperclass();
 		if( superClazz != null )
@@ -646,9 +639,9 @@ public class ReflectionUtils {
 	 * @return the specified declared field from the specified class or its ancestors.
 	 * @throws NoSuchFieldException if no field with the specified name is found in the specified class or ancestor classes
 	 */
-	public static final Field getDeclaredField( final Class< ? > clazz, final String fieldName ) throws NoSuchFieldException
+	public static Field getDeclaredField( final Class< ? > clazz, final String fieldName ) throws NoSuchFieldException
 	{
-		Field field = null;
+		Field field;
 		try
 		{
 			// does the current class have the requested field

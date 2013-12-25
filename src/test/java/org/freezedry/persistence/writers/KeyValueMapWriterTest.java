@@ -9,6 +9,8 @@ import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.DateUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -20,6 +22,9 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class KeyValueMapWriterTest {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger( KeyValueMapWriterTest.class );
+
 	@Before
 	public void setUp() throws Exception
 	{
@@ -94,7 +99,7 @@ public class KeyValueMapWriterTest {
 
 		final PersistenceEngine engine = new PersistenceEngine();
 		final InfoNode rootNode = engine.createSemanticModel( division );
-		System.out.println( rootNode.simpleTreeToString() );
+		LOGGER.debug( rootNode.simpleTreeToString() );
 
 		final KeyValueMapWriter writer = new KeyValueMapWriter();
 //			writer.setShowFullKey( true );
@@ -105,7 +110,7 @@ public class KeyValueMapWriterTest {
 
 		for( Map.Entry< String, Object > entry : flattenedObject.entrySet() )
 		{
-			System.out.println( entry.getKey() + " = " + entry.getValue().toString() );
+			LOGGER.debug( entry.getKey() + " = " + entry.getValue().toString() );
 		}
 	}
 

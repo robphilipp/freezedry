@@ -116,15 +116,4 @@ public abstract class AbstractPersistence implements Persistence {
 	 * {@link Persistence} interface
 	 */
 	abstract protected PersistenceReader getPersistenceReader();
-	
-	public static void main( String...args )
-	{
-		final double pi = Math.PI;
-		System.out.println( Double.class.cast( pi ) );
-		
-		final Double PI = new Double( Math.PI );
-		
-		final Class< ? > clazz = double.class;
-		System.out.println( clazz.cast( PI ) );
-	}
 }

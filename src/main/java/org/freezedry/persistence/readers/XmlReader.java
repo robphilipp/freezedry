@@ -401,39 +401,4 @@ public class XmlReader implements PersistenceReader {
 		
 		return InfoNode.createRootNode( fieldName, clazz );
 	}
-	
-	/**
-	 * 
-	 * @param args
-	 * @throws ParserConfigurationException
-	 * @throws SAXException
-	 * @throws IOException
-	 * @throws SecurityException
-	 * @throws ReflectiveOperationException
-	 */
-	public static void main( String[] args ) throws ParserConfigurationException, SAXException, IOException, SecurityException, ReflectiveOperationException
-	{
-//		final XmlReader reader = new XmlReader();
-////		reader.setRemoveEmptyTextNodes( false );
-//		final InputStream inputStream = new BufferedInputStream( new FileInputStream( "person.xml" ) );
-//		final Reader input = new InputStreamReader( inputStream );
-//		final InfoNode infoNode = reader.read( Division.class, input );
-//		System.out.println( infoNode.simpleTreeToString() );
-//		
-//		final PersistenceEngine engine = new PersistenceEngine();
-//		final Object reperson = engine.parseSemanticModel( Division.class, infoNode );
-//		System.out.println( reperson );
-		
-		final XmlReader reader = new XmlReader();
-		final Class< ? > inputClazz = int[][].class;
-//		reader.setRemoveEmptyTextNodes( false );
-		final InputStream inputStream = new BufferedInputStream( new FileInputStream( "test.xml" ) );
-		final Reader input = new InputStreamReader( inputStream );
-		final InfoNode infoNode = reader.read( inputClazz, input );
-		System.out.println( infoNode.simpleTreeToString() );
-		
-		final PersistenceEngine engine = new PersistenceEngine();
-		final Object reperson = engine.parseSemanticModel( inputClazz, infoNode );
-		System.out.println( reperson );
-	}
 }
