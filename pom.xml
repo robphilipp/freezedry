@@ -31,11 +31,16 @@
         <!-- logging -->
         <slf4j.version>1.7.5</slf4j.version>
         <logback.version>1.0.13</logback.version>
-        <groovy.version>2.2.1</groovy.version>
 
         <!-- testing -->
         <junit.version>4.8.1</junit.version>
         <maven.surefire.version>2.16</maven.surefire.version>
+        <exam.version>3.4.0</exam.version>
+        <url.version>1.6.0</url.version>
+        <!-- felix version 4.2.1 doesn't seem to work, get an exception that the bundle event can't be found
+            so use the latest version of the 3 series -->
+        <!--<felix.version>4.2.1</felix.version>-->
+        <felix.version>3.2.2</felix.version>
 
         <!-- freezedry project dependencies -->
         <json.version>20090211_1</json.version>
@@ -117,9 +122,9 @@
                 <configuration>
                     <instructions>
                         <Export-Package>
-                            org.freezedry.difference.*;verision=0.2.9,
-                            org.freezedry.persistence.*;verision=0.2.9,
-                            org.freezedry.serialization.*;verision=0.2.9
+                            org.freezedry.difference*;verision=${project.version},
+                            org.freezedry.persistence*;verision=${project.version},
+                            org.freezedry.serialization*;verision=${project.version}
                         </Export-Package>
                         <Private-Package>
                             org.freezedry.*
@@ -178,7 +183,39 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
-            <scope>compile</scope>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam-container-native</artifactId>
+            <version>${exam.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam-junit4</artifactId>
+            <version>${exam.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam-link-mvn</artifactId>
+            <version>${exam.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.url</groupId>
+            <artifactId>pax-url-aether</artifactId>
+            <version>${url.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.framework</artifactId>
+            <version>${felix.version}</version>
+            <scope>test</scope>
         </dependency>
         <!-- end of testing -->
 
@@ -201,11 +238,6 @@
             <artifactId>logback-core</artifactId>
             <version>${logback.version}</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-            <version>${groovy.version}</version>
         </dependency>
         <!-- end of logging -->
 

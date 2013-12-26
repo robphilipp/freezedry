@@ -102,7 +102,6 @@ public class KeyValueMapWriterTest {
 		LOGGER.debug( rootNode.simpleTreeToString() );
 
 		final KeyValueMapWriter writer = new KeyValueMapWriter();
-//			writer.setShowFullKey( true );
 		final KeyValueBuilder builder = writer.getBuilder();
 		builder.putRenderer( Collection.class, new FlatteningCollectionRenderer( builder ) );
 		writer.setKeyElementSeparator( "." );

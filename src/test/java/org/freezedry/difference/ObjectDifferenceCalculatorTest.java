@@ -6,14 +6,58 @@ import org.freezedry.persistence.tests.Person;
 import org.freezedry.persistence.utils.DateUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.ops4j.pax.exam.Configuration;
+import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.junit.PaxExam;
+import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
+import org.ops4j.pax.exam.spi.reactors.PerMethod;
 
 import java.text.ParseException;
 import java.util.*;
 
+import static org.ops4j.pax.exam.CoreOptions.*;
+import static org.ops4j.pax.exam.OptionUtils.*;
+
+@RunWith(PaxExam.class)
+@ExamReactorStrategy(PerMethod.class)
 public class ObjectDifferenceCalculatorTest {
 
 	private Division division1;
 	private Division division2;
+
+	/**
+	 * @return The configuration for the OSGi framework
+	 */
+	@Configuration
+	public Option[] configuration()
+	{
+		return combine( combine( freezedryBundles(), logging() ), junitBundles(), cleanCaches() );
+	}
+
+	/**
+	 * @return an array of options containing the core freezedry bundles to be provisioned
+	 */
+	private Option[] freezedryBundles()
+	{
+		return new Option[] {
+			mavenBundle( "com.closure-sys", "freezedry" ),
+			mavenBundle( "org.apache.geronimo.bundles", "json", "20090211_1" ),
+			mavenBundle( "org.apache.servicemix.bundles", "org.apache.servicemix.bundles.commons-io", "1.4_3" )
+		};
+	}
+
+	/**
+	 * @return an array of options containing the core logging bundles to be provisioned
+	 */
+	private Option[] logging()
+	{
+		return new Option[] {
+				mavenBundle( "org.slf4j", "slf4j-api", "1.7.5" ),
+				mavenBundle( "ch.qos.logback", "logback-core", "1.0.13" ),
+				mavenBundle( "ch.qos.logback", "logback-classic", "1.0.13" )
+		};
+	}
 
 	@Before
 	public void init()
@@ -125,32 +169,4 @@ public class ObjectDifferenceCalculatorTest {
 		johnny.setBirthdate( Calendar.getInstance() );
 		return division;
 	}
-
-	static class Account {
-		private Long accountId;
-		private String firmCode;
-		private String officeCode;
-		private String accountNumber;
-		private String accountType;
-		private String tradingType;
-		private String baseCurrency;
-		private String countryCode;
-		private Boolean accountActive;
-		private Date creationDate;
-
-		Account( Long accountId, String firmCode, String officeCode, String accountNumber, String accountType, String tradingType, String baseCurrency, String countryCode, Boolean accountActive, Date creationDate )
-		{
-			this.accountId = accountId;
-			this.firmCode = firmCode;
-			this.officeCode = officeCode;
-			this.accountNumber = accountNumber;
-			this.accountType = accountType;
-			this.tradingType = tradingType;
-			this.baseCurrency = baseCurrency;
-			this.countryCode = countryCode;
-			this.accountActive = accountActive;
-			this.creationDate = creationDate;
-		}
-	}
-
 }
