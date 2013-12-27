@@ -37,10 +37,6 @@
         <maven.surefire.version>2.16</maven.surefire.version>
         <exam.version>3.4.0</exam.version>
         <url.version>1.6.0</url.version>
-        <!-- felix version 4.2.1 doesn't seem to work, get an exception that the bundle event can't be found
-            so use the latest version of the 3 series -->
-        <!--<felix.version>4.2.1</felix.version>-->
-        <felix.version>3.2.2</felix.version>
 
         <!-- freezedry project dependencies -->
         <json.version>20090211_1</json.version>
@@ -175,6 +171,95 @@
                 </plugins>
             </build>
         </profile>
+
+        <!-- Testing profiles for each of the osgi frameworks, and without -->
+        <!--<profile>-->
+            <!--<id>no-framework</id>-->
+            <!--<activation>-->
+                <!--<activeByDefault>true</activeByDefault>-->
+            <!--</activation>-->
+        <!--</profile>-->
+
+        <profile>
+            <id>felix</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+                <property>
+                    <name>pax.exam.framework</name>
+                    <value>felix</value>
+                </property>
+            </activation>
+            <properties>
+                <pax.exam.framework>felix</pax.exam.framework>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>org.apache.felix.framework</artifactId>
+                    <version>3.2.2</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <!--<profile>-->
+            <!--<id>knopflerfish</id>-->
+            <!--<activation>-->
+                <!--<activeByDefault>false</activeByDefault>-->
+                <!--<property>-->
+                    <!--<name>pax.exam.framework</name>-->
+                    <!--<value>knopflerfish</value>-->
+                <!--</property>-->
+            <!--</activation>-->
+            <!--<properties>-->
+                <!--<pax.exam.framework>knopflerfish</pax.exam.framework>-->
+            <!--</properties>-->
+            <!--<repositories>-->
+                <!--<repository>-->
+                    <!--<id>knopflerfish-releases</id>-->
+                    <!--<url>http://www.knopflerfish.org/maven2</url>-->
+                <!--</repository>-->
+            <!--</repositories>-->
+            <!--<dependencies>-->
+                <!--<dependency>-->
+                    <!--<groupId>org.knopflerfish</groupId>-->
+                    <!--<artifactId>framework</artifactId>-->
+                    <!--<version>5.2.0</version>-->
+                    <!--<scope>test</scope>-->
+                <!--</dependency>-->
+            <!--</dependencies>-->
+        <!--</profile>-->
+
+        <profile>
+            <id>equinox</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>pax.exam.framework</name>
+                    <value>equinox</value>
+                </property>
+            </activation>
+            <properties>
+                <pax.exam.framework>equinox</pax.exam.framework>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.eclipse.osgi</groupId>
+                    <artifactId>org.eclipse.osgi</artifactId>
+                    <version>3.6.0.v20100517</version>
+                    <scope>test</scope>
+                </dependency>
+                <!-- doesn't work...some dependency issue on org.osgi...?-->
+                <!--<dependency>-->
+                    <!--<groupId>org.eclipse</groupId>-->
+                    <!--<artifactId>osgi</artifactId>-->
+                    <!--<version>3.9.1-v20130814-1242</version>-->
+                    <!--<scope>test</scope>-->
+                <!--</dependency>-->
+            </dependencies>
+        </profile>
+        <!-- end of testing profiles -->
+
     </profiles>
 
     <dependencies>
@@ -211,13 +296,13 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>org.apache.felix.framework</artifactId>
-            <version>${felix.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- end of testing -->
+        <!--<dependency>-->
+            <!--<groupId>org.apache.felix</groupId>-->
+            <!--<artifactId>org.apache.felix.framework</artifactId>-->
+            <!--<version>${felix.version}</version>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
+        <!--&lt;!&ndash; end of testing &ndash;&gt;-->
 
         <!-- logging -->
         <dependency>

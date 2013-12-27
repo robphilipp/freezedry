@@ -3,12 +3,10 @@ package org.freezedry;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.util.PathUtils;
 
-import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
-import static org.ops4j.pax.exam.CoreOptions.systemProperty;
+import static org.ops4j.pax.exam.CoreOptions.*;
 
 /**
- * [Description]
- *
+ * Common options for Pax Exam testing with OSGi containers
  * @author rob
  *         12/26/13 3:29 PM
  */
@@ -27,7 +25,26 @@ public class PaxExamTestUtils {
 	}
 
 	/**
-	 * @return an array of options containing the core logging bundles to be provisioned
+	 * @return an array of options containing the console settings
+	 */
+	public static Option console()
+	{
+		return systemProperty( "osgi.console" ).value( "6666" );
+	}
+
+	/**
+	 * @return an array of options containing the debugging settings
+	 */
+	public static Option[] remoteDebugging()
+	{
+		return new Option[] {
+				vmOption( "-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005" ),
+				systemTimeout( 0 )
+		};
+	}
+
+	/**
+	 * @return an array of options containing the core logging bundles to be provisioned and settings
 	 */
 	public static Option[] logging()
 	{

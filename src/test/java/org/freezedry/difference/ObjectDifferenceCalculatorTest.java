@@ -16,8 +16,7 @@ import org.ops4j.pax.exam.spi.reactors.PerMethod;
 import java.text.ParseException;
 import java.util.*;
 
-import static org.freezedry.PaxExamTestUtils.freezedryBundles;
-import static org.freezedry.PaxExamTestUtils.logging;
+import static org.freezedry.PaxExamTestUtils.*;
 import static org.ops4j.pax.exam.CoreOptions.cleanCaches;
 import static org.ops4j.pax.exam.CoreOptions.junitBundles;
 import static org.ops4j.pax.exam.OptionUtils.combine;
