@@ -15,24 +15,25 @@
  */
 package org.freezedry.persistence;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import junit.framework.Assert;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.freezedry.persistence.builders.NodeBuilder;
 import org.freezedry.persistence.builders.StringNodeBuilder;
-import org.freezedry.persistence.readers.JsonReader;
-import org.freezedry.persistence.readers.XmlReader;
-import org.freezedry.persistence.tests.Division;
-import org.freezedry.persistence.tests.Person;
-import org.freezedry.persistence.tree.InfoNode;
-import org.freezedry.persistence.utils.DateUtils;
-import org.freezedry.persistence.writers.JsonWriter;
-import org.freezedry.persistence.writers.XmlWriter;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.ops4j.pax.exam.Configuration;
+import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.junit.PaxExam;
+import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
+import org.ops4j.pax.exam.spi.reactors.PerMethod;
+import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.util.*;
+import static org.freezedry.PaxExamTestUtils.freezedryBundles;
+import static org.freezedry.PaxExamTestUtils.logging;
+import static org.ops4j.pax.exam.CoreOptions.cleanCaches;
+import static org.ops4j.pax.exam.CoreOptions.junitBundles;
+import static org.ops4j.pax.exam.OptionUtils.combine;
 
 /**
  * Created with IntelliJ IDEA.
@@ -41,7 +42,21 @@ import java.util.*;
  * Time: 7:53 PM
  * To change this template use File | Settings | File Templates.
  */
+@RunWith(PaxExam.class)
+@ExamReactorStrategy(PerMethod.class)
 public class PersistenceEngineTest {
+
+	/**
+	 * @return The configuration for the OSGi framework
+	 */
+	@Configuration
+	public Option[] configuration()
+	{
+//		((Logger) LoggerFactory.getLogger( Logger.ROOT_LOGGER_NAME )).setLevel( Level.WARN );
+		return combine( combine( freezedryBundles(), logging() ),
+				junitBundles(),
+				cleanCaches() );
+	}
 
 	@Before
 	public void setUp() throws Exception

@@ -1,5 +1,7 @@
 package org.freezedry.difference;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import junit.framework.Assert;
 import org.freezedry.persistence.tests.Division;
 import org.freezedry.persistence.tests.Person;
@@ -12,12 +14,16 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerMethod;
+import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.util.*;
 
-import static org.ops4j.pax.exam.CoreOptions.*;
-import static org.ops4j.pax.exam.OptionUtils.*;
+import static org.freezedry.PaxExamTestUtils.freezedryBundles;
+import static org.freezedry.PaxExamTestUtils.logging;
+import static org.ops4j.pax.exam.CoreOptions.cleanCaches;
+import static org.ops4j.pax.exam.CoreOptions.junitBundles;
+import static org.ops4j.pax.exam.OptionUtils.combine;
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerMethod.class)
@@ -32,31 +38,10 @@ public class ObjectDifferenceCalculatorTest {
 	@Configuration
 	public Option[] configuration()
 	{
-		return combine( combine( freezedryBundles(), logging() ), junitBundles(), cleanCaches() );
-	}
-
-	/**
-	 * @return an array of options containing the core freezedry bundles to be provisioned
-	 */
-	private Option[] freezedryBundles()
-	{
-		return new Option[] {
-			mavenBundle( "com.closure-sys", "freezedry" ),
-			mavenBundle( "org.apache.geronimo.bundles", "json", "20090211_1" ),
-			mavenBundle( "org.apache.servicemix.bundles", "org.apache.servicemix.bundles.commons-io", "1.4_3" )
-		};
-	}
-
-	/**
-	 * @return an array of options containing the core logging bundles to be provisioned
-	 */
-	private Option[] logging()
-	{
-		return new Option[] {
-				mavenBundle( "org.slf4j", "slf4j-api", "1.7.5" ),
-				mavenBundle( "ch.qos.logback", "logback-core", "1.0.13" ),
-				mavenBundle( "ch.qos.logback", "logback-classic", "1.0.13" )
-		};
+//		((Logger) LoggerFactory.getLogger( Logger.ROOT_LOGGER_NAME )).setLevel( Level.WARN );
+		return combine( combine( freezedryBundles(), logging() ),
+				junitBundles(),
+				cleanCaches() );
 	}
 
 	@Before

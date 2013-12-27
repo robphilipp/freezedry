@@ -1,6 +1,9 @@
 package org.freezedry.serialization;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import junit.framework.Assert;
+import org.freezedry.PaxExamTestUtils;
 import org.freezedry.difference.ObjectDifferenceCalculator;
 import org.freezedry.persistence.tests.BadPerson;
 import org.freezedry.persistence.tests.Division;
@@ -9,10 +12,23 @@ import org.freezedry.persistence.utils.DateUtils;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.ops4j.pax.exam.Configuration;
+import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.junit.PaxExam;
+import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
+import org.ops4j.pax.exam.spi.reactors.PerMethod;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.text.ParseException;
 import java.util.*;
+
+import static org.freezedry.PaxExamTestUtils.freezedryBundles;
+import static org.freezedry.PaxExamTestUtils.logging;
+import static org.ops4j.pax.exam.CoreOptions.cleanCaches;
+import static org.ops4j.pax.exam.CoreOptions.junitBundles;
+import static org.ops4j.pax.exam.OptionUtils.combine;
 
 /**
  * [Description]
@@ -20,6 +36,8 @@ import java.util.*;
  * @author rob
  *         12/1/13 3:04 PM
  */
+@RunWith(PaxExam.class)
+@ExamReactorStrategy(PerMethod.class)
 public class PersistenceSerializerTest {
 
 	private Person person;
@@ -30,9 +48,16 @@ public class PersistenceSerializerTest {
 	private final Serializer jsonSerializer = new JsonPersistenceSerializer();
 	private final Serializer keyValueSerializer = new KeyValuePersistenceSerializer();
 
-	@BeforeClass
-	public static void init()
+	/**
+	 * @return The configuration for the OSGi framework
+	 */
+	@Configuration
+	public Option[] configuration()
 	{
+//		((Logger) LoggerFactory.getLogger( Logger.ROOT_LOGGER_NAME )).setLevel( Level.WARN );
+		return combine( combine( freezedryBundles(), logging() ),
+				junitBundles(),
+				cleanCaches() );
 	}
 
 	@Before
@@ -42,15 +67,15 @@ public class PersistenceSerializerTest {
 		person.addFriend( "james henley", "buddy buddy" );
 		person.addFriend( "castor heliopolis", "buddy" );
 		person.addFriend( "janis joplin", "music" );
-//		Map< String, String > group = new LinkedHashMap<>();
-//		group.put( "one", "ONE" );
-//		group.put( "two", "TWO" );
-//		group.put( "three", "THREE" );
-//		person.addGroup( "numbers", group );
-//		group = new LinkedHashMap<>();
-//		group.put( "a", "AY" );
-//		group.put( "b", "BEE" );
-//		person.addGroup( "letters", group );
+		Map< String, String > group = new LinkedHashMap<>();
+		group.put( "one", "ONE" );
+		group.put( "two", "TWO" );
+		group.put( "three", "THREE" );
+		person.addGroup( "numbers", group );
+		group = new LinkedHashMap<>();
+		group.put( "a", "AY" );
+		group.put( "b", "BEE" );
+		person.addGroup( "letters", group );
 
 		badPerson = new BadPerson( "henley", "james", 42 );
 		badPerson.addEvilDoing( "Added semicolon after the closing parenthesis of colleague's code." );
