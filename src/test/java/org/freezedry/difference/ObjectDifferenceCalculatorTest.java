@@ -1,7 +1,5 @@
 package org.freezedry.difference;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
 import junit.framework.Assert;
 import org.freezedry.persistence.tests.Division;
 import org.freezedry.persistence.tests.Person;
@@ -14,7 +12,6 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerMethod;
-import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.util.*;
@@ -38,7 +35,6 @@ public class ObjectDifferenceCalculatorTest {
 	@Configuration
 	public Option[] configuration()
 	{
-//		((Logger) LoggerFactory.getLogger( Logger.ROOT_LOGGER_NAME )).setLevel( Level.WARN );
 		return combine( combine( freezedryBundles(), logging() ),
 				junitBundles(),
 				cleanCaches() );

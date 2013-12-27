@@ -1,6 +1,7 @@
 package org.freezedry;
 
 import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.util.PathUtils;
 
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
@@ -33,10 +34,9 @@ public class PaxExamTestUtils {
 		return new Option[] {
 				mavenBundle( "org.slf4j", "slf4j-api", "1.7.5" ),
 				mavenBundle( "ch.qos.logback", "logback-core", "1.0.13" ),
-				mavenBundle( "ch.qos.logback", "logback-classic", "1.0.13" )
-//				systemProperty( "org.ops4j.pax.logging.DefaultServiceLog.level" ).value( "WARN" )
-//				frameworkProperty( "org.osgi.logging.level" ).value( "WARN" )
-//				frameworkProperty( "osgi.console.log.level" ).value( "2" )
+				mavenBundle( "ch.qos.logback", "logback-classic", "1.0.13" ),
+				systemProperty("logback.configurationFile").value( "file:" + PathUtils.getBaseDir() + "/src/test/resources/logback-test.xml" ),
+				systemProperty( "org.ops4j.pax.logging.DefaultServiceLog.level" ).value( "WARN" )
 		};
 	}
 }
