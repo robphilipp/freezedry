@@ -15,7 +15,6 @@
  */
 package org.freezedry.persistence;
 
-import org.freezedry.PaxExamTestUtils;
 import org.freezedry.persistence.tests.Division;
 import org.freezedry.persistence.tests.Person;
 import org.freezedry.persistence.utils.Constants;

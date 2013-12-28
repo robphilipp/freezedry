@@ -18,38 +18,14 @@ package org.freezedry.persistence;
 import org.freezedry.difference.ObjectDifferenceCalculator;
 import org.freezedry.persistence.tests.Division;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.ops4j.pax.exam.Configuration;
-import org.ops4j.pax.exam.Option;
-import org.ops4j.pax.exam.junit.PaxExam;
-import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
-import org.ops4j.pax.exam.spi.reactors.PerMethod;
 
 import java.util.Map;
 
 import static junit.framework.Assert.assertTrue;
-import static org.freezedry.PaxExamTestUtils.freezedryBundles;
-import static org.freezedry.PaxExamTestUtils.logging;
-import static org.ops4j.pax.exam.CoreOptions.cleanCaches;
-import static org.ops4j.pax.exam.CoreOptions.junitBundles;
-import static org.ops4j.pax.exam.OptionUtils.combine;
 
-@RunWith(PaxExam.class)
-@ExamReactorStrategy(PerMethod.class)
 public class XmlPersistenceTest  extends AbstractPersistenceTest {
 
 	private final XmlPersistence persistence = new XmlPersistence();
-
-	/**
-	 * @return The configuration for the OSGi framework
-	 */
-	@Configuration
-	public Option[] configuration()
-	{
-		return combine( combine( freezedryBundles(), logging() ),
-				junitBundles(),
-				cleanCaches() );
-	}
 
 	@Test
 	public void testPersistence() throws Exception

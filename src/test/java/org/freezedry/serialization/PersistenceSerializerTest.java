@@ -8,12 +8,6 @@ import org.freezedry.persistence.tests.Person;
 import org.freezedry.persistence.utils.DateUtils;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.ops4j.pax.exam.Configuration;
-import org.ops4j.pax.exam.Option;
-import org.ops4j.pax.exam.junit.PaxExam;
-import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
-import org.ops4j.pax.exam.spi.reactors.PerMethod;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -21,20 +15,12 @@ import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.util.*;
 
-import static org.freezedry.PaxExamTestUtils.freezedryBundles;
-import static org.freezedry.PaxExamTestUtils.logging;
-import static org.ops4j.pax.exam.CoreOptions.cleanCaches;
-import static org.ops4j.pax.exam.CoreOptions.junitBundles;
-import static org.ops4j.pax.exam.OptionUtils.combine;
-
 /**
  * [Description]
  *
  * @author rob
  *         12/1/13 3:04 PM
  */
-@RunWith(PaxExam.class)
-@ExamReactorStrategy(PerMethod.class)
 public class PersistenceSerializerTest {
 
 	private Person person;
@@ -44,17 +30,6 @@ public class PersistenceSerializerTest {
 	private final Serializer xmlSerializer = new XmlPersistenceSerializer();
 	private final Serializer jsonSerializer = new JsonPersistenceSerializer();
 	private final Serializer keyValueSerializer = new KeyValuePersistenceSerializer();
-
-	/**
-	 * @return The configuration for the OSGi framework
-	 */
-	@Configuration
-	public Option[] configuration()
-	{
-		return combine( combine( freezedryBundles(), logging() ),
-				junitBundles(),
-				cleanCaches() );
-	}
 
 	@Before
 	public void setup() throws ParseException

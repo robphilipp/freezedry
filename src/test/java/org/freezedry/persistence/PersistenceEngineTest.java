@@ -19,18 +19,6 @@ import junit.framework.Assert;
 import org.freezedry.persistence.builders.StringNodeBuilder;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.ops4j.pax.exam.Configuration;
-import org.ops4j.pax.exam.Option;
-import org.ops4j.pax.exam.junit.PaxExam;
-import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
-import org.ops4j.pax.exam.spi.reactors.PerMethod;
-
-import static org.freezedry.PaxExamTestUtils.freezedryBundles;
-import static org.freezedry.PaxExamTestUtils.logging;
-import static org.ops4j.pax.exam.CoreOptions.cleanCaches;
-import static org.ops4j.pax.exam.CoreOptions.junitBundles;
-import static org.ops4j.pax.exam.OptionUtils.combine;
 
 /**
  * Created with IntelliJ IDEA.
@@ -39,20 +27,7 @@ import static org.ops4j.pax.exam.OptionUtils.combine;
  * Time: 7:53 PM
  * To change this template use File | Settings | File Templates.
  */
-@RunWith(PaxExam.class)
-@ExamReactorStrategy(PerMethod.class)
 public class PersistenceEngineTest {
-
-	/**
-	 * @return The configuration for the OSGi framework
-	 */
-	@Configuration
-	public Option[] configuration()
-	{
-		return combine( combine( freezedryBundles(), logging() ),
-				junitBundles(),
-				cleanCaches() );
-	}
 
 	@Before
 	public void setUp() throws Exception

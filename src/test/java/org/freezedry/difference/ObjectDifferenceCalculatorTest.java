@@ -6,38 +6,14 @@ import org.freezedry.persistence.tests.Person;
 import org.freezedry.persistence.utils.DateUtils;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.ops4j.pax.exam.Configuration;
-import org.ops4j.pax.exam.Option;
-import org.ops4j.pax.exam.junit.PaxExam;
-import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
-import org.ops4j.pax.exam.spi.reactors.PerMethod;
 
 import java.text.ParseException;
 import java.util.*;
 
-import static org.freezedry.PaxExamTestUtils.*;
-import static org.ops4j.pax.exam.CoreOptions.cleanCaches;
-import static org.ops4j.pax.exam.CoreOptions.junitBundles;
-import static org.ops4j.pax.exam.OptionUtils.combine;
-
-@RunWith(PaxExam.class)
-@ExamReactorStrategy(PerMethod.class)
 public class ObjectDifferenceCalculatorTest {
 
 	private Division division1;
 	private Division division2;
-
-	/**
-	 * @return The configuration for the OSGi framework
-	 */
-	@Configuration
-	public Option[] configuration()
-	{
-		return combine( combine( freezedryBundles(), logging() ),
-				junitBundles(),
-				cleanCaches() );
-	}
 
 	@Before
 	public void init()
