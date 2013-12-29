@@ -16,15 +16,11 @@
 package org.freezedry.persistence.utils;
 
 import junit.framework.Assert;
-import org.freezedry.persistence.builders.DoubleNodeBuilder;
-import org.freezedry.persistence.tests.BadPerson;
 import org.freezedry.persistence.tests.Fconcrete;
 import org.freezedry.persistence.tests.MapMagic;
 import org.freezedry.persistence.tests.circle.*;
-import org.junit.Before;
 import org.junit.Test;
 
-import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.RunnableScheduledFuture;
@@ -49,11 +45,6 @@ import java.util.concurrent.RunnableScheduledFuture;
  *          Gconcrete
  */
 public class ReflectionUtilsTest {
-
-	@Before
-	public void setUp() throws Exception
-	{
-	}
 
 	@Test
 	public void testIsClassOrSuperclass() throws Exception

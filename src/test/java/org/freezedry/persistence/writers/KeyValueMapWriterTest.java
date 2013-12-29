@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+import static org.junit.Assert.assertNotNull;
+
 /**
  * Created with IntelliJ IDEA.
  * User: rob
@@ -99,25 +101,24 @@ public class KeyValueMapWriterTest {
 
 		final PersistenceEngine engine = new PersistenceEngine();
 		final InfoNode rootNode = engine.createSemanticModel( division );
-		LOGGER.debug( rootNode.simpleTreeToString() );
+//		LOGGER.debug( rootNode.simpleTreeToString() );
 
 		final KeyValueMapWriter writer = new KeyValueMapWriter();
-//			writer.setShowFullKey( true );
 		final KeyValueBuilder builder = writer.getBuilder();
 		builder.putRenderer( Collection.class, new FlatteningCollectionRenderer( builder ) );
 		writer.setKeyElementSeparator( "." );
 		Map< String, Object > flattenedObject = writer.createMap( rootNode );
 
-		for( Map.Entry< String, Object > entry : flattenedObject.entrySet() )
-		{
-			LOGGER.debug( entry.getKey() + " = " + entry.getValue().toString() );
-		}
+//		for( Map.Entry< String, Object > entry : flattenedObject.entrySet() )
+//		{
+//			LOGGER.debug( entry.getKey() + " = " + entry.getValue().toString() );
+//		}
 	}
 
 	@Test
 	public void testGetKeyValueFlattener() throws Exception
 	{
-
+		assertNotNull( new KeyValueMapWriter().getKeyValueFlattener() );
 	}
 
 	@Test

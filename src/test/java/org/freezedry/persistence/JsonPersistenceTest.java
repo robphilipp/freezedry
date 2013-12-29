@@ -17,7 +17,6 @@ package org.freezedry.persistence;
 
 import org.freezedry.difference.ObjectDifferenceCalculator;
 import org.freezedry.persistence.tests.Division;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Map;

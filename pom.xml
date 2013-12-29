@@ -31,11 +31,13 @@
         <!-- logging -->
         <slf4j.version>1.7.5</slf4j.version>
         <logback.version>1.0.13</logback.version>
-        <groovy.version>2.2.1</groovy.version>
 
         <!-- testing -->
         <junit.version>4.8.1</junit.version>
         <maven.surefire.version>2.16</maven.surefire.version>
+        <maven.failsage.version>2.16</maven.failsage.version>
+        <exam.version>3.4.0</exam.version>
+        <url.version>1.6.0</url.version>
 
         <!-- freezedry project dependencies -->
         <json.version>20090211_1</json.version>
@@ -102,10 +104,33 @@
                     <target>1.7</target>
                 </configuration>
             </plugin>
+
+            <!-- unit testing -->
             <plugin>
                 <groupId>org.apache.maven.surefire</groupId>
                 <artifactId>maven-surefire-common</artifactId>
                 <version>${maven.surefire.version}</version>
+            </plugin>
+
+            <!-- integration testing -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>${maven.failsage.version}</version>
+                <configuration>
+                    <parallel>methods</parallel>
+                    <threadCount>10</threadCount>
+                    <forkCount>4</forkCount>
+                    <reuseForks>false</reuseForks>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <!-- osgi bundle plugin-->
@@ -117,9 +142,9 @@
                 <configuration>
                     <instructions>
                         <Export-Package>
-                            org.freezedry.difference.*;verision=0.2.9,
-                            org.freezedry.persistence.*;verision=0.2.9,
-                            org.freezedry.serialization.*;verision=0.2.9
+                            org.freezedry.difference*;verision=${project.version},
+                            org.freezedry.persistence*;verision=${project.version},
+                            org.freezedry.serialization*;verision=${project.version}
                         </Export-Package>
                         <Private-Package>
                             org.freezedry.*
@@ -170,6 +195,95 @@
                 </plugins>
             </build>
         </profile>
+
+        <!-- Testing profiles for each of the osgi frameworks, and without -->
+        <!--<profile>-->
+            <!--<id>no-framework</id>-->
+            <!--<activation>-->
+                <!--<activeByDefault>true</activeByDefault>-->
+            <!--</activation>-->
+        <!--</profile>-->
+
+        <profile>
+            <id>felix</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+                <property>
+                    <name>pax.exam.framework</name>
+                    <value>felix</value>
+                </property>
+            </activation>
+            <properties>
+                <pax.exam.framework>felix</pax.exam.framework>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>org.apache.felix.framework</artifactId>
+                    <version>3.2.2</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <!--<profile>-->
+            <!--<id>knopflerfish</id>-->
+            <!--<activation>-->
+                <!--<activeByDefault>false</activeByDefault>-->
+                <!--<property>-->
+                    <!--<name>pax.exam.framework</name>-->
+                    <!--<value>knopflerfish</value>-->
+                <!--</property>-->
+            <!--</activation>-->
+            <!--<properties>-->
+                <!--<pax.exam.framework>knopflerfish</pax.exam.framework>-->
+            <!--</properties>-->
+            <!--<repositories>-->
+                <!--<repository>-->
+                    <!--<id>knopflerfish-releases</id>-->
+                    <!--<url>http://www.knopflerfish.org/maven2</url>-->
+                <!--</repository>-->
+            <!--</repositories>-->
+            <!--<dependencies>-->
+                <!--<dependency>-->
+                    <!--<groupId>org.knopflerfish</groupId>-->
+                    <!--<artifactId>framework</artifactId>-->
+                    <!--<version>5.2.0</version>-->
+                    <!--<scope>test</scope>-->
+                <!--</dependency>-->
+            <!--</dependencies>-->
+        <!--</profile>-->
+
+        <profile>
+            <id>equinox</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>pax.exam.framework</name>
+                    <value>equinox</value>
+                </property>
+            </activation>
+            <properties>
+                <pax.exam.framework>equinox</pax.exam.framework>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>org.eclipse.osgi</groupId>
+                    <artifactId>org.eclipse.osgi</artifactId>
+                    <version>3.6.0.v20100517</version>
+                    <scope>test</scope>
+                </dependency>
+                <!-- doesn't work...some dependency issue on org.osgi...?-->
+                <!--<dependency>-->
+                    <!--<groupId>org.eclipse</groupId>-->
+                    <!--<artifactId>osgi</artifactId>-->
+                    <!--<version>3.9.1-v20130814-1242</version>-->
+                    <!--<scope>test</scope>-->
+                <!--</dependency>-->
+            </dependencies>
+        </profile>
+        <!-- end of testing profiles -->
+
     </profiles>
 
     <dependencies>
@@ -178,9 +292,41 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
-            <scope>compile</scope>
+            <scope>test</scope>
         </dependency>
-        <!-- end of testing -->
+
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam-container-native</artifactId>
+            <version>${exam.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam-junit4</artifactId>
+            <version>${exam.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam-link-mvn</artifactId>
+            <version>${exam.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.url</groupId>
+            <artifactId>pax-url-aether</artifactId>
+            <version>${url.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!--<dependency>-->
+            <!--<groupId>org.apache.felix</groupId>-->
+            <!--<artifactId>org.apache.felix.framework</artifactId>-->
+            <!--<version>${felix.version}</version>-->
+            <!--<scope>test</scope>-->
+        <!--</dependency>-->
+        <!--&lt;!&ndash; end of testing &ndash;&gt;-->
 
         <!-- logging -->
         <dependency>
@@ -201,11 +347,6 @@
             <artifactId>logback-core</artifactId>
             <version>${logback.version}</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-            <version>${groovy.version}</version>
         </dependency>
         <!-- end of logging -->
 

@@ -17,10 +17,11 @@ package org.freezedry.persistence;
 
 import org.freezedry.difference.ObjectDifferenceCalculator;
 import org.freezedry.persistence.tests.Division;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Map;
+
+import static junit.framework.Assert.assertTrue;
 
 public class XmlPersistenceTest  extends AbstractPersistenceTest {
 
@@ -36,6 +37,6 @@ public class XmlPersistenceTest  extends AbstractPersistenceTest {
 		final Division redivision = persistence.read( Division.class, output );
 		final ObjectDifferenceCalculator calculator = new ObjectDifferenceCalculator();
 		final Map< String, ObjectDifferenceCalculator.Difference > differences = calculator.calculateDifference( redivision, division );
-		junit.framework.Assert.assertTrue( differences == null || differences.isEmpty() );
+		assertTrue( differences == null || differences.isEmpty() );
 	}
 }

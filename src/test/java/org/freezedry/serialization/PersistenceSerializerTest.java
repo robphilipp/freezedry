@@ -7,10 +7,11 @@ import org.freezedry.persistence.tests.Division;
 import org.freezedry.persistence.tests.Person;
 import org.freezedry.persistence.utils.DateUtils;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.util.*;
 
@@ -30,11 +31,6 @@ public class PersistenceSerializerTest {
 	private final Serializer jsonSerializer = new JsonPersistenceSerializer();
 	private final Serializer keyValueSerializer = new KeyValuePersistenceSerializer();
 
-	@BeforeClass
-	public static void init()
-	{
-	}
-
 	@Before
 	public void setup() throws ParseException
 	{
@@ -42,15 +38,15 @@ public class PersistenceSerializerTest {
 		person.addFriend( "james henley", "buddy buddy" );
 		person.addFriend( "castor heliopolis", "buddy" );
 		person.addFriend( "janis joplin", "music" );
-//		Map< String, String > group = new LinkedHashMap<>();
-//		group.put( "one", "ONE" );
-//		group.put( "two", "TWO" );
-//		group.put( "three", "THREE" );
-//		person.addGroup( "numbers", group );
-//		group = new LinkedHashMap<>();
-//		group.put( "a", "AY" );
-//		group.put( "b", "BEE" );
-//		person.addGroup( "letters", group );
+		Map< String, String > group = new LinkedHashMap<>();
+		group.put( "one", "ONE" );
+		group.put( "two", "TWO" );
+		group.put( "three", "THREE" );
+		person.addGroup( "numbers", group );
+		group = new LinkedHashMap<>();
+		group.put( "a", "AY" );
+		group.put( "b", "BEE" );
+		person.addGroup( "letters", group );
 
 		badPerson = new BadPerson( "henley", "james", 42 );
 		badPerson.addEvilDoing( "Added semicolon after the closing parenthesis of colleague's code." );

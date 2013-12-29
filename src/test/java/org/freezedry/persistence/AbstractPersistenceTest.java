@@ -20,7 +20,6 @@ import org.freezedry.persistence.tests.Person;
 import org.freezedry.persistence.utils.Constants;
 import org.freezedry.persistence.utils.DateUtils;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,17 +33,12 @@ import java.util.*;
  * @author rob
  *         10/12/13 4:19 PM
  */
-public class AbstractPersistenceTest {
+public abstract class AbstractPersistenceTest {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger( AbstractPersistenceTest.class );
 
 	protected final static String OUTPUT_DIR = "src/test/output/";
 	protected Division division;
-
-	@BeforeClass
-	public static void init()
-	{
-	}
 
 	@Before
 	public void setUp() throws Exception

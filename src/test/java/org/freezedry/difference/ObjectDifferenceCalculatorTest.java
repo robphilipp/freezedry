@@ -125,32 +125,4 @@ public class ObjectDifferenceCalculatorTest {
 		johnny.setBirthdate( Calendar.getInstance() );
 		return division;
 	}
-
-	static class Account {
-		private Long accountId;
-		private String firmCode;
-		private String officeCode;
-		private String accountNumber;
-		private String accountType;
-		private String tradingType;
-		private String baseCurrency;
-		private String countryCode;
-		private Boolean accountActive;
-		private Date creationDate;
-
-		Account( Long accountId, String firmCode, String officeCode, String accountNumber, String accountType, String tradingType, String baseCurrency, String countryCode, Boolean accountActive, Date creationDate )
-		{
-			this.accountId = accountId;
-			this.firmCode = firmCode;
-			this.officeCode = officeCode;
-			this.accountNumber = accountNumber;
-			this.accountType = accountType;
-			this.tradingType = tradingType;
-			this.baseCurrency = baseCurrency;
-			this.countryCode = countryCode;
-			this.accountActive = accountActive;
-			this.creationDate = creationDate;
-		}
-	}
-
 }
