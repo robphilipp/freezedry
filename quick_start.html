@@ -156,22 +156,25 @@
 
 
             <h4 id="testing"><a href="#overview" class="scroll-offset">Testing</a></h4>
-            <p>The test cases are contained in</p>
+            <p>There are two types of tests available: unit tests and integration tests. Unit tests can be run using:</p>
             <pre class="brush: powershell">
-                src/test/java/org/freezedry/persistence
+                mvn clean test
             </pre>
-            directory. The abstract <b class="class">org.freezedry.persistence.AbstractPersistenceTest</b>
-            class has the following descendants that implement tests for Json, XML, and key-value pair
-            persistence.
-            <ul>
-                <li><b class="class">org.freezedry.persistence.JsonPersistenceTest</b></li>
-                <li><b class="class">org.freezedry.persistence.XmlPersistenceTest</b></li>
-                <li><b class="class">org.freezedry.persistence.KeyValuePersistenceTest</b></li>
-            </ul>
-
-            <p>The class <b class="class">org.freezedry.persistence.PersistenceTest</b> has a bunch of simple tests to
-            test specific aspects of FreezeDry persistence.</p>
-
+            <p>and integration tests, which run select tests in an OSGi container, can be run using:</p>
+            <pre class="brush: powershell">
+                mvn clean verify
+            </pre>
+            <p>By default, freezedry uses Apache's felix OSGi container, but if you prefer equinox you can add the
+            maven profile as such</p>
+            <pre class="brush: powershell">
+                mvn clean varify -Pequinox
+            </pre>
+            <p>Issuing the command</p>
+            <pre class="brush: powershell">
+                mvn clean install
+            </pre>
+            <p>will run both unit and integration tests (use the maven profile for equinox).</p>
+            
             <p>That's it.</p>
         </div>
     </div>

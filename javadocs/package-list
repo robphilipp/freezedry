@@ -10,8 +10,6 @@ org.freezedry.persistence.keyvalue.renderers
 org.freezedry.persistence.keyvalue.renderers.decorators
 org.freezedry.persistence.keyvalue.utils
 org.freezedry.persistence.readers
-org.freezedry.persistence.tests
-org.freezedry.persistence.tests.circle
 org.freezedry.persistence.tree
 org.freezedry.persistence.utils
 org.freezedry.persistence.writers
