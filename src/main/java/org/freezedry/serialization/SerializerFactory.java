@@ -19,12 +19,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.freezedry.persistence.utils.Constants;
 
 public class SerializerFactory {
 
-	private static final Logger LOGGER = Logger.getLogger( SerializerFactory.class );
+	private static final Logger LOGGER = LoggerFactory.getLogger( SerializerFactory.class );
 	
 	/**
 	 * SerializerFactoryHolder is loaded on the first execution of

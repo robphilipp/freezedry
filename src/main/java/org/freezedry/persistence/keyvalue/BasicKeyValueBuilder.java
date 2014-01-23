@@ -22,7 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.freezedry.persistence.containers.Pair;
 import org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer;
 import org.freezedry.persistence.keyvalue.utils.KeyValueUtils;
@@ -37,7 +38,7 @@ import org.freezedry.persistence.utils.Constants;
  */
 public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 
-	private static final Logger LOGGER = Logger.getLogger( BasicKeyValueBuilder.class );
+	private static final Logger LOGGER = LoggerFactory.getLogger( BasicKeyValueBuilder.class );
 
 	private boolean useClassAsRootKey = false;
 
@@ -174,7 +175,7 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 	 */
 	private String createKey( final InfoNode infoNode, final String key, final boolean isWithholdPersitName )
 	{
-		final StringBuffer newKey = new StringBuffer();
+		final StringBuilder newKey = new StringBuilder();
 		
 		// if the key is empty then don't add anything
 		if( key != null && !key.isEmpty() )
@@ -186,7 +187,7 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 			}
 		}
 		
-		// if we're withholding the persistence name, then don't add it to the key
+		// if we're not withholding the persistence name, then add it to the key
 		if( !isWithholdPersitName )
 		{
 			newKey.append( infoNode.getPersistName() );
@@ -248,20 +249,25 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 	@Override
 	public void createInfoNode( final InfoNode parentNode, final String groupName, final List< Pair< String, String > > keyValues )
 	{
-		System.out.println( groupName );
-		for( Pair< String, String > pair : keyValues )
+		if( LOGGER.isDebugEnabled() )
 		{
-			System.out.println( pair );
+			final StringBuilder message = new StringBuilder( "Creating InfoNode; " )
+					.append( "parent node: " ).append( parentNode.getPersistName() )
+					.append( "group name: " ).append( groupName );
+			for( Pair< String, String > pair : keyValues )
+			{
+				message.append( Constants.NEW_LINE ).append( pair );
+			}
+			LOGGER.debug( message.toString() );
 		}
-		System.out.println();
 
 		// key-value list cannot be empty.
 		if( keyValues.isEmpty() )
 		{
-			final StringBuffer message = new StringBuffer();
-			message.append( "Cannot create an InfoNode when the specified list of key-values for the group is empty." + Constants.NEW_LINE );
-			message.append( "  Parent Node's Persistence Name: " + parentNode.getPersistName() + Constants.NEW_LINE );
-			message.append( "  Group Name: " + groupName + Constants.NEW_LINE );
+			final StringBuilder message = new StringBuilder();
+			message.append( "Cannot create an InfoNode when the specified list of key-values for the group is empty." ).append( Constants.NEW_LINE );
+			message.append( "  Parent Node's Persistence Name: " ).append( parentNode.getPersistName() ).append( Constants.NEW_LINE );
+			message.append( "  Group Name: " ).append( groupName ).append( Constants.NEW_LINE );
 			LOGGER.error( message.toString() );
 			throw new IllegalArgumentException( message.toString() );
 		}
@@ -273,12 +279,12 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 			final String name = keyValues.get( 0 ).getFirst();
 			if( !groupName.equals( getGroupName( name ) ) )
 			{
-				final StringBuffer message = new StringBuffer();
-				message.append( "The group name must match the persist name for a leaf node." + Constants.NEW_LINE );
-				message.append( "  Parent Node's Persistence Name: " + parentNode.getPersistName() + Constants.NEW_LINE );
-				message.append( "  Group Name: " + groupName + Constants.NEW_LINE );
-				message.append( "  Key: " + name + Constants.NEW_LINE );
-				message.append( "  Value: " + keyValues.get( 0 ).getSecond() );
+				final StringBuilder message = new StringBuilder();
+				message.append( "The group name must match the persist name for a leaf node." ).append( Constants.NEW_LINE );
+				message.append( "  Parent Node's Persistence Name: " ).append( parentNode.getPersistName() ).append( Constants.NEW_LINE );
+				message.append( "  Group Name: " ).append( groupName ).append( Constants.NEW_LINE );
+				message.append( "  Key: " ).append( name ).append( Constants.NEW_LINE );
+				message.append( "  Value: " ).append( keyValues.get( 0 ).getSecond() );
 				LOGGER.error( message.toString() );
 				throw new IllegalStateException( message.toString() );
 			}
@@ -376,12 +382,12 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 		// has one element, or if all the group names are the same
 		if( keySet.size() != 1 )
 		{
-			final StringBuffer message = new StringBuffer();
-			message.append( "The first element of all the keys must be the same. This is the root key." + Constants.NEW_LINE );
-			message.append( "  Set elements:" + Constants.NEW_LINE );
+			final StringBuilder message = new StringBuilder();
+			message.append( "The first element of all the keys must be the same. This is the root key." ).append( Constants.NEW_LINE );
+			message.append( "  Set elements:" ).append( Constants.NEW_LINE );
 			for( String keyName : keySet )
 			{
-				message.append( "    " + keyName + Constants.NEW_LINE );
+				message.append( "    " ).append( keyName ).append( Constants.NEW_LINE );
 			}
 			LOGGER.error( message.toString() );
 			throw new IllegalArgumentException( message.toString() );
@@ -391,10 +397,10 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 		final String rootKey = keySet.iterator().next();
 		if( desiredName != null && !desiredName.equals( rootKey ) )
 		{
-			final StringBuffer message = new StringBuffer();
-			message.append( "The root key is not the same as the persistence name" + Constants.NEW_LINE );
-			message.append( "  Root Key: " + rootKey + Constants.NEW_LINE );
-			message.append( "  Persistence Name: " + desiredName );
+			final StringBuilder message = new StringBuilder();
+			message.append( "The root key is not the same as the persistence name" ).append( Constants.NEW_LINE );
+			message.append( "  Root Key: " ).append( rootKey ).append( Constants.NEW_LINE );
+			message.append( "  Persistence Name: " ).append( desiredName );
 			LOGGER.error( message.toString() );
 			throw new IllegalArgumentException( message.toString() );
 		}

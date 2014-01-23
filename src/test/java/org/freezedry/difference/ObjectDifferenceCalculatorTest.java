@@ -1,9 +1,6 @@
 package org.freezedry.difference;
 
 import junit.framework.Assert;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.xml.DOMConfigurator;
 import org.freezedry.persistence.tests.Division;
 import org.freezedry.persistence.tests.Person;
 import org.freezedry.persistence.utils.DateUtils;
@@ -21,9 +18,6 @@ public class ObjectDifferenceCalculatorTest {
 	@Before
 	public void init()
 	{
-		DOMConfigurator.configure( "log4j.xml" );
-		Logger.getRootLogger().setLevel( Level.ERROR );
-
 		try
 		{
 			division1 = createDivisionOne();
@@ -131,69 +125,4 @@ public class ObjectDifferenceCalculatorTest {
 		johnny.setBirthdate( Calendar.getInstance() );
 		return division;
 	}
-
-	public static void main( String...args ) throws ParseException
-	{
-		DOMConfigurator.configure( "log4j.xml" );
-		Logger.getRootLogger().setLevel( Level.WARN );
-
-		//
-//		System.out.println( "Complex Object" );
-//		long start = System.currentTimeMillis();
-//		final ObjectDifferenceCalculator diffCalc = new ObjectDifferenceCalculator( "." );
-//		Map< String, ObjectDifferenceCalculator.Difference> difference = null;
-//		long iters = 1_000;
-//		for( int i = 0; i < iters; ++i )
-//		{
-//			difference = diffCalc.calculateDifference( division, division2 );
-//		}
-//		for( Map.Entry< String, ObjectDifferenceCalculator.Difference> entry : difference.entrySet() )
-//		{
-//			System.out.println( entry.getKey() + ": " + entry.getValue().toString() );
-//		}
-//		System.out.println( (double)( System.currentTimeMillis() - start ) / iters + " ms per comparison");
-//
-//		//
-//		System.out.println( "Simple Object" );
-//		Account account1 = new Account( 12345L, "firmABCD", "office123", "12345", "cash", "individual", "USD", "US", true, Calendar.getInstance().getTime() );
-//		Account account2 = new Account( 12345L, "firmABC", "office123", "12345", "cash", "individual", "USD", "US", true, Calendar.getInstance().getTime() );
-//		start = System.currentTimeMillis();
-//		for( int i = 0; i < iters; ++i )
-//		{
-//			difference = diffCalc.calculateDifference( account1, account2 );
-//		}
-//		for( Map.Entry< String, ObjectDifferenceCalculator.Difference> entry : difference.entrySet() )
-//		{
-//			System.out.println( entry.getKey() + ": " + entry.getValue().toString() );
-//		}
-//		System.out.println( (double)( System.currentTimeMillis() - start ) / iters + " ms per comparison");
-	}
-
-	static class Account {
-		private Long accountId;
-		private String firmCode;
-		private String officeCode;
-		private String accountNumber;
-		private String accountType;
-		private String tradingType;
-		private String baseCurrency;
-		private String countryCode;
-		private Boolean accountActive;
-		private Date creationDate;
-
-		Account( Long accountId, String firmCode, String officeCode, String accountNumber, String accountType, String tradingType, String baseCurrency, String countryCode, Boolean accountActive, Date creationDate )
-		{
-			this.accountId = accountId;
-			this.firmCode = firmCode;
-			this.officeCode = officeCode;
-			this.accountNumber = accountNumber;
-			this.accountType = accountType;
-			this.tradingType = tradingType;
-			this.baseCurrency = baseCurrency;
-			this.countryCode = countryCode;
-			this.accountActive = accountActive;
-			this.creationDate = creationDate;
-		}
-	}
-
 }

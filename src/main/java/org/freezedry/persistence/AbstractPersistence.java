@@ -18,7 +18,8 @@ package org.freezedry.persistence;
 import java.io.Reader;
 import java.io.Writer;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.freezedry.persistence.readers.JsonReader;
 import org.freezedry.persistence.readers.PersistenceReader;
 import org.freezedry.persistence.readers.XmlReader;
@@ -44,7 +45,7 @@ import org.freezedry.persistence.writers.XmlWriter;
  */
 public abstract class AbstractPersistence implements Persistence {
 
-	private static final Logger LOGGER = Logger.getLogger( AbstractPersistence.class );
+	private static final Logger LOGGER = LoggerFactory.getLogger( AbstractPersistence.class );
 	
 	private final PersistenceEngine engine;
 
@@ -115,15 +116,4 @@ public abstract class AbstractPersistence implements Persistence {
 	 * {@link Persistence} interface
 	 */
 	abstract protected PersistenceReader getPersistenceReader();
-	
-	public static void main( String...args )
-	{
-		final double pi = Math.PI;
-		System.out.println( Double.class.cast( pi ) );
-		
-		final Double PI = new Double( Math.PI );
-		
-		final Class< ? > clazz = double.class;
-		System.out.println( clazz.cast( PI ) );
-	}
 }

@@ -15,27 +15,6 @@
  */
 package org.freezedry.persistence;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.io.*;
-import java.lang.reflect.Array;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.xml.DOMConfigurator;
-import org.freezedry.persistence.PersistenceEngine;
 import org.freezedry.persistence.readers.JsonReader;
 import org.freezedry.persistence.readers.XmlReader;
 import org.freezedry.persistence.tests.BadPerson;
@@ -49,6 +28,14 @@ import org.freezedry.persistence.writers.JsonWriter;
 import org.freezedry.persistence.writers.PersistenceWriter;
 import org.freezedry.persistence.writers.XmlWriter;
 import org.junit.Test;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.lang.reflect.Array;
+import java.text.ParseException;
+import java.util.*;
+
+import static org.junit.Assert.*;
 
 /**
  * Tests for FreezeDry
@@ -66,9 +53,6 @@ public class PersistenceTest {
 	 */
 	public PersistenceTest()
 	{
-		DOMConfigurator.configure( "log4j.xml" );
-		Logger.getRootLogger().setLevel( Level.ERROR );
-		
 		// create the persistence engine that is used to create the semantic model from an object
 		// and used to create an object from the semantic model.
 		this.engine = new PersistenceEngine();

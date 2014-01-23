@@ -21,7 +21,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.freezedry.persistence.Persistence;
 import org.freezedry.persistence.utils.Constants;
 
@@ -33,7 +34,7 @@ import org.freezedry.persistence.utils.Constants;
  */
 public class PersistenceSerializer implements Serializer {
 	
-	private static final Logger LOGGER = Logger.getLogger( PersistenceSerializer.class );
+	private static final Logger LOGGER = LoggerFactory.getLogger( PersistenceSerializer.class );
 
 	private Persistence persistence;
 	
@@ -103,36 +104,4 @@ public class PersistenceSerializer implements Serializer {
 		
 		return object;
 	}
-
-//	/**
-//	 * 
-//	 * @param args
-//	 */
-//	public static void main( String[] args )
-//	{
-//		DOMConfigurator.configure( "log4j.xml" );
-//		Logger.getRootLogger().setLevel( Level.DEBUG );
-//		
-//		final TestClassB b = new TestClassB();
-//		b.setMessage(  "test_class_bee" );
-//		final TestClassA a = new TestClassA( b );
-//
-////		final Serializer serializer = new PersistenceSerializer( new XmlPersistence() );
-//		final Serializer serializer = new XmlPersistenceSerializer();
-////		final Serializer serializer = new JsonPersistenceSerializer();
-////		final Serializer serializer = new KeyValuePersistenceSerializer();
-//		try
-//		{
-//			serializer.serialize( a, new FileOutputStream( "test_a.xml" ) );
-//			
-//			final TestClassA serA = serializer.deserialize( new FileInputStream( "test_a.xml" ), TestClassA.class );
-//			
-//			System.out.println( serA.toString() );
-//		}
-//		catch( FileNotFoundException e1 )
-//		{
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		}
-//	}
 }

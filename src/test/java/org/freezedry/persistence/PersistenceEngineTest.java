@@ -16,22 +16,9 @@
 package org.freezedry.persistence;
 
 import junit.framework.Assert;
-import org.apache.log4j.xml.DOMConfigurator;
-import org.freezedry.persistence.builders.NodeBuilder;
 import org.freezedry.persistence.builders.StringNodeBuilder;
-import org.freezedry.persistence.readers.JsonReader;
-import org.freezedry.persistence.readers.XmlReader;
-import org.freezedry.persistence.tests.Division;
-import org.freezedry.persistence.tests.Person;
-import org.freezedry.persistence.tree.InfoNode;
-import org.freezedry.persistence.utils.DateUtils;
-import org.freezedry.persistence.writers.JsonWriter;
-import org.freezedry.persistence.writers.XmlWriter;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.*;
-import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.

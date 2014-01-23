@@ -94,7 +94,7 @@ import org.freezedry.persistence.tree.InfoNode;
  */
 public class FlatteningCollectionRenderer extends CollectionRenderer {
 
-//	private static final Logger LOGGER = Logger.getLogger( FlatteningCollectionRenderer.class );
+//	private static final Logger LOGGER = LoggerFactory.getLogger( FlatteningCollectionRenderer.class );
 
 	private final String decorationRegex;
 	private final Pattern decorationPattern;

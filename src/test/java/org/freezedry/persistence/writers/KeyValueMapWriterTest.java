@@ -1,6 +1,5 @@
 package org.freezedry.persistence.writers;
 
-import org.apache.log4j.xml.DOMConfigurator;
 import org.freezedry.persistence.PersistenceEngine;
 import org.freezedry.persistence.keyvalue.KeyValueBuilder;
 import org.freezedry.persistence.keyvalue.renderers.FlatteningCollectionRenderer;
@@ -10,8 +9,12 @@ import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.DateUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
+
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Created with IntelliJ IDEA.
@@ -21,11 +24,12 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class KeyValueMapWriterTest {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger( KeyValueMapWriterTest.class );
+
 	@Before
 	public void setUp() throws Exception
 	{
-		DOMConfigurator.configure( "log4j.xml" );
-
 		final Division division = new Division();
 		final Person johnny = new Person( "Hernandez", "Johnny", 13 );
 		johnny.addFriend( "Polly", "bird" );
@@ -97,25 +101,24 @@ public class KeyValueMapWriterTest {
 
 		final PersistenceEngine engine = new PersistenceEngine();
 		final InfoNode rootNode = engine.createSemanticModel( division );
-		System.out.println( rootNode.simpleTreeToString() );
+//		LOGGER.debug( rootNode.simpleTreeToString() );
 
 		final KeyValueMapWriter writer = new KeyValueMapWriter();
-//			writer.setShowFullKey( true );
 		final KeyValueBuilder builder = writer.getBuilder();
 		builder.putRenderer( Collection.class, new FlatteningCollectionRenderer( builder ) );
 		writer.setKeyElementSeparator( "." );
 		Map< String, Object > flattenedObject = writer.createMap( rootNode );
 
-		for( Map.Entry< String, Object > entry : flattenedObject.entrySet() )
-		{
-			System.out.println( entry.getKey() + " = " + entry.getValue().toString() );
-		}
+//		for( Map.Entry< String, Object > entry : flattenedObject.entrySet() )
+//		{
+//			LOGGER.debug( entry.getKey() + " = " + entry.getValue().toString() );
+//		}
 	}
 
 	@Test
 	public void testGetKeyValueFlattener() throws Exception
 	{
-
+		assertNotNull( new KeyValueMapWriter().getKeyValueFlattener() );
 	}
 
 	@Test

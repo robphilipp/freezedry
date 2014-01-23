@@ -26,8 +26,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.xml.DOMConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.freezedry.persistence.PersistenceEngine;
 import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.Constants;
@@ -49,7 +49,7 @@ import org.xml.sax.SAXException;
  */
 public class XmlReader implements PersistenceReader {
 
-	private static final Logger LOGGER = Logger.getLogger( XmlReader.class );
+	private static final Logger LOGGER = LoggerFactory.getLogger( XmlReader.class );
 	
 	private boolean isRemoveEmptyTextNodes;
 	
@@ -400,42 +400,5 @@ public class XmlReader implements PersistenceReader {
 		}
 		
 		return InfoNode.createRootNode( fieldName, clazz );
-	}
-	
-	/**
-	 * 
-	 * @param args
-	 * @throws ParserConfigurationException
-	 * @throws SAXException
-	 * @throws IOException
-	 * @throws SecurityException
-	 * @throws ReflectiveOperationException
-	 */
-	public static void main( String[] args ) throws ParserConfigurationException, SAXException, IOException, SecurityException, ReflectiveOperationException
-	{
-		DOMConfigurator.configure( "log4j.xml" );
-		
-//		final XmlReader reader = new XmlReader();
-////		reader.setRemoveEmptyTextNodes( false );
-//		final InputStream inputStream = new BufferedInputStream( new FileInputStream( "person.xml" ) );
-//		final Reader input = new InputStreamReader( inputStream );
-//		final InfoNode infoNode = reader.read( Division.class, input );
-//		System.out.println( infoNode.simpleTreeToString() );
-//		
-//		final PersistenceEngine engine = new PersistenceEngine();
-//		final Object reperson = engine.parseSemanticModel( Division.class, infoNode );
-//		System.out.println( reperson );
-		
-		final XmlReader reader = new XmlReader();
-		final Class< ? > inputClazz = int[][].class;
-//		reader.setRemoveEmptyTextNodes( false );
-		final InputStream inputStream = new BufferedInputStream( new FileInputStream( "test.xml" ) );
-		final Reader input = new InputStreamReader( inputStream );
-		final InfoNode infoNode = reader.read( inputClazz, input );
-		System.out.println( infoNode.simpleTreeToString() );
-		
-		final PersistenceEngine engine = new PersistenceEngine();
-		final Object reperson = engine.parseSemanticModel( inputClazz, infoNode );
-		System.out.println( reperson );
 	}
 }
