@@ -143,9 +143,9 @@
                 <configuration>
                     <instructions>
                         <Export-Package>
-                            org.freezedry.difference*;verision=${project.version},
-                            org.freezedry.persistence*;verision=${project.version},
-                            org.freezedry.serialization*;verision=${project.version}
+                            org.freezedry.difference*;version=${project.version},
+                            org.freezedry.persistence*;version=${project.version},
+                            org.freezedry.serialization*;version=${project.version}
                         </Export-Package>
                         <Private-Package>
                             org.freezedry.*
