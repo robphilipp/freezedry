@@ -90,6 +90,7 @@ public class PersistenceEngine {
 	private final Map< Class< ? >, NodeBuilder > nodeBuilders;
 	private ArrayNodeBuilder genaralArrayNodeBuilder;
 	private boolean isPersistClassConstants = false;
+	private boolean isPersistNullValues = false;
 	
 	private final Map< Class< ? >, Object > defaultInstances;
 	
@@ -198,7 +199,36 @@ public class PersistenceEngine {
 	{
 		this.isPersistClassConstants = isPersistClassConstants;
 	}
-	
+
+	/**
+	 * When set to {@code true} null values will be persisted. The default behaviour is not to persist null values.
+	 * @param isPersistNullValues whether or not to persist null values.
+	 */
+	public void setPersistNullValues( final boolean isPersistNullValues )
+	{
+		this.isPersistNullValues = isPersistNullValues;
+	}
+
+	/**
+	 * Tells the persistence engine to persist null values
+	 * @return This {@link org.freezedry.persistence.PersistenceEngine}
+	 */
+	public PersistenceEngine withPersistNullValues()
+	{
+		this.isPersistNullValues = true;
+		return this;
+	}
+
+	/**
+	 * Tells the persistence engine to persist class constants
+	 * @return This {@link org.freezedry.persistence.PersistenceEngine}
+	 */
+	public PersistenceEngine withPersistClassConstants()
+	{
+		this.isPersistClassConstants = true;
+		return this;
+	}
+
 	/**
 	 * Adds a {@link NodeBuilder} to be used for generating {@link InfoNode}s for the specified {@link Class}
 	 * @param clazz The {@link Class} of the object to persist and, therefore, for which to generate a node
@@ -401,7 +431,7 @@ public class PersistenceEngine {
 		// object we are being asked to persist.
 		final Class< ? > clazz = object.getClass();
 		
-		InfoNode rootNode = null;
+		InfoNode rootNode;
 		
 		// if the object is an array of one or more dimensions, then we need to replace the
 		// "[]" which the array suffix (by default = "Array"). Then we use the array node
@@ -411,7 +441,6 @@ public class PersistenceEngine {
 			final String persistName = clazz.getSimpleName().replaceAll( "\\[\\]", genaralArrayNodeBuilder.getCompoundArrayNameSuffix() );
 			try
 			{
-//				rootNode = genaralArrayNodeBuilder.createInfoNode( null, object, persistName );
 				rootNode = genaralArrayNodeBuilder.createInfoNode( object, persistName );
 			}
 			catch( ReflectiveOperationException e )
@@ -495,7 +524,7 @@ public class PersistenceEngine {
 				// create and add the node representing this object to the current node, unless the
 				// node has a null value.
 				final Object fieldObject = field.get( object );
-				if( fieldObject != null )
+				if( fieldObject != null || isPersistNullValues )
 				{
 					currentNode.addChild( createNode( clazz, fieldObject, field.getName() ) );
 				}
@@ -522,6 +551,12 @@ public class PersistenceEngine {
 	 */
 	public final InfoNode createNode( final Class< ? > containingClass, final Object object, final String fieldName )
 	{
+		InfoNode node;
+		if( object == null )
+		{
+			return InfoNode.createLeafNode( fieldName, object, fieldName, Object.class );
+		}
+
 		// create the InfoNode object (we first have to determine the node type, down the road, we'll check the
 		// factories for registered node info node builders for the Class< ? > of the object)
 		final Class< ? > clazz = object.getClass();
@@ -539,7 +574,6 @@ public class PersistenceEngine {
 		// the first two cases are handled by the info node builders in the info node builders map. even
 		// the leaf node info node builders may need to be overridden. the third case is handled
 		// by the compound node
-		InfoNode node = null;
 		if( containsAnnotatedNodeBuilder( containingClass, fieldName ) )
 		{
 			final NodeBuilder builder = getAnnotatedNodeBuilder( containingClass, fieldName );

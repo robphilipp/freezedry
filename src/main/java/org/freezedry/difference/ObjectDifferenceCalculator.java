@@ -36,7 +36,7 @@ import java.util.Set;
 public class ObjectDifferenceCalculator {
 
 	private final KeyValueMapWriter mapWriter;
-	private final PersistenceEngine persistenceEngine = new PersistenceEngine();
+	private final PersistenceEngine persistenceEngine = new PersistenceEngine().withPersistNullValues();
 
 	/**
 	 * Constructs a basic key-value writer that uses the specified renderers and separator.
@@ -78,6 +78,16 @@ public class ObjectDifferenceCalculator {
 	public ObjectDifferenceCalculator( final KeyValueBuilder builder )
 	{
 		mapWriter = new KeyValueMapWriter( builder );
+	}
+
+	/**
+	 * If set to {@code true} then tells the {@link org.freezedry.persistence.PersistenceEngine} to persist null values.
+	 * By default the {@link org.freezedry.persistence.PersistenceEngine} does not persist null values.
+	 * @param isPersistNullValues Whether or not to persist fields that have null values
+	 */
+	public void setPersistNullValues( final boolean isPersistNullValues )
+	{
+		persistenceEngine.setPersistNullValues( isPersistNullValues );
 	}
 
 	/**
