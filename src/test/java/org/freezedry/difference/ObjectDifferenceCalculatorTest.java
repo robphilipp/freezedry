@@ -34,13 +34,154 @@ public class ObjectDifferenceCalculatorTest {
 	{
 		final ObjectDifferenceCalculator diffCalc = new ObjectDifferenceCalculator( "." );
 		final Map< String, ObjectDifferenceCalculator.Difference> difference = diffCalc.calculateDifference( division1, division2 );
-		Assert.assertTrue( difference.size() == 2 );
+		Assert.assertEquals( "Number of Differences", difference.size(), 2 );
+		final ObjectDifferenceCalculator.Difference age = difference.get( "Division.people[0].Person.age" );
+		Assert.assertEquals( "Age (modified)", age.getObject(), "13" );
+		Assert.assertEquals( "Age (reference)", age.getReferenceObject(), "37" );
+		final ObjectDifferenceCalculator.Difference dob = difference.get( "Division.people[0].Person.birthDate" );
+		Assert.assertEquals( "DOB (modified)", dob.getObject(), "1963-04-22" );
+		Assert.assertEquals( "DOB (reference)", dob.getReferenceObject(), "2014-01-28" );
 	}
 
 	@Test
 	public void testFlattenObject() throws Exception
 	{
+		final ObjectDifferenceCalculator diffCalc = new ObjectDifferenceCalculator( "." );
+		final Map< String, Object > flattened = diffCalc.flattenObject( division1 );
 
+		final Map< String, Object > expectedKeys = new HashMap<>();
+		expectedKeys.put( "Division.people[0].Person.givenName", "\"Johnny\"" );
+		expectedKeys.put( "Division.people[0].Person.familyName", "\"Hernandez\"" );
+		expectedKeys.put( "Division.people[0].Person.age", "13" );
+		expectedKeys.put( "Division.people[0].Person.birthDate", "1963-04-22" );
+		expectedKeys.put( "Division.people[0].Person.Mood[0]", "0.0" );
+		expectedKeys.put( "Division.people[0].Person.Mood[1]", "0.7071067811865475" );
+		expectedKeys.put( "Division.people[0].Person.Mood[2]", "1.0" );
+		expectedKeys.put( "Division.people[0].Person.Mood[3]", "0.7071067811865476" );
+		expectedKeys.put( "Division.people[0].Person.Mood[4]", "1.2246467991473532E-16" );
+		expectedKeys.put( "Division.people[0].Person.Mood[5]", "-0.7071067811865475" );
+		expectedKeys.put( "Division.people[0].Person.Mood[6]", "-1.0" );
+		expectedKeys.put( "Division.people[0].Person.Mood[7]", "-0.7071067811865477" );
+		expectedKeys.put( "Division.people[0].Person.Mood[8]", "-2.4492935982947064E-16" );
+		expectedKeys.put( "Division.people[0].Person.Mood[9]", "0.7071067811865474" );
+		expectedKeys.put( "Division.people[0].Person.friends{\"Polly\"}", "\"bird\"" );
+		expectedKeys.put( "Division.people[0].Person.friends{\"Sparky\"}", "\"dog\"" );
+		expectedKeys.put( "Division.people[0].Person.groups{\"numbers\"}{\"one\"}", "\"ONE\"" );
+		expectedKeys.put( "Division.people[0].Person.groups{\"numbers\"}{\"two\"}", "\"TWO\"" );
+		expectedKeys.put( "Division.people[0].Person.groups{\"numbers\"}{\"three\"}", "\"THREE\"" );
+		expectedKeys.put( "Division.people[0].Person.groups{\"letters\"}{\"a\"}", "\"AY\"" );
+		expectedKeys.put( "Division.people[0].Person.groups{\"letters\"}{\"b\"}", "\"BEE\"" );
+		expectedKeys.put( "Division.people[1].Person.givenName", "\"Julie\"" );
+		expectedKeys.put( "Division.people[1].Person.familyName", "\"Prosky\"" );
+		expectedKeys.put( "Division.people[1].Person.age", "15" );
+		expectedKeys.put( "Division.people[1].Person.birthDate", null );
+		expectedKeys.put( "Division.people[1].Person.mood", null );
+		expectedKeys.put( "Division.people[1].Person.friends", null );
+		expectedKeys.put( "Division.people[1].Person.groups", null );
+		expectedKeys.put( "Division.people[2].Person.givenName", "\"Janet\"" );
+		expectedKeys.put( "Division.people[2].Person.familyName", "\"Jones\"" );
+		expectedKeys.put( "Division.people[2].Person.age", "13" );
+		expectedKeys.put( "Division.people[2].Person.birthDate", null );
+		expectedKeys.put( "Division.people[2].Person.mood", null );
+		expectedKeys.put( "Division.people[2].Person.friends", null );
+		expectedKeys.put( "Division.people[2].Person.groups", null );
+		expectedKeys.put( "Division.people[3].Person.givenName", "\"Booda\"" );
+		expectedKeys.put( "Division.people[3].Person.familyName", "\"Ghad\"" );
+		expectedKeys.put( "Division.people[3].Person.age", "17" );
+		expectedKeys.put( "Division.people[3].Person.birthDate", null );
+		expectedKeys.put( "Division.people[3].Person.mood", null );
+		expectedKeys.put( "Division.people[3].Person.friends", null );
+		expectedKeys.put( "Division.people[3].Person.groups", null );
+		expectedKeys.put( "Division.months{\"January\"}[0]", "1" );
+		expectedKeys.put( "Division.months{\"January\"}[1]", "2" );
+		expectedKeys.put( "Division.months{\"January\"}[2]", "3" );
+		expectedKeys.put( "Division.months{\"January\"}[3]", "31" );
+		expectedKeys.put( "Division.months{\"April\"}[0]", "1" );
+		expectedKeys.put( "Division.months{\"April\"}[1]", "2" );
+		expectedKeys.put( "Division.months{\"April\"}[2]", "3" );
+		expectedKeys.put( "Division.months{\"April\"}[3]", "30" );
+		expectedKeys.put( "Division.months{\"February\"}[0]", "1" );
+		expectedKeys.put( "Division.months{\"February\"}[1]", "2" );
+		expectedKeys.put( "Division.months{\"February\"}[2]", "3" );
+		expectedKeys.put( "Division.months{\"February\"}[3]", "28" );
+		expectedKeys.put( "Division.months{\"March\"}[0]", "1" );
+		expectedKeys.put( "Division.months{\"March\"}[1]", "2" );
+		expectedKeys.put( "Division.months{\"March\"}[2]", "3" );
+		expectedKeys.put( "Division.months{\"March\"}[3]", "31" );
+		expectedKeys.put( "Division.carNames[0]", "\"civic\"" );
+		expectedKeys.put( "Division.carNames[1]", "\"tsx\"" );
+		expectedKeys.put( "Division.carNames[2]", "\"accord\"" );
+		expectedKeys.put( "Division.arrayMatrix[0][0]", "11" );
+		expectedKeys.put( "Division.arrayMatrix[0][1]", "12" );
+		expectedKeys.put( "Division.arrayMatrix[0][2]", "13" );
+		expectedKeys.put( "Division.arrayMatrix[1][0]", "21" );
+		expectedKeys.put( "Division.arrayMatrix[1][1]", "22" );
+		expectedKeys.put( "Division.arrayMatrix[1][2]", "23" );
+		expectedKeys.put( "Division.arrayMatrix[2][0]", "31" );
+		expectedKeys.put( "Division.arrayMatrix[2][1]", "32" );
+		expectedKeys.put( "Division.arrayMatrix[2][2]", "33" );
+		expectedKeys.put( "Division.collectionMatrix[0][0]", "11" );
+		expectedKeys.put( "Division.collectionMatrix[0][1]", "12" );
+		expectedKeys.put( "Division.collectionMatrix[0][2]", "13" );
+		expectedKeys.put( "Division.collectionMatrix[1][0]", "21" );
+		expectedKeys.put( "Division.collectionMatrix[1][1]", "22" );
+		expectedKeys.put( "Division.collectionMatrix[1][2]", "23" );
+		expectedKeys.put( "Division.collectionMatrix[2][0]", "31" );
+		expectedKeys.put( "Division.collectionMatrix[2][1]", "32" );
+		expectedKeys.put( "Division.collectionMatrix[2][2]", "33" );
+		expectedKeys.put( "Division.personMap{\"funny\"}.givenName", "\"Pryor\"" );
+		expectedKeys.put( "Division.personMap{\"funny\"}.familyName", "\"Richard\"" );
+		expectedKeys.put( "Division.personMap{\"funny\"}.age", "63" );
+		expectedKeys.put( "Division.personMap{\"funny\"}.birthDate", null );
+		expectedKeys.put( "Division.personMap{\"funny\"}.mood", null );
+		expectedKeys.put( "Division.personMap{\"funny\"}.friends", null );
+		expectedKeys.put( "Division.personMap{\"funny\"}.groups", null );
+		expectedKeys.put( "Division.personMap{\"sad\"}.givenName", "\"Jones\"" );
+		expectedKeys.put( "Division.personMap{\"sad\"}.familyName", "\"Jenny\"" );
+		expectedKeys.put( "Division.personMap{\"sad\"}.age", "45" );
+		expectedKeys.put( "Division.personMap{\"sad\"}.birthDate", null );
+		expectedKeys.put( "Division.personMap{\"sad\"}.mood", null );
+		expectedKeys.put( "Division.personMap{\"sad\"}.friends", null );
+		expectedKeys.put( "Division.personMap{\"sad\"}.groups", null );
+		expectedKeys.put( "Division.personMap{\"pretty\"}.givenName", "\"Mendez\"" );
+		expectedKeys.put( "Division.personMap{\"pretty\"}.familyName", "\"Ginder\"" );
+		expectedKeys.put( "Division.personMap{\"pretty\"}.age", "23" );
+		expectedKeys.put( "Division.personMap{\"pretty\"}.birthDate", null );
+		expectedKeys.put( "Division.personMap{\"pretty\"}.mood", null );
+		expectedKeys.put( "Division.personMap{\"pretty\"}.friends", null );
+		expectedKeys.put( "Division.personMap{\"pretty\"}.groups", null );
+		expectedKeys.put( "Division.listOfMaps[0]{\"color\"}", "\"green\"" );
+		expectedKeys.put( "Division.listOfMaps[0]{\"size\"}", "\"large\"" );
+		expectedKeys.put( "Division.listOfMaps[0]{\"condition\"}", "\"used\"" );
+		expectedKeys.put( "Division.listOfMaps[1]{\"color\"}", "\"red\"" );
+		expectedKeys.put( "Division.listOfMaps[1]{\"size\"}", "\"small\"" );
+		expectedKeys.put( "Division.listOfMaps[1]{\"condition\"}", "\"new\"" );
+		expectedKeys.put( "Division.listOfMaps[2]{\"color\"}", "\"blue\"" );
+		expectedKeys.put( "Division.listOfMaps[2]{\"size\"}", "\"medium\"" );
+		expectedKeys.put( "Division.listOfMaps[2]{\"condition\"}", "\"good\"" );
+
+		Assert.assertEquals( "Flattened Division", expectedKeys, flattened );
+
+		// used to generate the expect results when needed
+//		for( Map.Entry< String, Object > entry : flattened.entrySet() )
+//		{
+//			final StringBuilder expression = new StringBuilder( "expectedKeys.put( \"" )
+//					.append( entry.getKey().replaceAll( "\\\"", "\\\\\"" ) )
+//					.append( "\", " );
+//			final Object object = entry.getValue();
+//			if( object == null )
+//			{
+//				expression.append( "null" );
+//			}
+//			else
+//			{
+//				expression.append( "\"" )
+//						.append( object.toString().replaceAll( "\\\"", "\\\\\"" ) )
+//						.append( "\"" );
+//			}
+//			expression.append( " );" );
+//			System.out.println( expression.toString() );
+//		}
 	}
 
 	private static Division createDivisionOne() throws ParseException
