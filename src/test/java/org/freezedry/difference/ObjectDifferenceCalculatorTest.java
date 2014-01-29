@@ -33,14 +33,49 @@ public class ObjectDifferenceCalculatorTest {
 	public void testCalculateDifference() throws Exception
 	{
 		final ObjectDifferenceCalculator diffCalc = new ObjectDifferenceCalculator( "." );
-		final Map< String, ObjectDifferenceCalculator.Difference> difference = diffCalc.calculateDifference( division1, division2 );
-		Assert.assertEquals( "Number of Differences", difference.size(), 2 );
-		final ObjectDifferenceCalculator.Difference age = difference.get( "Division.people[0].Person.age" );
-		Assert.assertEquals( "Age (modified)", age.getObject(), "13" );
-		Assert.assertEquals( "Age (reference)", age.getReferenceObject(), "37" );
-		final ObjectDifferenceCalculator.Difference dob = difference.get( "Division.people[0].Person.birthDate" );
-		Assert.assertEquals( "DOB (modified)", dob.getObject(), "1963-04-22" );
-		Assert.assertEquals( "DOB (reference)", dob.getReferenceObject(), "2014-01-28" );
+		final Map< String, ObjectDifferenceCalculator.Difference> differences = diffCalc.calculateDifference( division1, division2 );
+		Assert.assertEquals( "Number of Differences", differences.size(), 8 );
+		final ObjectDifferenceCalculator.Difference age = differences.get( "Division.people[0].Person.age" );
+		Assert.assertEquals( "Division.people[0].Person.age (modified)", age.getObject(), "13" );
+		Assert.assertEquals( "Division.people[0].Person.age (reference)", age.getReferenceObject(), "37" );
+		final ObjectDifferenceCalculator.Difference dob = differences.get( "Division.people[0].Person.birthDate" );
+		Assert.assertEquals( "Division.people[0].Person.birthDate (modified)", dob.getObject(), "1963-04-22" );
+		Assert.assertEquals( "Division.people[0].Person.birthDate (reference)", dob.getReferenceObject(), "2014-01-28" );
+
+		ObjectDifferenceCalculator.Difference col = differences.get( "Division.collectionMatrix[0][0]" );
+		Assert.assertEquals( "Divisoin.collectionMatrix[0][0] (modified)" , col.getObject(), "11" );
+		Assert.assertEquals( "Divisoin.collectionMatrix[0][0] (reference)" , col.getReferenceObject(), "21" );
+		col = differences.get( "Division.collectionMatrix[0][1]" );
+		Assert.assertEquals( "Divisoin.collectionMatrix[0][1] (modified)" , col.getObject(), "12" );
+		Assert.assertEquals( "Divisoin.collectionMatrix[0][1] (reference)" , col.getReferenceObject(), "23" );
+		col = differences.get( "Division.collectionMatrix[0][2]" );
+		Assert.assertEquals( "Divisoin.collectionMatrix[0][2] (modified)" , col.getObject(), "13" );
+		Assert.assertEquals( "Divisoin.collectionMatrix[0][2] (reference)" , col.getReferenceObject(), "22" );
+		col = differences.get( "Division.collectionMatrix[1][0]" );
+		Assert.assertEquals( "Divisoin.collectionMatrix[1][0] (modified)" , col.getObject(), "21" );
+		Assert.assertEquals( "Divisoin.collectionMatrix[1][0] (reference)" , col.getReferenceObject(), "12" );
+		col = differences.get( "Division.collectionMatrix[1][1]" );
+		Assert.assertEquals( "Divisoin.collectionMatrix[1][1] (modified)" , col.getObject(), "22" );
+		Assert.assertEquals( "Divisoin.collectionMatrix[1][1] (reference)" , col.getReferenceObject(), "11" );
+		col = differences.get( "Division.collectionMatrix[1][2]" );
+		Assert.assertEquals( "Divisoin.collectionMatrix[1][2] (modified)" , col.getObject(), "23" );
+		Assert.assertEquals( "Divisoin.collectionMatrix[1][2] (reference)" , col.getReferenceObject(), "13" );
+
+	}
+
+	@Test
+	public void testCalculateDifferenceListOrderIgnored() throws Exception
+	{
+		final ObjectDifferenceCalculator diffCalc = new ObjectDifferenceCalculator( "." ).listOrderIgnored();
+		final Map< String, ObjectDifferenceCalculator.Difference> differences = diffCalc.calculateDifference( division1, division2 );
+//		Assert.assertEquals( "Number of Differences", differences.size(), 2 );
+		Assert.assertEquals( "Number of Differences", differences.size(), 8 );
+		final ObjectDifferenceCalculator.Difference age = differences.get( "Division.people[0].Person.age" );
+		Assert.assertEquals( "Division.people[0].Person.age (modified)", age.getObject(), "13" );
+		Assert.assertEquals( "Division.people[0].Person.age (reference)", age.getReferenceObject(), "37" );
+		final ObjectDifferenceCalculator.Difference dob = differences.get( "Division.people[0].Person.birthDate" );
+		Assert.assertEquals( "Division.people[0].Person.birthDate (modified)", dob.getObject(), "1963-04-22" );
+		Assert.assertEquals( "Division.people[0].Person.birthDate (reference)", dob.getReferenceObject(), "2014-01-28" );
 	}
 
 	@Test
@@ -159,8 +194,9 @@ public class ObjectDifferenceCalculatorTest {
 		expectedKeys.put( "Division.listOfMaps[2]{\"color\"}", "\"blue\"" );
 		expectedKeys.put( "Division.listOfMaps[2]{\"size\"}", "\"medium\"" );
 		expectedKeys.put( "Division.listOfMaps[2]{\"condition\"}", "\"good\"" );
-
-		Assert.assertEquals( "Flattened Division", expectedKeys, flattened );
+		expectedKeys.put( "Division.crazySet[0]", "\"hypochondria\"" );
+		expectedKeys.put( "Division.crazySet[1]", "\"delusions\"" );
+		expectedKeys.put( "Division.crazySet[2]", "\"manic-depression\"" );
 
 		// used to generate the expect results when needed
 //		for( Map.Entry< String, Object > entry : flattened.entrySet() )
@@ -182,6 +218,9 @@ public class ObjectDifferenceCalculatorTest {
 //			expression.append( " );" );
 //			System.out.println( expression.toString() );
 //		}
+
+		Assert.assertEquals( "Flattened Division", expectedKeys, flattened );
+
 	}
 
 	private static Division createDivisionOne() throws ParseException
@@ -255,6 +294,10 @@ public class ObjectDifferenceCalculatorTest {
 		personMap.put( "pretty", new Person( "Ginder", "Mendez", 23 ) );
 		division.setPersonMap( personMap );
 
+		division.addToCrazySet( "hypochondria" );
+		division.addToCrazySet( "delusions" );
+		division.addToCrazySet( "manic-depression" );
+
 		return division;
 	}
 
@@ -263,7 +306,14 @@ public class ObjectDifferenceCalculatorTest {
 		final Division division = createDivisionOne();
 		final Person johnny = division.getPerson( "Hernandez", "Johnny" );
 		johnny.setAge( 37 );
-		johnny.setBirthdate( Calendar.getInstance() );
+		johnny.setBirthdate( DateUtils.createDateFromString( "2014-01-28", "yyyy-MM-dd" ) );
+
+		List<List< Integer >> collectionMatrix = Arrays.asList(
+				Arrays.asList( 21, 23, 22 ),
+				Arrays.asList( 12, 11, 13 ),
+				Arrays.asList( 31, 32, 33 ) );
+		division.setCollectionMatrix( collectionMatrix );
+
 		return division;
 	}
 }

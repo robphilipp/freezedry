@@ -20,11 +20,11 @@ import org.freezedry.persistence.keyvalue.KeyValueBuilder;
 import org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer;
 import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.writers.KeyValueMapWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Calculates the difference between two object of the same type and lists the flattened properties that differ. Also
@@ -35,8 +35,13 @@ import java.util.Set;
  */
 public class ObjectDifferenceCalculator {
 
+	private static Logger LOGGER = LoggerFactory.getLogger( ObjectDifferenceCalculator.class );
+
+	private static Pattern LIST_PATTERN = Pattern.compile( "(.)*(\\[[\\d]+\\])+(.)*" );
+
 	private final KeyValueMapWriter mapWriter;
 	private final PersistenceEngine persistenceEngine = new PersistenceEngine().withPersistNullValues();
+	private boolean isListOrderIgnored = false;
 
 	/**
 	 * Constructs a basic key-value writer that uses the specified renderers and separator.
@@ -80,6 +85,18 @@ public class ObjectDifferenceCalculator {
 		mapWriter = new KeyValueMapWriter( builder );
 	}
 
+	public ObjectDifferenceCalculator listOrderIgnored()
+	{
+		this.isListOrderIgnored = true;
+		return this;
+	}
+
+	public ObjectDifferenceCalculator listOrderMatters()
+	{
+		this.isListOrderIgnored = false;
+		return this;
+	}
+
 	/**
 	 * If set to {@code true} then tells the {@link org.freezedry.persistence.PersistenceEngine} to persist null values.
 	 * By default the {@link org.freezedry.persistence.PersistenceEngine} does not persist null values.
@@ -94,16 +111,16 @@ public class ObjectDifferenceCalculator {
 	 * Calculates the difference between the two specified objects and returns the difference as key-value pairs. The
 	 * {@link Difference} object holds the value of the {@code object}'s property and the {@code referenceObjects}'s property
 	 * that differ.
-	 * @param object The new object to compare against the reference object
+	 * @param modifiedObject The new object to compare against the reference object
 	 * @param referenceObject The reference object against which to compare the object
 	 * @param <T> The object's and the reference object's type.
 	 * @return A {@link Map} that holds the flattened property names of all the properties that are different between the
 	 * object and the reference object. For each entry in the map, the {@link Difference} holds the object's property
 	 * value and the reference object's property value
 	 */
-	public final < T > Map< String, Difference > calculateDifference( final T object, final T referenceObject )
+	public final < T > Map< String, Difference > calculateDifference( final T modifiedObject, final T referenceObject )
 	{
-		final Map< String, Object > objectMap = flattenObject( object );
+		final Map< String, Object > objectMap = flattenObject( modifiedObject );
 		final Map< String, Object > referenceObjectMap = flattenObject( referenceObject );
 
 		final Set< String > keys = new LinkedHashSet<>();
@@ -113,14 +130,19 @@ public class ObjectDifferenceCalculator {
 		final Map< String, Difference > difference = new LinkedHashMap<>();
 		for( String key : keys )
 		{
-			final Object newValue = objectMap.get( key );
-			final Object oldValue = referenceObjectMap.get( key );
-			if( ( newValue != null && oldValue != null && !newValue.toString().equals( oldValue.toString() ) ) ||
-				( newValue != null && oldValue == null ) ||
-				( newValue == null && oldValue != null ) )
+			final Object modifiedValue = objectMap.get( key );
+			final Object referenceValue = referenceObjectMap.get( key );
+			if( ( modifiedValue != null && referenceValue != null && !modifiedValue.toString().equals( referenceValue.toString() ) ) ||
+				( modifiedValue != null && referenceValue == null ) ||
+				( modifiedValue == null && referenceValue != null ) )
 			{
-				difference.put( key, new Difference( newValue, oldValue ) );
+				difference.put( key, new Difference( modifiedValue, referenceValue ) );
 			}
+		}
+
+		if( isListOrderIgnored )
+		{
+			ignoreListOrder( difference );
 		}
 
 		return difference;
@@ -139,6 +161,85 @@ public class ObjectDifferenceCalculator {
 	}
 
 	/**
+	 * Removes differences where the difference is only due to the place within a list the difference occurs.
+	 * @param differences A map holding differences between two objects and the keys representing the flattened field names
+	 * @return The map with differences removed that are only due to their placement in a list
+	 */
+	private Map< String, Difference > ignoreListOrder( final Map< String, Difference > differences )
+	{
+		final Map< Pattern, Map< String, Difference > > classifications = classifyLists( differences );
+		return differences;
+	}
+
+	/**
+	 * Extracts and returns any {@link org.freezedry.difference.ObjectDifferenceCalculator.Difference} objects that
+	 * represent a list or array. Whether the {@link org.freezedry.difference.ObjectDifferenceCalculator.Difference}
+	 * represents a list is determined by the regular expression {@link #LIST_PATTERN}.
+	 * @param differences The map of differences and their associated, flattened field name
+	 * @return T
+	 */
+	private Map< String, Difference > extractLists( final Map< String, Difference > differences )
+	{
+		final Map< String, Difference > lists = new HashMap<>();
+		for( Map.Entry< String, Difference > entry : differences.entrySet() )
+		{
+			if( LIST_PATTERN.matcher( entry.getKey() ).matches() )
+			{
+				lists.put( entry.getKey(), entry.getValue() );
+				if( LOGGER.isDebugEnabled() )
+				{
+					LOGGER.warn( entry.getKey() + "->" + entry.getValue() );
+				}
+			}
+		}
+		return lists;
+	}
+
+	/**
+	 * Classifies the lists into groups representing the same field
+	 * @param differences
+	 * @return
+	 */
+	private Map< Pattern, Map< String, Difference > > classifyLists( final Map< String, Difference > differences )
+	{
+		final Map< Pattern, Map< String, Difference > > mainGroups = new LinkedHashMap<>();
+
+		// finds the list-patterns and classifies each of the field names accordingly
+		for( Map.Entry< String, Difference > entry : differences.entrySet() )
+		{
+			// for keys that fit the list pattern, we classify them in groups that represent the same fields
+			if( LIST_PATTERN.matcher( entry.getKey() ).matches() )
+			{
+				// see if any of the patterns match the current key, if not, then we add the new pattern to the map
+				// along with the key and its value
+				boolean isClassified = false;
+				for( Map.Entry< Pattern, Map< String, Difference > > classEntry : mainGroups.entrySet() )
+				{
+					if( classEntry.getKey().matcher( entry.getKey() ).matches() )
+					{
+						classEntry.getValue().put( entry.getKey(), entry.getValue() );
+						isClassified = true;
+						break;
+					}
+				}
+				if( !isClassified )
+				{
+					final Map< String, Difference > difference = new HashMap<>();
+					difference.put( entry.getKey(), entry.getValue() );
+					mainGroups.put( createClassifier( entry.getKey() ), difference );
+				}
+			}
+		}
+		return mainGroups;
+	}
+
+	private Pattern createClassifier( final String flattenedField )
+	{
+		final String regex = flattenedField.replaceAll( "\\[[\\d]+\\]", "\\\\[[\\\\d]+\\\\]" );
+		return Pattern.compile( regex );
+	}
+
+	/**
 	 * Class representing the difference between the object's and the reference object's value.
 	 */
 	public final static class Difference {
@@ -148,12 +249,12 @@ public class ObjectDifferenceCalculator {
 
 		/**
 		 * The holds the value of a property of the object and the reference object
-		 * @param object The value of the object's property
+		 * @param modifiedObject The value of the object's property
 		 * @param referenceObject The value of the reference object's property
 		 */
-		public Difference( final Object object, final Object referenceObject )
+		public Difference( final Object modifiedObject, final Object referenceObject )
 		{
-			this.object = object;
+			this.object = modifiedObject;
 			this.referenceObject = referenceObject;
 		}
 
@@ -179,10 +280,8 @@ public class ObjectDifferenceCalculator {
 		@Override
 		public String toString()
 		{
-			final StringBuilder builder = new StringBuilder();
-			builder.append( "Object: " ).append( object == null ? "[null]" : object.toString() ).append( "; " )
-					.append( "Reference Object: " ).append( referenceObject == null ? "[null]" : referenceObject.toString() );
-			return builder.toString();
+			return "Modified Object: " + (object == null ? "[null]" : object.toString()) + "; " +
+					"Reference Object: " + (referenceObject == null ? "[null]" : referenceObject.toString());
 		}
 	}
 }

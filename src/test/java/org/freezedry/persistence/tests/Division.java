@@ -38,6 +38,17 @@ public class Division {
 
 	private List<Map<String, String>> listOfMaps;
 
+	private Set< String > crazySet;
+
+	public void addToCrazySet( final String craziness )
+	{
+		if( crazySet == null )
+		{
+			crazySet = new LinkedHashSet<>();
+		}
+		crazySet.add( craziness );
+	}
+
 	public void addPerson( final Person person )
 	{
 		if( people == null )
