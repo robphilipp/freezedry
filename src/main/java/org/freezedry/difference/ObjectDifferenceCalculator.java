@@ -167,38 +167,24 @@ public class ObjectDifferenceCalculator {
 	 */
 	private Map< String, Difference > ignoreListOrder( final Map< String, Difference > differences )
 	{
-		final Map< String, Map< String, Difference > > classifications = classifyLists( differences );
+		final Map< String, Map< String, Difference > > categories = classifyLists( differences );
+		for( Map.Entry< String, Map< String, Difference > > entry : categories.entrySet() )
+		{
+			// differences, even though they're lists, that have only one element are different regardless of
+			// whether order matters, so, in that case, we don't check that difference for list ordering
+			if( entry.getValue().size() > 1 )
+			{
+				final Group rootGroup = createTree( entry.getKey(), entry.getValue() );
+			}
+		}
 		return differences;
 	}
 
 	/**
-	 * Extracts and returns any {@link org.freezedry.difference.ObjectDifferenceCalculator.Difference} objects that
-	 * represent a list or array. Whether the {@link org.freezedry.difference.ObjectDifferenceCalculator.Difference}
-	 * represents a list is determined by the regular expression {@link #LIST_PATTERN}.
-	 * @param differences The map of differences and their associated, flattened field name
-	 * @return T
-	 */
-	private Map< String, Difference > extractLists( final Map< String, Difference > differences )
-	{
-		final Map< String, Difference > lists = new HashMap<>();
-		for( Map.Entry< String, Difference > entry : differences.entrySet() )
-		{
-			if( LIST_PATTERN.matcher( entry.getKey() ).matches() )
-			{
-				lists.put( entry.getKey(), entry.getValue() );
-				if( LOGGER.isDebugEnabled() )
-				{
-					LOGGER.warn( entry.getKey() + "->" + entry.getValue() );
-				}
-			}
-		}
-		return lists;
-	}
-
-	/**
-	 * Classifies the lists into groups representing the same field
-	 * @param differences
-	 * @return
+	 * Classifies the lists into groups representing the same field. The categories are represented by the key in
+	 * the outer return map, which is the group name with the indexes changed to wild cards (i.e. [1] or [2] -> [*])
+	 * @param differences The object differences
+	 * @return a map whose keys are the group name patterns, and whose values are the differences.
 	 */
 	private Map< String, Map< String, Difference > > classifyLists( final Map< String, Difference > differences )
 	{
@@ -242,9 +228,121 @@ public class ObjectDifferenceCalculator {
 		return groups;
 	}
 
-	private Pattern createClassifier( final String flattenedField )
+	private Group createTree( final String category, final Map< String, Difference > differences )
 	{
-		return Pattern.compile( flattenedField.replaceAll( "\\[[\\d]+\\]", "\\\\[[\\\\d]+\\\\]" ) );
+		final List< String > groupNames = getListGroups( category );
+		if ( groupNames.size() < 2 )
+		{
+			// only a root node, but no lists...shouldn't happen
+			return null;
+		}
+
+		final Set< String > keys = differences.keySet();
+
+		// first add the list to the nodes, then we can recursively add the groups to their parent groups
+		final Group rootGroup = new Group( groupNames.get( 0 ) );
+
+		for( int i = 1; i < groupNames.size(); ++i )
+		{
+
+		}
+
+
+		for( String name : groupNames )
+		{
+			final int numNodes = getNumGroups( name, keys );
+			System.out.println();
+		}
+		return null;
+	}
+
+	private int getNumGroups( final String name, final Set< String > keys )
+	{
+		final int openBracket = name.lastIndexOf( "[" );
+
+		// root node, no dimensions
+		if( openBracket == -1 )
+		{
+			return -1;
+		}
+		final Set< Integer > indexes = new HashSet<>();
+		for( String key: keys )
+		{
+			final int closeBracket = key.indexOf( "]", openBracket+1 );
+			indexes.add( Integer.valueOf( key.substring( openBracket+1, closeBracket ) ) );
+		}
+		return Collections.max( indexes ) + 1;
+	}
+
+	private List< String > getGroupNames( final String name, final Set< String > keys )
+	{
+		final List< String > indexes = new ArrayList<>();
+		final int numGroups = getNumGroups( name, keys );
+		for( int i = 0; i < numGroups; ++i )
+		{
+			indexes.add( name.replaceFirst( "\\*", Integer.toString( i ) ) );
+		}
+		return indexes;
+	}
+
+	private void createGroup( final Group parent, final int currentLevel, final int maxLevel, final String groupName, final Map< String, Difference > differences )
+	{
+		if( currentLevel == maxLevel )
+		{
+			// leaf node, add the lists
+			return;
+		}
+
+		final List< String > groupNames = getGroupNames( groupName, differences.keySet() );
+		int i = 0;
+		for( String name : groupNames )
+		{
+			final Group group = new Group( name );
+			parent.addChild( i, group );
+			createGroup( group, currentLevel+1, maxLevel, name, differences );
+		}
+	}
+
+	/**
+	 * Returns the names of the groups as regular expressions that can be used as masks. The last element in the list
+	 * is the most specific (i.e. name[*][*]) and the first element in the list is the most general (i.e. name). The most
+	 * general name will be assigned to the root group (node in the tree) and the most specific will be a leaf group
+	 * holding the actual list of values.
+	 * @param category
+	 * @return
+	 */
+	private List< String > getListGroups( final String category )
+	{
+		final List< String > groups = new ArrayList<>();
+
+		final int numDimensions = calcListDimensions( category );
+		final String[] dimensions = category.split( Pattern.quote( "[*]" ) );
+		for( int i = 0; i < numDimensions; ++i )
+		{
+			final StringBuilder groupName = new StringBuilder( dimensions[ 0 ] );
+			for( int j = 1; j <= i; ++j )
+			{
+				groupName.append( "[*]" ).append( ( j < dimensions.length ? dimensions[ j ] : "" ) );
+			}
+			groups.add( groupName.toString() );
+		}
+		return groups;
+	}
+
+	/**
+	 * Calculates the dimensions of the list (i.e. name[*][*] has dimensions of 2)
+	 * @param category The category name
+	 * @return The number of dimensions in the list
+	 */
+	private int calcListDimensions( final String category )
+	{
+		int count = 0;
+		int index = 0;
+		while( ( index = category.indexOf( "[*]", index+3 ) ) > 0 )
+		{
+			++count;
+		}
+		return count;
 	}
 
 	/**
