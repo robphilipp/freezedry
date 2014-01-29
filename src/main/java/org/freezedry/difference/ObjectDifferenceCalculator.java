@@ -167,7 +167,7 @@ public class ObjectDifferenceCalculator {
 	 */
 	private Map< String, Difference > ignoreListOrder( final Map< String, Difference > differences )
 	{
-		final Map< Pattern, Map< String, Difference > > classifications = classifyLists( differences );
+		final Map< String, Map< String, Difference > > classifications = classifyLists( differences );
 		return differences;
 	}
 
@@ -200,7 +200,7 @@ public class ObjectDifferenceCalculator {
 	 * @param differences
 	 * @return
 	 */
-	private Map< Pattern, Map< String, Difference > > classifyLists( final Map< String, Difference > differences )
+	private Map< String, Map< String, Difference > > classifyLists( final Map< String, Difference > differences )
 	{
 		final Map< Pattern, Map< String, Difference > > mainGroups = new LinkedHashMap<>();
 
@@ -226,17 +226,25 @@ public class ObjectDifferenceCalculator {
 				{
 					final Map< String, Difference > difference = new HashMap<>();
 					difference.put( entry.getKey(), entry.getValue() );
-					mainGroups.put( createClassifier( entry.getKey() ), difference );
+					final Pattern pattern = Pattern.compile( entry.getKey().replaceAll( "\\[[\\d]+\\]", "\\\\[[\\\\d]+\\\\]" ) );
+					mainGroups.put( pattern, difference );
 				}
 			}
 		}
-		return mainGroups;
+
+		// convert the indexes for the regex patterns (the group names) to "[*]"
+		final Map< String, Map< String, Difference > > groups = new HashMap<>( mainGroups.size() );
+		for( Map.Entry< Pattern, Map< String, Difference > > entry : mainGroups.entrySet() )
+		{
+			final String key = entry.getKey().pattern().replaceAll( Pattern.quote( "\\[[\\d]+\\]" ), "[*]" );
+			groups.put( key, entry.getValue() );
+		}
+		return groups;
 	}
 
 	private Pattern createClassifier( final String flattenedField )
 	{
-		final String regex = flattenedField.replaceAll( "\\[[\\d]+\\]", "\\\\[[\\\\d]+\\\\]" );
-		return Pattern.compile( regex );
+		return Pattern.compile( flattenedField.replaceAll( "\\[[\\d]+\\]", "\\\\[[\\\\d]+\\\\]" ) );
 	}
 
 	/**
