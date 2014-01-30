@@ -25,21 +25,22 @@ import java.util.*;
  */
 public class Group
 {
+	private final String name;
 	private String value;
 	private Group parent;
 	private List< Group > children;
 //	private List< String > values;
 //	private Map< String, Integer > values;
 
-//	public Group( final String groupName )
-//	{
-//		this.groupName = groupName;
-//	}
-//
-//	public String getGroupName()
-//	{
-//		return groupName;
-//	}
+	public Group( final String name )
+	{
+		this.name = name;
+	}
+
+	public String getName()
+	{
+		return name;
+	}
 
 	public Group addChild( final Group group )
 	{

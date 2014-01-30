@@ -16,6 +16,7 @@
 package org.freezedry.difference;
 
 import org.freezedry.persistence.PersistenceEngine;
+import org.freezedry.persistence.containers.Pair;
 import org.freezedry.persistence.keyvalue.KeyValueBuilder;
 import org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer;
 import org.freezedry.persistence.tree.InfoNode;
@@ -174,7 +175,8 @@ public class ObjectDifferenceCalculator {
 			// whether order matters, so, in that case, we don't check that difference for list ordering
 			if( entry.getValue().size() > 1 )
 			{
-				final Group rootGroup = createTree( entry.getKey(), entry.getValue() );
+				final Pair< Group, Group > trees = createTree( entry.getKey(), entry.getValue() );
+				System.out.println();
 			}
 		}
 		return differences;
@@ -228,7 +230,15 @@ public class ObjectDifferenceCalculator {
 		return groups;
 	}
 
-	private Group createTree( final String category, final Map< String, Difference > differences )
+	/**
+	 * Creates the value and reference trees representing the lists. The first elements in the pairs contain the value
+	 * tree, and the second elements contain the reference-value tree.
+	 * @param category The list category
+	 * @param differences The object differences
+	 * @return the value and reference trees representing the lists. The first elements in the pairs contain the value
+	 * tree, and the second elements contain the reference-value tree.
+	 */
+	private Pair< Group, Group > createTree( final String category, final Map< String, Difference > differences )
 	{
 		final List< String > groupNames = getListGroups( category );
 		if ( groupNames.size() < 2 )
@@ -237,7 +247,7 @@ public class ObjectDifferenceCalculator {
 			return null;
 		}
 
-		final Set< String > keys = differences.keySet();
+		// split the difference objects into values and reference values
 		final Map< String, Object > values = new HashMap<>();
 		final Map< String, Object > referenceValues = new HashMap<>();
 		for( Map.Entry< String, Difference > entry : differences.entrySet() )
@@ -246,16 +256,51 @@ public class ObjectDifferenceCalculator {
 			referenceValues.put( entry.getKey(), entry.getValue().getReferenceObject() );
 		}
 
-		for( String name : groupNames )
-		{
-			final int numGroups = getNumGroups( name, keys );
-			final Group root = new Group();
-			createGroup( root, 1, numGroups, name, values );
-			System.out.println();
-		}
-		return null;
+//		// build the trees for the values and reference values
+//		final Set< String > keys = differences.keySet();
+//		final List<Pair< Group, Group >> trees = new ArrayList<>();
+//		for( String name : groupNames )
+//		{
+//			// the number of groups give the dimensions of the lists, and is used as the max
+//			// levels of the tree as a stopping condition
+//			final int numGroups = getNumGroups( name, keys );
+//
+//			// create the tree for the values
+//			final Group root = new Group( name );
+//			createGroup( root, 1, numGroups, name, values );
+//
+//			// create the tree for the reference values
+//			final Group referenceRoot = new Group( name );
+//			createGroup( referenceRoot, 1, numGroups, name, referenceValues );
+//
+//			trees.add( new Pair<>( root, referenceRoot ) );
+//		}
+		// build the trees for the values and reference values
+		final Set< String > keys = differences.keySet();
+
+		// the number of groups give the dimensions of the lists, and is used as the max
+		// levels of the tree as a stopping condition
+		final int numGroups = getNumGroups( category, keys );
+
+		// create the tree for the values
+		final Group root = new Group( category );
+		createGroup( root, 1, numGroups, category, values );
+
+		// create the tree for the reference values
+		final Group referenceRoot = new Group( category );
+		createGroup( referenceRoot, 1, numGroups, category, referenceValues );
+
+		return new Pair<>( root, referenceRoot );
 	}
 
+	/**
+	 * Calculates the number of unique indexes for the next dimension of the multidimensional array starting from the
+	 * dimension represented by the specified name.
+	 * @param name The name representing the current dimension of the multi-dimensional array
+	 * @param keys The flattened field names representing the entire multi-dimensional array
+	 * @return the number of unique indexes for the next dimension of the multidimensional array starting from the
+	 * dimension represented by the specified name.
+	 */
 	private int getNumGroups( final String name, final Set< String > keys )
 	{
 		final int openBracket = name.lastIndexOf( "[" );
@@ -268,12 +313,20 @@ public class ObjectDifferenceCalculator {
 		final Set< Integer > indexes = new HashSet<>();
 		for( String key: keys )
 		{
-			final int closeBracket = key.indexOf( "]", openBracket+1 );
-			indexes.add( Integer.valueOf( key.substring( openBracket+1, closeBracket ) ) );
+			final int closeBracket = key.indexOf( "]", openBracket + 1 );
+			indexes.add( Integer.valueOf( key.substring( openBracket + 1, closeBracket ) ) );
 		}
-		return Collections.max( indexes ) + 1;
+		return Collections.max( indexes );
 	}
 
+	/**
+	 * Returns the group names with the indexes filled in (i.e. the wild card is replaced). For example, if the name
+	 * is {@code name[0][*]} and there are 3 groups within that name found in the keys, then the following list of names
+	 * will be returned {@code name[0][0], name[0][1], name[0][2]}.
+	 * @param name The name that serves as a template (i.e name[0][*])
+	 * @param keys The keys to use to determine the number of groups at this dimension
+	 * @return the group names with the indexes filled in (i.e. the wild card is replaced)
+	 */
 	private List< String > getGroupNames( final String name, final Set< String > keys )
 	{
 		final List< String > indexes = new ArrayList<>();
@@ -285,6 +338,15 @@ public class ObjectDifferenceCalculator {
 		return indexes;
 	}
 
+	/**
+	 * Creates the tree (recursively) of groups, each representing an element of a list (which itself may contain lists).
+	 * The leaf groups are the actual values of the lists.
+	 * @param parent The parent group to which the newly created groups are added.
+	 * @param currentLevel The current level of within the tree
+	 * @param maxLevel The max number of levels the tree will have (the dimension of the lists, i.e. name[i][j] has two dimensions)
+	 * @param groupName The name of the group (which will be something like name[*], or name[1][*], etc)
+	 * @param values The key-values representing the lists
+	 */
 	private void createGroup( final Group parent, final int currentLevel, final int maxLevel, final String groupName, final Map< String, Object > values )
 	{
 		if( currentLevel < maxLevel )
@@ -292,7 +354,7 @@ public class ObjectDifferenceCalculator {
 			final List< String > groupNames = getGroupNames( groupName, values.keySet() );
 			for( String name : groupNames )
 			{
-				final Group group = new Group();
+				final Group group = new Group( name );
 				parent.addChild( group );
 				createGroup( group, currentLevel+1, maxLevel, name, values );
 			}
@@ -304,20 +366,19 @@ public class ObjectDifferenceCalculator {
 			{
 				if( entry.getKey().startsWith( groupName ) )
 				{
-					parent.addChild( new Group().withValue( entry.getValue().toString() ) );
+					parent.addChild( new Group( entry.getKey() ).withValue( entry.getValue().toString() ) );
 				}
 			}
-			return;
 		}
 	}
 
 	/**
-	 * Returns the names of the groups as regular expressions that can be used as masks. The last element in the list
+	 * Returns the names of the groups with wild-cards for indexes that can be used as masks. The last element in the list
 	 * is the most specific (i.e. name[*][*]) and the first element in the list is the most general (i.e. name). The most
 	 * general name will be assigned to the root group (node in the tree) and the most specific will be a leaf group
 	 * holding the actual list of values.
-	 * @param category
-	 * @return
+	 * @param category a wild-carded field name (for example, name[*].People.person[*].Person.age)
+	 * @return the names of the groups with wild-cards for indexes that can be used as masks.
 	 */
 	private List< String > getListGroups( final String category )
 	{
