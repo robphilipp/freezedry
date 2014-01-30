@@ -238,19 +238,19 @@ public class ObjectDifferenceCalculator {
 		}
 
 		final Set< String > keys = differences.keySet();
-
-		// first add the list to the nodes, then we can recursively add the groups to their parent groups
-		final Group rootGroup = new Group( groupNames.get( 0 ) );
-
-		for( int i = 1; i < groupNames.size(); ++i )
+		final Map< String, Object > values = new HashMap<>();
+		final Map< String, Object > referenceValues = new HashMap<>();
+		for( Map.Entry< String, Difference > entry : differences.entrySet() )
 		{
-
+			values.put( entry.getKey(), entry.getValue().getObject() );
+			referenceValues.put( entry.getKey(), entry.getValue().getReferenceObject() );
 		}
-
 
 		for( String name : groupNames )
 		{
-			final int numNodes = getNumGroups( name, keys );
+			final int numGroups = getNumGroups( name, keys );
+			final Group root = new Group();
+			createGroup( root, 1, numGroups, name, values );
 			System.out.println();
 		}
 		return null;
@@ -285,21 +285,29 @@ public class ObjectDifferenceCalculator {
 		return indexes;
 	}
 
-	private void createGroup( final Group parent, final int currentLevel, final int maxLevel, final String groupName, final Map< String, Difference > differences )
+	private void createGroup( final Group parent, final int currentLevel, final int maxLevel, final String groupName, final Map< String, Object > values )
 	{
-		if( currentLevel == maxLevel )
+		if( currentLevel < maxLevel )
+		{
+			final List< String > groupNames = getGroupNames( groupName, values.keySet() );
+			for( String name : groupNames )
+			{
+				final Group group = new Group();
+				parent.addChild( group );
+				createGroup( group, currentLevel+1, maxLevel, name, values );
+			}
+		}
+		else
 		{
 			// leaf node, add the lists
+			for( Map.Entry< String, Object > entry : values.entrySet() )
+			{
+				if( entry.getKey().startsWith( groupName ) )
+				{
+					parent.addChild( new Group().withValue( entry.getValue().toString() ) );
+				}
+			}
 			return;
-		}
-
-		final List< String > groupNames = getGroupNames( groupName, differences.keySet() );
-		int i = 0;
-		for( String name : groupNames )
-		{
-			final Group group = new Group( name );
-			parent.addChild( i, group );
-			createGroup( group, currentLevel+1, maxLevel, name, differences );
 		}
 	}
 

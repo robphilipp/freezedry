@@ -15,9 +15,7 @@
  */
 package org.freezedry.difference;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * todo
@@ -27,29 +25,31 @@ import java.util.List;
  */
 public class Group
 {
-	private final String groupName;
+	private String value;
 	private Group parent;
 	private List< Group > children;
-	private List< String > values;
+//	private List< String > values;
+//	private Map< String, Integer > values;
 
-	public Group( final String groupName )
-	{
-		this.groupName = groupName;
-	}
+//	public Group( final String groupName )
+//	{
+//		this.groupName = groupName;
+//	}
+//
+//	public String getGroupName()
+//	{
+//		return groupName;
+//	}
 
-	public String getGroupName()
-	{
-		return groupName;
-	}
-
-	public void addChild( final int index, final Group group )
+	public Group addChild( final Group group )
 	{
 		if( children == null )
 		{
 			children = new ArrayList<>();
 		}
 		group.parent = this;
-		children.add( index, group );
+		children.add( group );
+		return this;
 	}
 
 	public List< Group > getChildren()
@@ -57,40 +57,90 @@ public class Group
 		return Collections.unmodifiableList( children );
 	}
 
-	public Group removeChild( final int index )
+	public boolean removeChild( final Group child )
 	{
 		if( children != null )
 		{
-			return children.remove( index );
+			return children.remove( child );
 		}
-		return null;
+		return false;
 	}
 
-	public void addValue( final int index, final String value )
+	public Group withValue( final String value )
 	{
-		if( values == null )
-		{
-			values = new ArrayList<>();
-		}
-		values.add( index, value );
+		this.value = value;
+		return this;
 	}
 
-	public String removeValue( final int index )
+	public String getValue()
 	{
-		if( values != null )
-		{
-			return values.remove( index );
-		}
-		return null;
+		return value;
 	}
 
-	public boolean hasList()
-	{
-		return values != null && !values.isEmpty();
-	}
+//	public void addValue( final int index, final String value )
+//	{
+//		if( values == null )
+//		{
+//			values = new ArrayList<>();
+//		}
+//		values.add( index, value );
+//	}
+
+//	public void addValue( final String value )
+//	{
+//		if( values == null )
+//		{
+//			values = new HashMap<>();
+//		}
+//
+//		// increment the value count if it exists, or add it to the map of values
+//		if( values.containsKey( value ) )
+//		{
+//			values.put( value, values.get( value )+1 );
+//		}
+//		else
+//		{
+//			values.put( value, 1 );
+//		}
+//	}
+
+//	public String removeValue( final int index )
+//	{
+//		if( values != null )
+//		{
+//			return values.remove( index );
+//		}
+//		return null;
+//	}
+
+//	public void removeValue( final String value )
+//	{
+//		if( values.containsKey( value ) )
+//		{
+//			final int count = values.get( value ) - 1;
+//			if( count > 0 )
+//			{
+//				values.put( value, count );
+//			}
+//			else
+//			{
+//				values.remove( value );
+//			}
+//		}
+//	}
+
+//	public boolean hasList()
+//	{
+//		return values != null && !values.isEmpty();
+//	}
 
 	public boolean hasChildren()
 	{
 		return children != null && !children.isEmpty();
 	}
+
+//	public boolean areValuesEqual( final Group group )
+//	{
+//		return values != null && values.equals( group.values );
+//	}
 }
