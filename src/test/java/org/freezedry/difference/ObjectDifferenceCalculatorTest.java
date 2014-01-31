@@ -68,8 +68,8 @@ public class ObjectDifferenceCalculatorTest {
 	{
 		final ObjectDifferenceCalculator diffCalc = new ObjectDifferenceCalculator( "." ).listOrderIgnored();
 		final Map< String, ObjectDifferenceCalculator.Difference> differences = diffCalc.calculateDifference( division1, division2 );
-//		Assert.assertEquals( "Number of Differences", differences.size(), 2 );
-		Assert.assertEquals( "Number of Differences", differences.size(), 8 );
+		Assert.assertEquals( "Number of Differences", differences.size(), 2 );
+//		Assert.assertEquals( "Number of Differences", differences.size(), 8 );
 		final ObjectDifferenceCalculator.Difference age = differences.get( "Division.people[0].Person.age" );
 		Assert.assertEquals( "Division.people[0].Person.age (modified)", age.getObject(), "13" );
 		Assert.assertEquals( "Division.people[0].Person.age (reference)", age.getReferenceObject(), "37" );

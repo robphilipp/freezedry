@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Robert Philipp, InvestLab Technology LLC
+ * Copyright 2013 Robert Philipp
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -175,11 +175,81 @@ public class ObjectDifferenceCalculator {
 			// whether order matters, so, in that case, we don't check that difference for list ordering
 			if( entry.getValue().size() > 1 )
 			{
+				// todo if one-dimensional list, then just use the map< value, count > method to compare lists
+
+				// create the value tree (pair.first) and reference tree (pair.second)
 				final Pair< Group, Group > trees = createTree( entry.getKey(), entry.getValue() );
-				System.out.println();
+
+				// compare the trees, returning the names of lists that are the same
+//				findEqualLists( trees.getFirst(), trees.getSecond(), differences );
+				final List< String > groupNames = getGroupNames( entry.getKey(), entry.getValue().keySet() );
+				findEqualLists( trees.getFirst(), trees.getSecond(), entry.getKey(), groupNames, differences );
 			}
 		}
 		return differences;
+	}
+
+//	private List< Pair< String, String > > findEqualLists( final Group values, final Group referenceValues, final Map< String, Difference > differences )
+	private void findEqualLists( final Group values, final Group referenceValues, final String category, final List< String > groupNames, final Map< String, Difference > differences )
+	{
+		for( String groupName : groupNames )
+		{
+			final Group value = values.findGroup( groupName );
+			if( value != null )
+			{
+				for( String groupName2 : groupNames )
+				{
+					final Group referenceValue = referenceValues.findGroup( groupName2 );
+					if( referenceValue != null && value.equalValues( referenceValue ) )
+					{
+						// remove the list from the differences map
+						for( Map.Entry< String, Set< String > > entry : value.getValues().entrySet() )
+						{
+							for( String key : entry.getValue() )
+							{
+								differences.remove( key );
+							}
+						}
+
+						// remove the nodes, since they are the same
+						value.getParent().removeChild( value );
+						referenceValue.getParent().removeChild( referenceValue );
+
+						break;
+					}
+				}
+			}
+		}
+
+//		final List< Pair< String, String > > equalLists = new ArrayList<>();
+//
+//		// drops to the leaf node, gets the parent, asks for a map( values |-> counts )
+//		for( Map.Entry< String, Difference > entry : differences.entrySet() )
+//		{
+//			final Group value = values.findParentOf( entry.getKey() );
+//			if( value != null )
+//			{
+////				final Map< String, Integer > counts = value.getChildrenValueMap();
+//				final Map< String, Set< String > > counts = value.getValues();
+//				final Group referenceValue = referenceValues.findParentOf( entry.getKey() );
+//				if( referenceValue != null )
+//				{
+////					final Map< String, Integer > referenceCounts = referenceValue.getChildrenValueMap();
+//					final Map< String, Set< String > > referenceCounts = referenceValue.getValues();
+//					if( counts.equals( referenceCounts ) )
+//					{
+//						equalLists.add( new Pair<>( value.getName(), referenceValues.getName() ) );
+//					}
+//				}
+//			}
+//		}
+//
+//
+//		// recursively checks lists (starting with the leaf nodes (those holding the values))
+//
+//
+//
+//		return equalLists;
 	}
 
 	/**
@@ -240,12 +310,12 @@ public class ObjectDifferenceCalculator {
 	 */
 	private Pair< Group, Group > createTree( final String category, final Map< String, Difference > differences )
 	{
-		final List< String > groupNames = getListGroups( category );
-		if ( groupNames.size() < 2 )
-		{
-			// only a root node, but no lists...shouldn't happen
-			return null;
-		}
+//		final List< String > groupNames = getListGroups( category );
+//		if ( groupNames.size() < 2 )
+//		{
+//			// only a root node, but no lists...shouldn't happen
+//			return null;
+//		}
 
 		// split the difference objects into values and reference values
 		final Map< String, Object > values = new HashMap<>();
@@ -256,31 +326,17 @@ public class ObjectDifferenceCalculator {
 			referenceValues.put( entry.getKey(), entry.getValue().getReferenceObject() );
 		}
 
-//		// build the trees for the values and reference values
-//		final Set< String > keys = differences.keySet();
-//		final List<Pair< Group, Group >> trees = new ArrayList<>();
-//		for( String name : groupNames )
-//		{
-//			// the number of groups give the dimensions of the lists, and is used as the max
-//			// levels of the tree as a stopping condition
-//			final int numGroups = getNumGroups( name, keys );
-//
-//			// create the tree for the values
-//			final Group root = new Group( name );
-//			createGroup( root, 1, numGroups, name, values );
-//
-//			// create the tree for the reference values
-//			final Group referenceRoot = new Group( name );
-//			createGroup( referenceRoot, 1, numGroups, name, referenceValues );
-//
-//			trees.add( new Pair<>( root, referenceRoot ) );
-//		}
 		// build the trees for the values and reference values
 		final Set< String > keys = differences.keySet();
 
 		// the number of groups give the dimensions of the lists, and is used as the max
 		// levels of the tree as a stopping condition
-		final int numGroups = getNumGroups( category, keys );
+//		final int numGroups = getNumGroups( category, keys );
+		final int numGroups = calcListDimensions( category );
+		if( numGroups < 1 )
+		{
+			return null;
+		}
 
 		// create the tree for the values
 		final Group root = new Group( category );
@@ -316,7 +372,7 @@ public class ObjectDifferenceCalculator {
 			final int closeBracket = key.indexOf( "]", openBracket + 1 );
 			indexes.add( Integer.valueOf( key.substring( openBracket + 1, closeBracket ) ) );
 		}
-		return Collections.max( indexes );
+		return Collections.max( indexes ) + 1;
 	}
 
 	/**
@@ -330,7 +386,12 @@ public class ObjectDifferenceCalculator {
 	private List< String > getGroupNames( final String name, final Set< String > keys )
 	{
 		final List< String > indexes = new ArrayList<>();
-		final int numGroups = getNumGroups( name, keys );
+
+		final int index = name.indexOf( "[*]" );
+		final String truncated = index > 0 ? name.substring( 0, name.indexOf( "[*]" )+3 ) : name;
+
+		final int numGroups = getNumGroups( truncated, keys );
+//		final int numGroups = getNumGroups( name, keys );
 		for( int i = 0; i < numGroups; ++i )
 		{
 			indexes.add( name.replaceFirst( "\\*", Integer.toString( i ) ) );
@@ -349,9 +410,10 @@ public class ObjectDifferenceCalculator {
 	 */
 	private void createGroup( final Group parent, final int currentLevel, final int maxLevel, final String groupName, final Map< String, Object > values )
 	{
+		final List< String > groupNames = getGroupNames( groupName, values.keySet() );
 		if( currentLevel < maxLevel )
 		{
-			final List< String > groupNames = getGroupNames( groupName, values.keySet() );
+//			final List< String > groupNames = getGroupNames( groupName, values.keySet() );
 			for( String name : groupNames )
 			{
 				final Group group = new Group( name );
@@ -364,9 +426,11 @@ public class ObjectDifferenceCalculator {
 			// leaf node, add the lists
 			for( Map.Entry< String, Object > entry : values.entrySet() )
 			{
-				if( entry.getKey().startsWith( groupName ) )
+				if( groupNames.contains( entry.getKey() ) )
+//				if( entry.getKey().startsWith( groupName ) )
 				{
-					parent.addChild( new Group( entry.getKey() ).withValue( entry.getValue().toString() ) );
+//					parent.addChild( new Group( entry.getKey() ).withValue( entry.getValue().toString() ) );
+					parent.addValue( entry.getKey(), entry.getValue().toString() );
 				}
 			}
 		}
