@@ -69,7 +69,6 @@ public class ObjectDifferenceCalculatorTest {
 		final ObjectDifferenceCalculator diffCalc = new ObjectDifferenceCalculator( "." ).listOrderIgnored();
 		final Map< String, ObjectDifferenceCalculator.Difference> differences = diffCalc.calculateDifference( division1, division2 );
 		Assert.assertEquals( "Number of Differences", differences.size(), 2 );
-//		Assert.assertEquals( "Number of Differences", differences.size(), 8 );
 		final ObjectDifferenceCalculator.Difference age = differences.get( "Division.people[0].Person.age" );
 		Assert.assertEquals( "Division.people[0].Person.age (modified)", age.getObject(), "13" );
 		Assert.assertEquals( "Division.people[0].Person.age (reference)", age.getReferenceObject(), "37" );
@@ -308,11 +307,16 @@ public class ObjectDifferenceCalculatorTest {
 		johnny.setAge( 37 );
 		johnny.setBirthdate( DateUtils.createDateFromString( "2014-01-28", "yyyy-MM-dd" ) );
 
+		// changing order of lists effect difference, but not when list order is ignored
 		List<List< Integer >> collectionMatrix = Arrays.asList(
 				Arrays.asList( 21, 23, 22 ),
 				Arrays.asList( 12, 11, 13 ),
 				Arrays.asList( 31, 32, 33 ) );
 		division.setCollectionMatrix( collectionMatrix );
+
+		// set order should cause a difference
+		division.addMonth( "February", new HashSet<>( Arrays.asList( 1, 3, 2, 28 ) ) );
+		division.addMonth( "March", new HashSet<>( Arrays.asList( 2, 1, 3, 31 ) ) );
 
 		return division;
 	}
