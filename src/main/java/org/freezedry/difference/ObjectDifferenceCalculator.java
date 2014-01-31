@@ -181,17 +181,27 @@ public class ObjectDifferenceCalculator {
 				final Pair< Group, Group > trees = createTree( entry.getKey(), entry.getValue() );
 
 				// compare the trees, returning the names of lists that are the same
-//				findEqualLists( trees.getFirst(), trees.getSecond(), differences );
 				final List< String > groupNames = getGroupNames( entry.getKey(), entry.getValue().keySet() );
-				findEqualLists( trees.getFirst(), trees.getSecond(), entry.getKey(), groupNames, differences );
+				removeEquivalentLists( trees.getFirst(), trees.getSecond(), groupNames, differences );
 			}
 		}
 		return differences;
 	}
 
-//	private List< Pair< String, String > > findEqualLists( final Group values, final Group referenceValues, final Map< String, Difference > differences )
-	private void findEqualLists( final Group values, final Group referenceValues, final String category, final List< String > groupNames, final Map< String, Difference > differences )
+	/**
+	 * Removes lists from the difference map that are equivalent when order is not taken into account.
+	 * @param values The root group (node) holding the values, or modified values
+	 * @param referenceValues The root group (node) holding the reference values
+	 * @param groupNames The names of the groups in the value (and reference value) trees
+	 * @param differences The raw differences as calculated by the {@link #calculateDifference(Object, Object)} method
+	 *                    before order is taken into account.
+	 */
+	private void removeEquivalentLists( final Group values,
+										final Group referenceValues,
+										final List<String> groupNames,
+										final Map<String, Difference> differences )
 	{
+		// todo make more efficient by remove group names for which the lists are equivalent
 		for( String groupName : groupNames )
 		{
 			final Group value = values.findGroup( groupName );
@@ -200,7 +210,7 @@ public class ObjectDifferenceCalculator {
 				for( String groupName2 : groupNames )
 				{
 					final Group referenceValue = referenceValues.findGroup( groupName2 );
-					if( referenceValue != null && value.equalValues( referenceValue ) )
+					if( referenceValue != null && value.equivalentValues( referenceValue ) )
 					{
 						// remove the list from the differences map
 						for( Map.Entry< String, Set< String > > entry : value.getValues().entrySet() )
@@ -220,36 +230,6 @@ public class ObjectDifferenceCalculator {
 				}
 			}
 		}
-
-//		final List< Pair< String, String > > equalLists = new ArrayList<>();
-//
-//		// drops to the leaf node, gets the parent, asks for a map( values |-> counts )
-//		for( Map.Entry< String, Difference > entry : differences.entrySet() )
-//		{
-//			final Group value = values.findParentOf( entry.getKey() );
-//			if( value != null )
-//			{
-////				final Map< String, Integer > counts = value.getChildrenValueMap();
-//				final Map< String, Set< String > > counts = value.getValues();
-//				final Group referenceValue = referenceValues.findParentOf( entry.getKey() );
-//				if( referenceValue != null )
-//				{
-////					final Map< String, Integer > referenceCounts = referenceValue.getChildrenValueMap();
-//					final Map< String, Set< String > > referenceCounts = referenceValue.getValues();
-//					if( counts.equals( referenceCounts ) )
-//					{
-//						equalLists.add( new Pair<>( value.getName(), referenceValues.getName() ) );
-//					}
-//				}
-//			}
-//		}
-//
-//
-//		// recursively checks lists (starting with the leaf nodes (those holding the values))
-//
-//
-//
-//		return equalLists;
 	}
 
 	/**
@@ -310,13 +290,6 @@ public class ObjectDifferenceCalculator {
 	 */
 	private Pair< Group, Group > createTree( final String category, final Map< String, Difference > differences )
 	{
-//		final List< String > groupNames = getListGroups( category );
-//		if ( groupNames.size() < 2 )
-//		{
-//			// only a root node, but no lists...shouldn't happen
-//			return null;
-//		}
-
 		// split the difference objects into values and reference values
 		final Map< String, Object > values = new HashMap<>();
 		final Map< String, Object > referenceValues = new HashMap<>();
@@ -331,7 +304,6 @@ public class ObjectDifferenceCalculator {
 
 		// the number of groups give the dimensions of the lists, and is used as the max
 		// levels of the tree as a stopping condition
-//		final int numGroups = getNumGroups( category, keys );
 		final int numGroups = calcListDimensions( category );
 		if( numGroups < 1 )
 		{
@@ -413,7 +385,6 @@ public class ObjectDifferenceCalculator {
 		final List< String > groupNames = getGroupNames( groupName, values.keySet() );
 		if( currentLevel < maxLevel )
 		{
-//			final List< String > groupNames = getGroupNames( groupName, values.keySet() );
 			for( String name : groupNames )
 			{
 				final Group group = new Group( name );
@@ -427,9 +398,7 @@ public class ObjectDifferenceCalculator {
 			for( Map.Entry< String, Object > entry : values.entrySet() )
 			{
 				if( groupNames.contains( entry.getKey() ) )
-//				if( entry.getKey().startsWith( groupName ) )
 				{
-//					parent.addChild( new Group( entry.getKey() ).withValue( entry.getValue().toString() ) );
 					parent.addValue( entry.getKey(), entry.getValue().toString() );
 				}
 			}

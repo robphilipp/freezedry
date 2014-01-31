@@ -18,7 +18,7 @@ package org.freezedry.difference;
 import java.util.*;
 
 /**
- * todo
+ * Tree structure representing the multidimensional list.
  *
  * @author Robert Philipp
  *         1/29/14, 11:32 AM
@@ -26,27 +26,40 @@ import java.util.*;
 public class Group
 {
 	private final String name;
-//	private String value;
-//	private Map< String, Integer > values;
 	private Map< String, Set< String > > values;
 	private Group parent;
 	private List< Group > children;
 
+	/**
+	 * Constructs a group with the specified group name (i.e. name[*][*])
+	 * @param name The group name
+	 */
 	public Group( final String name )
 	{
 		this.name = name;
 	}
 
+	/**
+	 * @return the group name
+	 */
 	public String getName()
 	{
 		return name;
 	}
 
+	/**
+	 * @return the parent of this group, null if this is the root group
+	 */
 	public Group getParent()
 	{
 		return parent;
 	}
 
+	/**
+	 * Adds a child group to this group
+	 * @param group The child group
+	 * @return this group to allow chaining
+	 */
 	public Group addChild( final Group group )
 	{
 		if( children == null )
@@ -58,27 +71,31 @@ public class Group
 		return this;
 	}
 
+	/**
+	 * @return a list of this group's children
+	 */
 	public List< Group > getChildren()
 	{
 		return Collections.unmodifiableList( children );
 	}
 
+	/**
+	 * Removes the child from the group
+	 * @param child the child group to remove from this node
+	 * @return {@code true} if the child was successfully removed; {@code false} otherwise
+	 */
 	public boolean removeChild( final Group child )
 	{
 		return children != null && children.remove( child );
 	}
 
-//	public Group withValue( final String value )
-//	{
-//		this.value = value;
-//		return this;
-//	}
-//
-//	public String getValue()
-//	{
-//		return value;
-//	}
-
+	/**
+	 * Adds a value to the list of values held by this group. This is meant for leaf groups that hold the values
+	 * of the lowest dimension of the list.
+	 * @param key The field name of the list (i.e. name[0][1][3])
+	 * @param value The value of the element (i.e. the value of name[0][1][3])
+	 * @return the number of elements with the same value as the specified one
+	 */
 	public int addValue( final String key, final String value )
 	{
 		if( values == null )
@@ -86,15 +103,6 @@ public class Group
 			values = new HashMap<>();
 		}
 
-//		if( values.containsKey( value ) )
-//		{
-//			return values.put( value, values.get( value )+1 );
-//		}
-//		else
-//		{
-//			values.put( value, 1 );
-//			return 0;
-//		}
 		if( values.containsKey( value ) )
 		{
 			final Set< String > keys = values.get( value );
@@ -110,6 +118,9 @@ public class Group
 		}
 	}
 
+	/**
+	 * @return A map containing the values and their set of associated field names
+	 */
 	public Map< String, Set< String > > getValues()
 	{
 		if( values == null )
@@ -119,23 +130,15 @@ public class Group
 		return Collections.unmodifiableMap( values );
 	}
 
+	/**
+	 * Removes a value with the specified key
+	 * @param key The field name of the list (i.e. name[0][1][3])
+	 * @param value The value of the element (i.e. the value of name[0][1][3])
+	 * @return the number of elements remaining with the same value as the specified one
+	 */
 	public int removeValue( final String key, final String value )
 	{
 		int remaining = -1;
-//		if( values != null && values.containsKey( value ) )
-//		{
-//			final int count = values.get( value ) - 1;
-//			if( count > 0 )
-//			{
-//				values.put( value, count );
-//			}
-//			else
-//			{
-//				values.remove( value );
-//			}
-//			remaining = count;
-//		}
-//		return remaining;
 		if( values != null && values.containsKey( value ) && values.get( value ).contains( key ) )
 		{
 			final Set< String > keys = values.get( value );
@@ -149,7 +152,12 @@ public class Group
 		return remaining;
 	}
 
-	public boolean equalValues( final Group group )
+	/**
+	 * Determines if the values of this group are equivalent to the values of the specified group.
+	 * @param group The group whose values to compare to this one
+	 * @return {@code true} if the values of the specified group are equivalent to this one; {@code false} otherwise
+	 */
+	public boolean equivalentValues( final Group group )
 	{
 		if( values == null || group.values == null )
 		{
@@ -166,26 +174,32 @@ public class Group
 				}
 			}
 			return true;
-//			return values.equals( group.values );
 		}
 	}
 
+	/**
+	 * @return {@code true} if this group has children; {@code false} otherwise
+	 */
 	public boolean hasChildren()
 	{
 		return children != null && !children.isEmpty();
 	}
 
+	/**
+	 * @return {@code true} if this group is a leaf (i.e. has no children); {@code false} otherwise
+	 */
 	public boolean isLeaf()
 	{
 		return !hasChildren();
 	}
 
-	public Group findParentOf( final String name )
-	{
-		final Group group = findGroup( name );
-		return group == null ? null : group.parent;
-	}
-
+	/**
+	 * Finds the group that has the specfied group name and returns it. If no group can be found with the specified
+	 * name, then returns {@code null}.
+	 * @param name The name of the group to find
+	 * @return the group that has the specfied group name, or, if no group can be found with the specified
+	 * name, then returns {@code null}.
+	 */
 	public Group findGroup( final String name )
 	{
 		if( this.name.equals( name ) )
@@ -209,22 +223,4 @@ public class Group
 		}
 		return null;
 	}
-
-//	public Map< String, Integer > getChildrenValueMap()
-//	{
-//		final Map< String, Integer > values = new HashMap<>();
-//		for( Group child : children )
-//		{
-//			final String key = child.getValue();
-//			if( values.containsKey( key ) )
-//			{
-//				values.put( key, values.get( key ) + 1 );
-//			}
-//			else
-//			{
-//				values.put( key, 1 );
-//			}
-//		}
-//		return values;
-//	}
 }
