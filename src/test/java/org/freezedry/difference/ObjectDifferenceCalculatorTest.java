@@ -21,8 +21,8 @@ public class ObjectDifferenceCalculatorTest {
 	{
 		try
 		{
-			referenceObject = createDivisionOne();
-			modifiedObject = createDivisionTwo();
+			referenceObject = createReferenceDivision();
+			modifiedObject = createModifiedDivision();
 		}
 		catch( ParseException e )
 		{
@@ -279,41 +279,41 @@ public class ObjectDifferenceCalculatorTest {
 		Assert.assertEquals( "Flattened Division", expectedKeys, flattened );
 	}
 
-	/**
-	 * Prints the expected fields to the console so that it can be pasted into the flatten-object test. Call this method
-	 * when updating the Division class (or classes it contains).
-	 */
-	public void createExpectedFields()
-	{
-		final ObjectDifferenceCalculator diffCalc = new ObjectDifferenceCalculator( "." );
-		final Map< String, Object > flattened = diffCalc.flattenObject( referenceObject );
-		for( Map.Entry< String, Object > entry : flattened.entrySet() )
-		{
-			final StringBuilder expression = new StringBuilder( "expectedKeys.put( \"" )
-					.append( entry.getKey().replaceAll( "\\\"", "\\\\\"" ) )
-					.append( "\", " );
-			final Object object = entry.getValue();
-			if( object == null )
-			{
-				expression.append( "null" );
-			}
-			else
-			{
-				expression.append( "\"" )
-						.append( object.toString().replaceAll( "\\\"", "\\\\\"" ) )
-						.append( "\"" );
-			}
-			expression.append( " );" );
-			System.out.println( expression.toString() );
-		}
-	}
+//	/**
+//	 * Prints the expected fields to the console so that it can be pasted into the flatten-object test. Call this method
+//	 * when updating the Division class (or classes it contains).
+//	 */
+//	public void createExpectedFields()
+//	{
+//		final ObjectDifferenceCalculator diffCalc = new ObjectDifferenceCalculator( "." );
+//		final Map< String, Object > flattened = diffCalc.flattenObject( referenceObject );
+//		for( Map.Entry< String, Object > entry : flattened.entrySet() )
+//		{
+//			final StringBuilder expression = new StringBuilder( "expectedKeys.put( \"" )
+//					.append( entry.getKey().replaceAll( "\\\"", "\\\\\"" ) )
+//					.append( "\", " );
+//			final Object object = entry.getValue();
+//			if( object == null )
+//			{
+//				expression.append( "null" );
+//			}
+//			else
+//			{
+//				expression.append( "\"" )
+//						.append( object.toString().replaceAll( "\\\"", "\\\\\"" ) )
+//						.append( "\"" );
+//			}
+//			expression.append( " );" );
+//			System.out.println( expression.toString() );
+//		}
+//	}
 
 	/**
 	 * Creates and returns the reference division object
 	 * @return The reference division object
 	 * @throws ParseException
 	 */
-	private static Division createDivisionOne() throws ParseException
+	private static Division createReferenceDivision() throws ParseException
 	{
 		final Division division = new Division();
 		final Person johnny = new Person( "Hernandez", "Johnny", 13 );
@@ -417,9 +417,9 @@ public class ObjectDifferenceCalculatorTest {
 	 * @return The modified division object
 	 * @throws ParseException
 	 */
-	private static Division createDivisionTwo() throws ParseException
+	private static Division createModifiedDivision() throws ParseException
 	{
-		final Division division = createDivisionOne();
+		final Division division = createReferenceDivision();
 		final Person johnny = division.getPerson( "Hernandez", "Johnny" );
 		johnny.setAge( 37 );
 		johnny.setBirthdate( DateUtils.createDateFromString( "2014-01-28", "yyyy-MM-dd" ) );

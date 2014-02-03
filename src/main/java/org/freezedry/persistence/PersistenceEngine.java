@@ -16,8 +16,6 @@
 package org.freezedry.persistence;
 
 import org.freezedry.persistence.annotations.Persist;
-import org.freezedry.persistence.annotations.PersistCollection;
-import org.freezedry.persistence.annotations.PersistDateAs;
 import org.freezedry.persistence.builders.*;
 import org.freezedry.persistence.readers.PersistenceReader;
 import org.freezedry.persistence.tree.InfoNode;

@@ -86,12 +86,22 @@ public class ObjectDifferenceCalculator {
 		mapWriter = new KeyValueMapWriter( builder );
 	}
 
+	/**
+	 * Sets this difference calculator to ignore the ordering of lists when comparing objects. When ignoring order,
+	 * the difference calculator checks only that all the elements of a list match. This works for multidimensional lists
+	 * or objects contained in, and containing, lists.
+	 * @return This {@link org.freezedry.difference.ObjectDifferenceCalculator} for chaining
+	 */
 	public ObjectDifferenceCalculator listOrderIgnored()
 	{
 		this.isListOrderIgnored = true;
 		return this;
 	}
 
+	/**
+	 * Sets this difference calculator to care the ordering of lists when comparing objects.
+	 * @return This {@link org.freezedry.difference.ObjectDifferenceCalculator} for chaining
+	 */
 	public ObjectDifferenceCalculator listOrderMatters()
 	{
 		this.isListOrderIgnored = false;
@@ -420,32 +430,6 @@ public class ObjectDifferenceCalculator {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Returns the names of the groups with wild-cards for indexes that can be used as masks. The last element in the list
-	 * is the most specific (i.e. name[*][*]) and the first element in the list is the most general (i.e. name). The most
-	 * general name will be assigned to the root group (node in the tree) and the most specific will be a leaf group
-	 * holding the actual list of values.
-	 * @param category a wild-carded field name (for example, name[*].People.person[*].Person.age)
-	 * @return the names of the groups with wild-cards for indexes that can be used as masks.
-	 */
-	private List< String > getListGroups( final String category )
-	{
-		final List< String > groups = new ArrayList<>();
-
-		final int numDimensions = calcListDimensions( category );
-		final String[] dimensions = category.split( Pattern.quote( "[*]" ) );
-		for( int i = 0; i < numDimensions; ++i )
-		{
-			final StringBuilder groupName = new StringBuilder( dimensions[ 0 ] );
-			for( int j = 1; j <= i; ++j )
-			{
-				groupName.append( "[*]" ).append( ( j < dimensions.length ? dimensions[ j ] : "" ) );
-			}
-			groups.add( groupName.toString() );
-		}
-		return groups;
 	}
 
 	/**

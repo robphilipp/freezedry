@@ -336,15 +336,15 @@ public class InfoNode implements Copyable< InfoNode > {
 	 */
 	public String nodeInfoToString()
 	{
-		final StringBuffer buffer = new StringBuffer();
-		buffer.append( "Node Type: " + nodeType.name() + "; " );
-		buffer.append( "Field Name: " + (fieldName==null?"[null]":fieldName) + "; " );
-		buffer.append( "Value: " + (value==null?"[null]":value) + "; " );
-		buffer.append( "Persist Name: " + (persistName == null ? "[null]" : persistName) + "; " );
-		buffer.append( "Class: " + (clazz == null ? "[null]" : clazz.getSimpleName()) + "; " );
-		buffer.append( "Constructor: " + (constructor==null?"[null]":constructor.toGenericString()) + "; " );
-		buffer.append( "Set Field Map: " + (setFieldMap==null?"[null]":setFieldMap.toString()) + "; " );
-		buffer.append( "Get Field Map: " + (getFieldMap==null?"[null]":getFieldMap.toString()) + "; " );
+		final StringBuilder buffer = new StringBuilder();
+		buffer.append( "Node Type: " ).append( nodeType.name() ).append( "; " );
+		buffer.append( "Field Name: " ).append( fieldName == null ? "[null]" : fieldName ).append( "; " );
+		buffer.append( "Value: " ).append( value == null ? "[null]" : value ).append( "; " );
+		buffer.append( "Persist Name: " ).append( persistName == null ? "[null]" : persistName ).append( "; " );
+		buffer.append( "Class: " ).append( clazz == null ? "[null]" : clazz.getSimpleName() ).append( "; " );
+		buffer.append( "Constructor: " ).append( constructor == null ? "[null]" : constructor.toGenericString() ).append( "; " );
+		buffer.append( "Set Field Map: " ).append( setFieldMap == null ? "[null]" : setFieldMap.toString() ).append( "; " );
+		buffer.append( "Get Field Map: " ).append( getFieldMap == null ? "[null]" : getFieldMap.toString() ).append( "; " );
 		return buffer.toString();
 	}
 
@@ -560,14 +560,14 @@ public class InfoNode implements Copyable< InfoNode > {
 	 * 
 	 * @param node The node to find in the subtree of this node
 	 * @return A list of TreeNode(s) that contain the specified node.
-	 * @see #getNodeFromDescendants(Object)
+	 * @see #getNodeFromDescendants(InfoNode)
 	 */
 	public List< InfoNode > getNode( final InfoNode node )
 	{
-		List< InfoNode > nodes = null;
+		List< InfoNode > nodes;
 		if( this.equals( node ) )
 		{
-			nodes = new ArrayList< InfoNode >();
+			nodes = new ArrayList<>();
 			nodes.add( this );
 		}
 		else
@@ -584,14 +584,14 @@ public class InfoNode implements Copyable< InfoNode > {
 	 * 
 	 * @param node The node to find in the subtree of this node
 	 * @return A list of TreeNode(s) that contain the specified node.
-	 * @see #getNode(Object)
+	 * @see #getNode(InfoNode)
 	 */
 	public List< InfoNode > getNodeFromDescendants( final InfoNode node )
 	{
 		return recursiveGetNodeFromDescendants( node, this );
 	}
 
-	/*
+	/**
 	 * Performs a recursive search for the descendant in the subtree specified by the node.
 	 * @param descendant The node to find in the subtree specified by #node
 	 * @param node The node containing the subtree to search.
@@ -623,14 +623,14 @@ public class InfoNode implements Copyable< InfoNode > {
 		return recursiveGetSubtreeAsList( this );
 	}
 
-	/*
+	/**
 	 * Recursively adds all the nodes in the subtree (node) to a list and returns it
 	 * @param node The root of the current subtree
 	 * @return List of tree nodes in the current subtree
 	 */
 	private List< InfoNode > recursiveGetSubtreeAsList( final InfoNode node )
 	{
-		List< InfoNode > descendants = new ArrayList< InfoNode >();
+		List< InfoNode > descendants = new ArrayList<>();
 		for( final InfoNode child : node.getChildren() )
 		{
 			descendants.add( child );
@@ -647,7 +647,7 @@ public class InfoNode implements Copyable< InfoNode > {
 	@Override
 	public String toString()
 	{
-		final StringBuffer rep = new StringBuffer();
+		final StringBuilder rep = new StringBuilder();
 		rep.append( nodeInfoToString() ).append( " {" );
 		rep.append( (parent != null ? parent : "root") ).append( "}: [ " );
 		for( int i = 0; i < children.size(); ++i )
@@ -666,14 +666,14 @@ public class InfoNode implements Copyable< InfoNode > {
 		return subtreeToString( this );
 	}
 
-	/*
+	/**
 	 * Creates a string representation from the subtree
 	 * @param node The root node of the subtree
 	 * @return a string representation from the subtree
 	 */
 	private String subtreeToString( final InfoNode node )
 	{
-		final StringBuffer buffer = new StringBuffer();
+		final StringBuilder buffer = new StringBuilder();
 		buffer.append( node.toString() ).append( Constants.NEW_LINE );
 		for( final InfoNode child : node.getChildren() )
 		{
@@ -688,14 +688,14 @@ public class InfoNode implements Copyable< InfoNode > {
 		return simpleTreeToString( this, 0 );
 	}
 
-	/*
+	/**
 	 * Creates a string representation from the subtree
 	 * @param node The root node of the subtree
 	 * @return a string representation from the subtree
 	 */
 	private String simpleTreeToString( final InfoNode node, final int level )
 	{
-		final StringBuffer buffer = new StringBuffer();
+		final StringBuilder buffer = new StringBuilder();
 		String space = "";
 		for( int i = 0; i < level; ++i )
 		{
@@ -703,11 +703,11 @@ public class InfoNode implements Copyable< InfoNode > {
 		}
 		buffer.append( space );
 		buffer.append( node.getPersistName() );
-		buffer.append( ": field_name=" + node.getFieldName() );
-		buffer.append( ", value=" + node.getValue() );
-		buffer.append( ", class=" + node.getClazz() );
-		buffer.append( ", type=" + node.getNodeType().toString() );
-		buffer.append( ", children=" + node.getChildCount() );
+		buffer.append( ": field_name=" ).append( node.getFieldName() );
+		buffer.append( ", value=" ).append( node.getValue() );
+		buffer.append( ", class=" ).append( node.getClazz() );
+		buffer.append( ", type=" ).append( node.getNodeType().toString() );
+		buffer.append( ", children=" ).append( node.getChildCount() );
 		buffer.append( Constants.NEW_LINE );
 		for( final InfoNode child : node.getChildren() )
 		{
@@ -749,6 +749,6 @@ public class InfoNode implements Copyable< InfoNode > {
 	 * Represents the types of nodes
 	 */
 	public enum NodeType {
-		ROOT_NODE, COMPOUND_NODE, LEAF_NODE;
+		ROOT_NODE, COMPOUND_NODE, LEAF_NODE
 	}
 }
