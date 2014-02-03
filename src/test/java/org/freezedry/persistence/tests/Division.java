@@ -40,6 +40,8 @@ public class Division {
 
 	private Set< String > crazySet;
 
+	private int[][][] threeD;
+
 	public void addToCrazySet( final String craziness )
 	{
 		if( crazySet == null )
@@ -112,6 +114,11 @@ public class Division {
 	public void setListOfMaps( final List<Map<String, String>> listOfMaps )
 	{
 		this.listOfMaps = listOfMaps;
+	}
+
+	public void setThreeD( final int[][][] threeD )
+	{
+		this.threeD = threeD;
 	}
 
 	public String toString()
@@ -191,18 +198,49 @@ public class Division {
 	@Override
 	public boolean equals( Object o )
 	{
-		if( this == o ) return true;
-		if( o == null || getClass() != o.getClass() ) return false;
+		if( this == o )
+		{
+			return true;
+		}
+		if( o == null || getClass() != o.getClass() )
+		{
+			return false;
+		}
 
 		Division division = (Division) o;
 
-		if( !Arrays.equals( carNames, division.carNames ) ) return false;
-		if( collectionMatrix != null ? !collectionMatrix.equals( division.collectionMatrix ) : division.collectionMatrix != null )
+		if( !Arrays.equals( carNames, division.carNames ) )
+		{
 			return false;
-		if( listOfMaps != null ? !listOfMaps.equals( division.listOfMaps ) : division.listOfMaps != null ) return false;
-		if( months != null ? !months.equals( division.months ) : division.months != null ) return false;
-		if( people != null ? !people.equals( division.people ) : division.people != null ) return false;
-		if( personMap != null ? !personMap.equals( division.personMap ) : division.personMap != null ) return false;
+		}
+		if( collectionMatrix != null ? !collectionMatrix.equals( division.collectionMatrix ) : division.collectionMatrix != null )
+		{
+			return false;
+		}
+		if( crazySet != null ? !crazySet.equals( division.crazySet ) : division.crazySet != null )
+		{
+			return false;
+		}
+		if( listOfMaps != null ? !listOfMaps.equals( division.listOfMaps ) : division.listOfMaps != null )
+		{
+			return false;
+		}
+		if( months != null ? !months.equals( division.months ) : division.months != null )
+		{
+			return false;
+		}
+		if( people != null ? !people.equals( division.people ) : division.people != null )
+		{
+			return false;
+		}
+		if( personMap != null ? !personMap.equals( division.personMap ) : division.personMap != null )
+		{
+			return false;
+		}
+		if( threeD != null ? !threeD.equals( division.threeD ) : division.threeD != null )
+		{
+			return false;
+		}
 
 		return true;
 	}
@@ -216,6 +254,8 @@ public class Division {
 		result = 31 * result + (collectionMatrix != null ? collectionMatrix.hashCode() : 0);
 		result = 31 * result + (personMap != null ? personMap.hashCode() : 0);
 		result = 31 * result + (listOfMaps != null ? listOfMaps.hashCode() : 0);
+		result = 31 * result + (crazySet != null ? crazySet.hashCode() : 0);
+		result = 31 * result + (threeD != null ? threeD.hashCode() : 0);
 		return result;
 	}
 }

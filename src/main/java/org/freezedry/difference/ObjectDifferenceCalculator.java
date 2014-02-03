@@ -299,9 +299,6 @@ public class ObjectDifferenceCalculator {
 			referenceValues.put( entry.getKey(), entry.getValue().getReferenceObject() );
 		}
 
-		// build the trees for the values and reference values
-		final Set< String > keys = differences.keySet();
-
 		// the number of groups give the dimensions of the lists, and is used as the max
 		// levels of the tree as a stopping condition
 		final int numGroups = calcListDimensions( category );
@@ -358,17 +355,37 @@ public class ObjectDifferenceCalculator {
 	private List< String > getGroupNames( final String name, final Set< String > keys )
 	{
 		final List< String > indexes = new ArrayList<>();
+		getGroupNames( name, keys, indexes );
+		return indexes;
 
+//		final List< String > indexes = new ArrayList<>();
+//
+//		final int index = name.indexOf( "[*]" );
+//		final String truncated = index > 0 ? name.substring( 0, name.indexOf( "[*]" )+3 ) : name;
+//
+//		final int numGroups = getNumGroups( truncated, keys );
+//		for( int i = 0; i < numGroups; ++i )
+//		{
+//			indexes.add( name.replaceFirst( "\\*", Integer.toString( i ) ) );
+//		}
+//		return indexes;
+	}
+
+	private void getGroupNames( final String name, final Set< String > keys, final List< String > indexes )
+	{
 		final int index = name.indexOf( "[*]" );
+		final int lastIndex = name.lastIndexOf( "[*]" );
 		final String truncated = index > 0 ? name.substring( 0, name.indexOf( "[*]" )+3 ) : name;
-
 		final int numGroups = getNumGroups( truncated, keys );
-//		final int numGroups = getNumGroups( name, keys );
 		for( int i = 0; i < numGroups; ++i )
 		{
-			indexes.add( name.replaceFirst( "\\*", Integer.toString( i ) ) );
+			final String indexedName = name.replaceFirst( "\\*", Integer.toString( i ) );
+			indexes.add( indexedName );
+			if( index < lastIndex )
+			{
+				getGroupNames( indexedName, keys, indexes );
+			}
 		}
-		return indexes;
 	}
 
 	/**
