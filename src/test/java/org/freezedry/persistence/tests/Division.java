@@ -58,6 +58,16 @@ public class Division {
 		people.add( person );
 	}
 
+	public boolean removePerson( final Person person )
+	{
+		return people.remove( person );
+	}
+
+	public boolean removePerson( final String familyName, final String givenName )
+	{
+		return removePerson( getPerson( familyName, givenName ) );
+	}
+
 	public Person getPerson( final String familyName, final String givenName )
 	{
 		for( Person person : people )

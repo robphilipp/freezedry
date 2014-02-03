@@ -1,6 +1,7 @@
 package org.freezedry.difference;
 
 import junit.framework.Assert;
+import org.freezedry.persistence.tests.BadPerson;
 import org.freezedry.persistence.tests.Division;
 import org.freezedry.persistence.tests.Person;
 import org.freezedry.persistence.utils.DateUtils;
@@ -34,7 +35,7 @@ public class ObjectDifferenceCalculatorTest {
 	{
 		final ObjectDifferenceCalculator diffCalc = new ObjectDifferenceCalculator( "." );
 		final Map< String, ObjectDifferenceCalculator.Difference> differences = diffCalc.calculateDifference( division1, division2 );
-		Assert.assertEquals( "Number of Differences", differences.size(), 8 );
+		Assert.assertEquals( "Number of Differences", differences.size(), 11 );
 		final ObjectDifferenceCalculator.Difference age = differences.get( "Division.people[0].Person.age" );
 		Assert.assertEquals( "Division.people[0].Person.age (modified)", age.getObject(), "13" );
 		Assert.assertEquals( "Division.people[0].Person.age (reference)", age.getReferenceObject(), "37" );
@@ -43,24 +44,33 @@ public class ObjectDifferenceCalculatorTest {
 		Assert.assertEquals( "Division.people[0].Person.birthDate (reference)", dob.getReferenceObject(), "2014-01-28" );
 
 		ObjectDifferenceCalculator.Difference col = differences.get( "Division.collectionMatrix[0][0]" );
-		Assert.assertEquals( "Divisoin.collectionMatrix[0][0] (modified)" , col.getObject(), "11" );
-		Assert.assertEquals( "Divisoin.collectionMatrix[0][0] (reference)" , col.getReferenceObject(), "21" );
+		Assert.assertEquals( "Division.collectionMatrix[0][0] (modified)" , col.getObject(), "11" );
+		Assert.assertEquals( "Division.collectionMatrix[0][0] (reference)" , col.getReferenceObject(), "21" );
 		col = differences.get( "Division.collectionMatrix[0][1]" );
-		Assert.assertEquals( "Divisoin.collectionMatrix[0][1] (modified)" , col.getObject(), "12" );
-		Assert.assertEquals( "Divisoin.collectionMatrix[0][1] (reference)" , col.getReferenceObject(), "23" );
+		Assert.assertEquals( "Division.collectionMatrix[0][1] (modified)" , col.getObject(), "12" );
+		Assert.assertEquals( "Division.collectionMatrix[0][1] (reference)" , col.getReferenceObject(), "23" );
 		col = differences.get( "Division.collectionMatrix[0][2]" );
-		Assert.assertEquals( "Divisoin.collectionMatrix[0][2] (modified)" , col.getObject(), "13" );
-		Assert.assertEquals( "Divisoin.collectionMatrix[0][2] (reference)" , col.getReferenceObject(), "22" );
+		Assert.assertEquals( "Division.collectionMatrix[0][2] (modified)" , col.getObject(), "13" );
+		Assert.assertEquals( "Division.collectionMatrix[0][2] (reference)" , col.getReferenceObject(), "22" );
 		col = differences.get( "Division.collectionMatrix[1][0]" );
-		Assert.assertEquals( "Divisoin.collectionMatrix[1][0] (modified)" , col.getObject(), "21" );
-		Assert.assertEquals( "Divisoin.collectionMatrix[1][0] (reference)" , col.getReferenceObject(), "12" );
+		Assert.assertEquals( "Division.collectionMatrix[1][0] (modified)" , col.getObject(), "21" );
+		Assert.assertEquals( "Division.collectionMatrix[1][0] (reference)" , col.getReferenceObject(), "12" );
 		col = differences.get( "Division.collectionMatrix[1][1]" );
-		Assert.assertEquals( "Divisoin.collectionMatrix[1][1] (modified)" , col.getObject(), "22" );
-		Assert.assertEquals( "Divisoin.collectionMatrix[1][1] (reference)" , col.getReferenceObject(), "11" );
+		Assert.assertEquals( "Division.collectionMatrix[1][1] (modified)" , col.getObject(), "22" );
+		Assert.assertEquals( "Division.collectionMatrix[1][1] (reference)" , col.getReferenceObject(), "11" );
 		col = differences.get( "Division.collectionMatrix[1][2]" );
-		Assert.assertEquals( "Divisoin.collectionMatrix[1][2] (modified)" , col.getObject(), "23" );
-		Assert.assertEquals( "Divisoin.collectionMatrix[1][2] (reference)" , col.getReferenceObject(), "13" );
+		Assert.assertEquals( "Division.collectionMatrix[1][2] (modified)" , col.getObject(), "23" );
+		Assert.assertEquals( "Division.collectionMatrix[1][2] (reference)" , col.getReferenceObject(), "13" );
 
+		col = differences.get( "Division.people[4].BadPerson.evilDoings[0]" );
+		Assert.assertEquals( "Division.people[4].BadPerson.evilDoings[0] (modified)" , col.getObject(), "\"wasted a beer\"" );
+		Assert.assertEquals( "\"Division.people[4].BadPerson.evilDoings[0] (reference)" , col.getReferenceObject(), "\"disliked technology\"" );
+		col = differences.get( "Division.people[4].BadPerson.evilDoings[1]" );
+		Assert.assertEquals( "Division.people[4].BadPerson.evilDoings[1] (modified)" , col.getObject(), "\"disliked technology\"" );
+		Assert.assertEquals( "\"Division.people[4].BadPerson.evilDoings[1] (reference)" , col.getReferenceObject(), "\"added sugar to coffee\"" );
+		col = differences.get( "Division.people[4].BadPerson.evilDoings[3]" );
+		Assert.assertEquals( "Division.people[4].BadPerson.evilDoings[3] (modified)" , col.getObject(), "\"added sugar to coffee\"" );
+		Assert.assertEquals( "\"Division.people[4].BadPerson.evilDoings[3] (reference)" , col.getReferenceObject(), "\"wasted a beer\"" );
 	}
 
 	@Test
@@ -126,6 +136,17 @@ public class ObjectDifferenceCalculatorTest {
 		expectedKeys.put( "Division.people[3].Person.mood", null );
 		expectedKeys.put( "Division.people[3].Person.friends", null );
 		expectedKeys.put( "Division.people[3].Person.groups", null );
+		expectedKeys.put( "Division.people[4].BadPerson.evilDoings[0]", "\"wasted a beer\"" );
+		expectedKeys.put( "Division.people[4].BadPerson.evilDoings[1]", "\"disliked technology\"" );
+		expectedKeys.put( "Division.people[4].BadPerson.evilDoings[2]", "\"added semicolon to someones for-loop\"" );
+		expectedKeys.put( "Division.people[4].BadPerson.evilDoings[3]", "\"added sugar to coffee\"" );
+		expectedKeys.put( "Division.people[4].BadPerson.givenName", "\"johnny\"" );
+		expectedKeys.put( "Division.people[4].BadPerson.familyName", "\"evil\"" );
+		expectedKeys.put( "Division.people[4].BadPerson.age", "666" );
+		expectedKeys.put( "Division.people[4].BadPerson.birthDate", null );
+		expectedKeys.put( "Division.people[4].BadPerson.mood", null );
+		expectedKeys.put( "Division.people[4].BadPerson.friends", null );
+		expectedKeys.put( "Division.people[4].BadPerson.groups", null );
 		expectedKeys.put( "Division.months{\"January\"}[0]", "1" );
 		expectedKeys.put( "Division.months{\"January\"}[1]", "2" );
 		expectedKeys.put( "Division.months{\"January\"}[2]", "3" );
@@ -297,6 +318,13 @@ public class ObjectDifferenceCalculatorTest {
 		division.addToCrazySet( "delusions" );
 		division.addToCrazySet( "manic-depression" );
 
+		final BadPerson evilJohnny = new BadPerson( "evil", "johnny", 666 );
+		evilJohnny.addEvilDoing( "wasted a beer" );
+		evilJohnny.addEvilDoing( "disliked technology" );
+		evilJohnny.addEvilDoing( "added semicolon to someones for-loop" );
+		evilJohnny.addEvilDoing( "added sugar to coffee" );
+		division.addPerson( evilJohnny );
+
 		return division;
 	}
 
@@ -317,6 +345,15 @@ public class ObjectDifferenceCalculatorTest {
 		// set order should cause a difference
 		division.addMonth( "February", new HashSet<>( Arrays.asList( 1, 3, 2, 28 ) ) );
 		division.addMonth( "March", new HashSet<>( Arrays.asList( 2, 1, 3, 31 ) ) );
+
+		// change the order of the evil-doings
+		division.removePerson( "evil", "johnny" );
+		final BadPerson evilJohnny = new BadPerson( "evil", "johnny", 666 );
+		evilJohnny.addEvilDoing( "disliked technology" );
+		evilJohnny.addEvilDoing( "added sugar to coffee" );
+		evilJohnny.addEvilDoing( "added semicolon to someones for-loop" );
+		evilJohnny.addEvilDoing( "wasted a beer" );
+		division.addPerson( evilJohnny );
 
 		return division;
 	}
