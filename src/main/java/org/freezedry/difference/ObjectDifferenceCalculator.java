@@ -28,10 +28,15 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 /**
- * Calculates the difference between two object of the same type and lists the flattened properties that differ. Also
+ * Calculates the difference between two object of the same type, and lists the flattened properties that differ. Also
  * provides access to flatten objects into key-value pairs.
  *
- * @author rphilipp
+ * By calling {@link #listOrderIgnored()} any differences in collections or arrays that are purely caused by the ordering
+ * are ignored. For example, if we have a list, numbers=(1,2,3,4,5), in the reference object, and then we compare it to
+ * the modified object where the list, numbers=(2,4,3,1,5), the difference calculator would report no difference. This
+ * works for multi-dimensional collections or arrays, and for list containing objects that contains list, etc.
+ *
+ * @author Robert Philpp
  *         10/7/13, 1:27 PM
  */
 public class ObjectDifferenceCalculator {
@@ -178,6 +183,7 @@ public class ObjectDifferenceCalculator {
 	 */
 	private Map< String, Difference > ignoreListOrder( final Map< String, Difference > differences )
 	{
+		LOGGER.debug( "Ignoring the order of lists" );
 		final Map< String, Map< String, Difference > > categories = classifyLists( differences );
 		for( Map.Entry< String, Map< String, Difference > > entry : categories.entrySet() )
 		{
@@ -185,6 +191,7 @@ public class ObjectDifferenceCalculator {
 			// whether order matters, so, in that case, we don't check that difference for list ordering
 			if( entry.getValue().size() > 1 )
 			{
+				LOGGER.trace( "Comparing lists: " + entry.getKey() );
 				// todo if one-dimensional list, then just use the map< value, count > method to compare lists
 
 				// create the value tree (pair.first) and reference tree (pair.second)
@@ -228,6 +235,7 @@ public class ObjectDifferenceCalculator {
 							for( String key : entry.getValue() )
 							{
 								differences.remove( key );
+								LOGGER.debug( "Removed (only difference in order): " + key );
 							}
 						}
 
