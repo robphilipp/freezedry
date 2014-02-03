@@ -70,7 +70,7 @@ public class ObjectDifferenceCalculatorTest {
 		Assert.assertEquals( "\"Division.people[4].BadPerson.evilDoings[1] (reference)" , col.getReferenceObject(), "\"added sugar to coffee\"" );
 		col = differences.get( "Division.people[4].BadPerson.evilDoings[3]" );
 		Assert.assertEquals( "Division.people[4].BadPerson.evilDoings[3] (modified)" , col.getObject(), "\"added sugar to coffee\"" );
-		Assert.assertEquals( "\"Division.people[4].BadPerson.evilDoings[3] (reference)" , col.getReferenceObject(), "\"wasted a beer\"" );
+		Assert.assertEquals( "\"Division.people[4].BadPerson.evilDoings[3] (reference)", col.getReferenceObject(), "\"wasted a beer\"" );
 	}
 
 	@Test
@@ -218,31 +218,44 @@ public class ObjectDifferenceCalculatorTest {
 		expectedKeys.put( "Division.crazySet[1]", "\"delusions\"" );
 		expectedKeys.put( "Division.crazySet[2]", "\"manic-depression\"" );
 
-		// used to generate the expect results when needed
-//		for( Map.Entry< String, Object > entry : flattened.entrySet() )
-//		{
-//			final StringBuilder expression = new StringBuilder( "expectedKeys.put( \"" )
-//					.append( entry.getKey().replaceAll( "\\\"", "\\\\\"" ) )
-//					.append( "\", " );
-//			final Object object = entry.getValue();
-//			if( object == null )
-//			{
-//				expression.append( "null" );
-//			}
-//			else
-//			{
-//				expression.append( "\"" )
-//						.append( object.toString().replaceAll( "\\\"", "\\\\\"" ) )
-//						.append( "\"" );
-//			}
-//			expression.append( " );" );
-//			System.out.println( expression.toString() );
-//		}
-
 		Assert.assertEquals( "Flattened Division", expectedKeys, flattened );
 
 	}
 
+	/**
+	 * Prints the expected fields to the console so that it can be pasted into the flatten-object test. Call this method
+	 * when updating the Division class (or classes it contains).
+	 */
+	private void createExpectedFields()
+	{
+		final ObjectDifferenceCalculator diffCalc = new ObjectDifferenceCalculator( "." );
+		final Map< String, Object > flattened = diffCalc.flattenObject( division1 );
+		for( Map.Entry< String, Object > entry : flattened.entrySet() )
+		{
+			final StringBuilder expression = new StringBuilder( "expectedKeys.put( \"" )
+					.append( entry.getKey().replaceAll( "\\\"", "\\\\\"" ) )
+					.append( "\", " );
+			final Object object = entry.getValue();
+			if( object == null )
+			{
+				expression.append( "null" );
+			}
+			else
+			{
+				expression.append( "\"" )
+						.append( object.toString().replaceAll( "\\\"", "\\\\\"" ) )
+						.append( "\"" );
+			}
+			expression.append( " );" );
+			System.out.println( expression.toString() );
+		}
+	}
+
+	/**
+	 * Creates and returns the reference division object
+	 * @return The reference division object
+	 * @throws ParseException
+	 */
 	private static Division createDivisionOne() throws ParseException
 	{
 		final Division division = new Division();
@@ -328,6 +341,11 @@ public class ObjectDifferenceCalculatorTest {
 		return division;
 	}
 
+	/**
+	 * Creates the reference division object, modifies it, and then returns it
+	 * @return The modified division object
+	 * @throws ParseException
+	 */
 	private static Division createDivisionTwo() throws ParseException
 	{
 		final Division division = createDivisionOne();
