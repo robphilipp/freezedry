@@ -1,6 +1,7 @@
 package org.freezedry.difference;
 
 import junit.framework.Assert;
+import org.freezedry.persistence.tests.BadPerson;
 import org.freezedry.persistence.tests.Division;
 import org.freezedry.persistence.tests.Person;
 import org.freezedry.persistence.utils.DateUtils;
@@ -12,16 +13,16 @@ import java.util.*;
 
 public class ObjectDifferenceCalculatorTest {
 
-	private Division division1;
-	private Division division2;
+	private Division referenceObject;
+	private Division modifiedObject;
 
 	@Before
 	public void init()
 	{
 		try
 		{
-			division1 = createDivisionOne();
-			division2 = createDivisionTwo();
+			referenceObject = createDivisionOne();
+			modifiedObject = createDivisionTwo();
 		}
 		catch( ParseException e )
 		{
@@ -33,21 +34,95 @@ public class ObjectDifferenceCalculatorTest {
 	public void testCalculateDifference() throws Exception
 	{
 		final ObjectDifferenceCalculator diffCalc = new ObjectDifferenceCalculator( "." );
-		final Map< String, ObjectDifferenceCalculator.Difference> difference = diffCalc.calculateDifference( division1, division2 );
-		Assert.assertEquals( "Number of Differences", difference.size(), 2 );
-		final ObjectDifferenceCalculator.Difference age = difference.get( "Division.people[0].Person.age" );
-		Assert.assertEquals( "Age (modified)", age.getObject(), "13" );
-		Assert.assertEquals( "Age (reference)", age.getReferenceObject(), "37" );
-		final ObjectDifferenceCalculator.Difference dob = difference.get( "Division.people[0].Person.birthDate" );
-		Assert.assertEquals( "DOB (modified)", dob.getObject(), "1963-04-22" );
-		Assert.assertEquals( "DOB (reference)", dob.getReferenceObject(), "2014-01-28" );
+		final Map< String, ObjectDifferenceCalculator.Difference> differences = diffCalc.calculateDifference( modifiedObject, referenceObject );
+		Assert.assertEquals( "Number of Differences", 19, differences.size() );
+		final ObjectDifferenceCalculator.Difference age = differences.get( "Division.people[0].Person.age" );
+		Assert.assertEquals( "Division.people[0].Person.age (reference.)", age.getReferenceObject(), "13" );
+		Assert.assertEquals( "Division.people[0].Person.age (modified)", age.getObject(), "37" );
+		final ObjectDifferenceCalculator.Difference dob = differences.get( "Division.people[0].Person.birthDate" );
+		Assert.assertEquals( "Division.people[0].Person.birthDate (reference.)", dob.getReferenceObject(), "1963-04-22" );
+		Assert.assertEquals( "Division.people[0].Person.birthDate (modified)", dob.getObject(), "2014-01-28" );
+
+		// changed the order of the collection matrix
+		ObjectDifferenceCalculator.Difference col = differences.get( "Division.collectionMatrix[0][0]" );
+		Assert.assertEquals( "Division.collectionMatrix[0][0] (reference.)" , col.getReferenceObject(), "11" );
+		Assert.assertEquals( "Division.collectionMatrix[0][0] (modified)" , col.getObject(), "21" );
+		col = differences.get( "Division.collectionMatrix[0][1]" );
+		Assert.assertEquals( "Division.collectionMatrix[0][1] (reference.)" , col.getReferenceObject(), "12" );
+		Assert.assertEquals( "Division.collectionMatrix[0][1] (modified)" , col.getObject(), "23" );
+		col = differences.get( "Division.collectionMatrix[0][2]" );
+		Assert.assertEquals( "Division.collectionMatrix[0][2] (reference.)" , col.getReferenceObject(), "13" );
+		Assert.assertEquals( "Division.collectionMatrix[0][2] (modified)" , col.getObject(), "22" );
+		col = differences.get( "Division.collectionMatrix[1][0]" );
+		Assert.assertEquals( "Division.collectionMatrix[1][0] (reference.)" , col.getReferenceObject(), "21" );
+		Assert.assertEquals( "Division.collectionMatrix[1][0] (modified)" , col.getObject(), "12" );
+		col = differences.get( "Division.collectionMatrix[1][1]" );
+		Assert.assertEquals( "Division.collectionMatrix[1][1] (reference.)" , col.getReferenceObject(), "22" );
+		Assert.assertEquals( "Division.collectionMatrix[1][1] (modified)" , col.getObject(), "11" );
+		col = differences.get( "Division.collectionMatrix[1][2]" );
+		Assert.assertEquals( "Division.collectionMatrix[1][2] (reference.)" , col.getReferenceObject(), "23" );
+		Assert.assertEquals( "Division.collectionMatrix[1][2] (modified)" , col.getObject(), "13" );
+
+		// changed the order of the evil doings
+		col = differences.get( "Division.people[4].BadPerson.evilDoings[0]" );
+		Assert.assertEquals( "Division.people[4].BadPerson.evilDoings[0] (reference.)" , col.getReferenceObject(), "\"wasted a beer\"" );
+		Assert.assertEquals( "Division.people[4].BadPerson.evilDoings[0] (modified)" , col.getObject(), "\"disliked technology\"" );
+		col = differences.get( "Division.people[4].BadPerson.evilDoings[1]" );
+		Assert.assertEquals( "Division.people[4].BadPerson.evilDoings[1] (reference.)" , col.getReferenceObject(), "\"disliked technology\"" );
+		Assert.assertEquals( "Division.people[4].BadPerson.evilDoings[1] (modified)" , col.getObject(), "\"added sugar to coffee\"" );
+		col = differences.get( "Division.people[4].BadPerson.evilDoings[3]" );
+		Assert.assertEquals( "Division.people[4].BadPerson.evilDoings[3] (reference.)" , col.getReferenceObject(), "\"added sugar to coffee\"" );
+		Assert.assertEquals( "Division.people[4].BadPerson.evilDoings[3] (modified)", col.getObject(), "\"wasted a beer\"" );
+
+		// changed the order of the lists on the leaf nodes (lowest dimension)
+		col = differences.get( "Division.threeD[0][0][1]" );
+		Assert.assertEquals( "Division.threeD[0][0][1] (reference.)" , col.getReferenceObject(), "1" );
+		Assert.assertEquals( "Division.threeD[0][0][1] (modified)" , col.getObject(), "2" );
+		col = differences.get( "Division.threeD[0][0][2]" );
+		Assert.assertEquals( "Division.threeD[0][0][2] (reference.)" , col.getReferenceObject(), "2" );
+		Assert.assertEquals( "Division.threeD[0][0][2] (modified)" , col.getObject(), "1" );
+
+		// changed the order of the 2nd dimension of the lists
+		col = differences.get( "Division.threeD[0][1][0]" );
+		Assert.assertEquals( "Division.threeD[0][1][0] (reference.)" , col.getReferenceObject(), "10" );
+		Assert.assertEquals( "Division.threeD[0][1][0] (modified)" , col.getObject(), "21" );
+		col = differences.get( "Division.threeD[0][1][1]" );
+		Assert.assertEquals( "Division.threeD[0][1][1] (reference.)" , col.getReferenceObject(), "11" );
+		Assert.assertEquals( "Division.threeD[0][1][1] (modified)" , col.getObject(), "20" );
+		col = differences.get( "Division.threeD[0][1][2]" );
+		Assert.assertEquals( "Division.threeD[0][1][2] (reference.)" , col.getReferenceObject(), "12" );
+		Assert.assertEquals( "Division.threeD[0][1][2] (modified)" , col.getObject(), "22" );
+
+		col = differences.get( "Division.threeD[0][2][0]" );
+		Assert.assertEquals( "Division.threeD[0][2][0] (reference.)" , col.getReferenceObject(), "20" );
+		Assert.assertEquals( "Division.threeD[0][2][0] (modified)" , col.getObject(), "12" );
+		col = differences.get( "Division.threeD[0][2][1]" );
+		Assert.assertEquals( "Division.threeD[0][2][1] (reference.)" , col.getReferenceObject(), "21" );
+		Assert.assertEquals( "Division.threeD[0][2][1] (modified)" , col.getObject(), "11" );
+		col = differences.get( "Division.threeD[0][2][2]" );
+		Assert.assertEquals( "Division.threeD[0][2][2] (reference.)" , col.getReferenceObject(), "22" );
+		Assert.assertEquals( "Division.threeD[0][2][2] (modified)" , col.getObject(), "10" );
+	}
+
+	@Test
+	public void testCalculateDifferenceListOrderIgnored() throws Exception
+	{
+		final ObjectDifferenceCalculator diffCalc = new ObjectDifferenceCalculator( "." ).listOrderIgnored();
+		final Map< String, ObjectDifferenceCalculator.Difference> differences = diffCalc.calculateDifference( modifiedObject, referenceObject );
+		Assert.assertEquals( "Number of Differences", 2, differences.size() );
+		final ObjectDifferenceCalculator.Difference age = differences.get( "Division.people[0].Person.age" );
+		Assert.assertEquals( "Division.people[0].Person.age (reference)", age.getReferenceObject(), "13" );
+		Assert.assertEquals( "Division.people[0].Person.age (modified)", age.getObject(), "37" );
+		final ObjectDifferenceCalculator.Difference dob = differences.get( "Division.people[0].Person.birthDate" );
+		Assert.assertEquals( "Division.people[0].Person.birthDate (reference)", dob.getReferenceObject(), "1963-04-22" );
+		Assert.assertEquals( "Division.people[0].Person.birthDate (modified)", dob.getObject(), "2014-01-28" );
 	}
 
 	@Test
 	public void testFlattenObject() throws Exception
 	{
 		final ObjectDifferenceCalculator diffCalc = new ObjectDifferenceCalculator( "." );
-		final Map< String, Object > flattened = diffCalc.flattenObject( division1 );
+		final Map< String, Object > flattened = diffCalc.flattenObject( referenceObject );
 
 		final Map< String, Object > expectedKeys = new HashMap<>();
 		expectedKeys.put( "Division.people[0].Person.givenName", "\"Johnny\"" );
@@ -92,6 +167,17 @@ public class ObjectDifferenceCalculatorTest {
 		expectedKeys.put( "Division.people[3].Person.mood", null );
 		expectedKeys.put( "Division.people[3].Person.friends", null );
 		expectedKeys.put( "Division.people[3].Person.groups", null );
+		expectedKeys.put( "Division.people[4].BadPerson.evilDoings[0]", "\"wasted a beer\"" );
+		expectedKeys.put( "Division.people[4].BadPerson.evilDoings[1]", "\"disliked technology\"" );
+		expectedKeys.put( "Division.people[4].BadPerson.evilDoings[2]", "\"added semicolon to someones for-loop\"" );
+		expectedKeys.put( "Division.people[4].BadPerson.evilDoings[3]", "\"added sugar to coffee\"" );
+		expectedKeys.put( "Division.people[4].BadPerson.givenName", "\"johnny\"" );
+		expectedKeys.put( "Division.people[4].BadPerson.familyName", "\"evil\"" );
+		expectedKeys.put( "Division.people[4].BadPerson.age", "666" );
+		expectedKeys.put( "Division.people[4].BadPerson.birthDate", null );
+		expectedKeys.put( "Division.people[4].BadPerson.mood", null );
+		expectedKeys.put( "Division.people[4].BadPerson.friends", null );
+		expectedKeys.put( "Division.people[4].BadPerson.groups", null );
 		expectedKeys.put( "Division.months{\"January\"}[0]", "1" );
 		expectedKeys.put( "Division.months{\"January\"}[1]", "2" );
 		expectedKeys.put( "Division.months{\"January\"}[2]", "3" );
@@ -159,31 +245,74 @@ public class ObjectDifferenceCalculatorTest {
 		expectedKeys.put( "Division.listOfMaps[2]{\"color\"}", "\"blue\"" );
 		expectedKeys.put( "Division.listOfMaps[2]{\"size\"}", "\"medium\"" );
 		expectedKeys.put( "Division.listOfMaps[2]{\"condition\"}", "\"good\"" );
+		expectedKeys.put( "Division.crazySet[0]", "\"hypochondria\"" );
+		expectedKeys.put( "Division.crazySet[1]", "\"delusions\"" );
+		expectedKeys.put( "Division.crazySet[2]", "\"manic-depression\"" );
+		expectedKeys.put( "Division.threeD[0][0][0]", "0" );
+		expectedKeys.put( "Division.threeD[0][0][1]", "1" );
+		expectedKeys.put( "Division.threeD[0][0][2]", "2" );
+		expectedKeys.put( "Division.threeD[0][1][0]", "10" );
+		expectedKeys.put( "Division.threeD[0][1][1]", "11" );
+		expectedKeys.put( "Division.threeD[0][1][2]", "12" );
+		expectedKeys.put( "Division.threeD[0][2][0]", "20" );
+		expectedKeys.put( "Division.threeD[0][2][1]", "21" );
+		expectedKeys.put( "Division.threeD[0][2][2]", "22" );
+		expectedKeys.put( "Division.threeD[1][0][0]", "100" );
+		expectedKeys.put( "Division.threeD[1][0][1]", "101" );
+		expectedKeys.put( "Division.threeD[1][0][2]", "102" );
+		expectedKeys.put( "Division.threeD[1][1][0]", "110" );
+		expectedKeys.put( "Division.threeD[1][1][1]", "111" );
+		expectedKeys.put( "Division.threeD[1][1][2]", "112" );
+		expectedKeys.put( "Division.threeD[1][2][0]", "120" );
+		expectedKeys.put( "Division.threeD[1][2][1]", "121" );
+		expectedKeys.put( "Division.threeD[1][2][2]", "122" );
+		expectedKeys.put( "Division.threeD[2][0][0]", "200" );
+		expectedKeys.put( "Division.threeD[2][0][1]", "201" );
+		expectedKeys.put( "Division.threeD[2][0][2]", "202" );
+		expectedKeys.put( "Division.threeD[2][1][0]", "210" );
+		expectedKeys.put( "Division.threeD[2][1][1]", "211" );
+		expectedKeys.put( "Division.threeD[2][1][2]", "212" );
+		expectedKeys.put( "Division.threeD[2][2][0]", "220" );
+		expectedKeys.put( "Division.threeD[2][2][1]", "221" );
+		expectedKeys.put( "Division.threeD[2][2][2]", "222" );
 
 		Assert.assertEquals( "Flattened Division", expectedKeys, flattened );
-
-		// used to generate the expect results when needed
-//		for( Map.Entry< String, Object > entry : flattened.entrySet() )
-//		{
-//			final StringBuilder expression = new StringBuilder( "expectedKeys.put( \"" )
-//					.append( entry.getKey().replaceAll( "\\\"", "\\\\\"" ) )
-//					.append( "\", " );
-//			final Object object = entry.getValue();
-//			if( object == null )
-//			{
-//				expression.append( "null" );
-//			}
-//			else
-//			{
-//				expression.append( "\"" )
-//						.append( object.toString().replaceAll( "\\\"", "\\\\\"" ) )
-//						.append( "\"" );
-//			}
-//			expression.append( " );" );
-//			System.out.println( expression.toString() );
-//		}
 	}
 
+	/**
+	 * Prints the expected fields to the console so that it can be pasted into the flatten-object test. Call this method
+	 * when updating the Division class (or classes it contains).
+	 */
+	public void createExpectedFields()
+	{
+		final ObjectDifferenceCalculator diffCalc = new ObjectDifferenceCalculator( "." );
+		final Map< String, Object > flattened = diffCalc.flattenObject( referenceObject );
+		for( Map.Entry< String, Object > entry : flattened.entrySet() )
+		{
+			final StringBuilder expression = new StringBuilder( "expectedKeys.put( \"" )
+					.append( entry.getKey().replaceAll( "\\\"", "\\\\\"" ) )
+					.append( "\", " );
+			final Object object = entry.getValue();
+			if( object == null )
+			{
+				expression.append( "null" );
+			}
+			else
+			{
+				expression.append( "\"" )
+						.append( object.toString().replaceAll( "\\\"", "\\\\\"" ) )
+						.append( "\"" );
+			}
+			expression.append( " );" );
+			System.out.println( expression.toString() );
+		}
+	}
+
+	/**
+	 * Creates and returns the reference division object
+	 * @return The reference division object
+	 * @throws ParseException
+	 */
 	private static Division createDivisionOne() throws ParseException
 	{
 		final Division division = new Division();
@@ -255,15 +384,89 @@ public class ObjectDifferenceCalculatorTest {
 		personMap.put( "pretty", new Person( "Ginder", "Mendez", 23 ) );
 		division.setPersonMap( personMap );
 
+		division.addToCrazySet( "hypochondria" );
+		division.addToCrazySet( "delusions" );
+		division.addToCrazySet( "manic-depression" );
+
+		final BadPerson evilJohnny = new BadPerson( "evil", "johnny", 666 );
+		evilJohnny.addEvilDoing( "wasted a beer" );
+		evilJohnny.addEvilDoing( "disliked technology" );
+		evilJohnny.addEvilDoing( "added semicolon to someones for-loop" );
+		evilJohnny.addEvilDoing( "added sugar to coffee" );
+		division.addPerson( evilJohnny );
+
+		final int size = 3;
+		final int[][][] threeD = new int[ size ][ size ][ size ];
+		for( int i = 0; i < 3; ++i )
+		{
+			for( int j=0; j < 3; ++j )
+			{
+				for( int k = 0; k < 3; ++k )
+				{
+					threeD[ i ][ j ][ k ] = i * 100 + j * 10 + k;
+				}
+			}
+		}
+		division.setThreeD( threeD );
+
 		return division;
 	}
 
+	/**
+	 * Creates the reference division object, modifies it, and then returns it
+	 * @return The modified division object
+	 * @throws ParseException
+	 */
 	private static Division createDivisionTwo() throws ParseException
 	{
 		final Division division = createDivisionOne();
 		final Person johnny = division.getPerson( "Hernandez", "Johnny" );
 		johnny.setAge( 37 );
-		johnny.setBirthdate( Calendar.getInstance() );
+		johnny.setBirthdate( DateUtils.createDateFromString( "2014-01-28", "yyyy-MM-dd" ) );
+
+		// changing order of lists effect difference, but not when list order is ignored
+		List<List< Integer >> collectionMatrix = Arrays.asList(
+				Arrays.asList( 21, 23, 22 ),
+				Arrays.asList( 12, 11, 13 ),
+				Arrays.asList( 31, 32, 33 ) );
+		division.setCollectionMatrix( collectionMatrix );
+
+		// set order should cause a difference
+		division.addMonth( "February", new HashSet<>( Arrays.asList( 1, 3, 2, 28 ) ) );
+		division.addMonth( "March", new HashSet<>( Arrays.asList( 2, 1, 3, 31 ) ) );
+
+		// change the order of the evil-doings
+		division.removePerson( "evil", "johnny" );
+		final BadPerson evilJohnny = new BadPerson( "evil", "johnny", 666 );
+		evilJohnny.addEvilDoing( "disliked technology" );
+		evilJohnny.addEvilDoing( "added sugar to coffee" );
+		evilJohnny.addEvilDoing( "added semicolon to someones for-loop" );
+		evilJohnny.addEvilDoing( "wasted a beer" );
+		division.addPerson( evilJohnny );
+
+		final int size = 3;
+		final int[][][] threeD = new int[ size ][ size ][ size ];
+		for( int i = 0; i < 3; ++i )
+		{
+			for( int j=0; j < 3; ++j )
+			{
+				for( int k = 0; k < 3; ++k )
+				{
+					threeD[ i ][ j ][ k ] = i * 100 + j * 10 + k;
+				}
+			}
+		}
+		threeD[ 0 ][ 0 ][ 1 ] = 2;
+		threeD[ 0 ][ 0 ][ 2 ] = 1;
+
+		threeD[ 0 ][ 1 ][ 0 ] = 21;
+		threeD[ 0 ][ 1 ][ 1 ] = 20;
+		threeD[ 0 ][ 1 ][ 2 ] = 22;
+		threeD[ 0 ][ 2 ][ 0 ] = 12;
+		threeD[ 0 ][ 2 ][ 1 ] = 11;
+		threeD[ 0 ][ 2 ][ 2 ] = 10;
+		division.setThreeD( threeD );
+
 		return division;
 	}
 }

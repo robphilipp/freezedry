@@ -21,7 +21,8 @@ import java.util.List;
 import org.freezedry.persistence.annotations.Persist;
 
 public class BadPerson extends Person {
-	
+
+	@Persist( ignore = true )
 	private volatile int hashCode;
 
 	private List< String > evilDoings = new ArrayList<>();
