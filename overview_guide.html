@@ -38,21 +38,8 @@
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
-    <script src="scripts/jquery-1.8.3.js"></script>
-    <script src="scripts/ui/jquery-ui-1.9.2.custom.js"></script>
+    <script data-main="scripts/config.js" src="scripts/require.js"></script>
 
-    <!-- Code Syntax Highlighting -->
-    <script src="scripts/syntax_highlight/shCore.js"></script>
-    <script src="scripts/syntax_highlight/shBrushJava.js"></script>
-    <script src="scripts/syntax_highlight/shBrushXml.js"></script>
-    <script src="scripts/syntax_highlight/shBrushJScript.js"></script>
-
-    <!-- Twitter bootstrap -->
-    <script src="scripts/bootstrap/js/bootstrap.js"></script>
-
-    <script src="scripts/toc-creator.js"></script>
-    <script src="scripts/scroll-adjust.js"></script>
-    <script src="scripts/setup.js"></script>
     <script>
         $(document).ready( function() {
 
@@ -131,14 +118,14 @@
                 objects and lists of key-value pairs. In its most basic form, converting a Java object into a persisted form is as simple as:</p>
 
             <!-- You also need to add some content to highlight, but that is covered elsewhere. -->
-            <pre class="brush: java">
+            <pre class="prettyprint">
                 final XmlPersistence persistence = new XmlPersistence();
                 persistence.write( division, "person.xml" );
             </pre>
 
             <p>And to reconstitute the <b>division</b> object from the "person.xml" file, all you need to do is:</p>
 
-            <pre class="brush: java">
+            <pre class="prettyprint">
                 final XmlPersistence persistence = new XmlPersistence();
                 Division redivision = persistence.read( Division.class, "person.xml" );
             </pre>
@@ -148,7 +135,7 @@
                 The code below demonstrates how to persist a Java object to an XML file by directly using the <b class="class">PersistenceEngine</b>
                 and an <b class="class">XmlWriter</b>:</p>
 
-            <pre class="brush: java">
+            <pre class="prettyprint">
                 // create the persistence engine
                 final PersistenceEngine engine = new PersistenceEngine();
 
@@ -171,7 +158,7 @@
 
             <p>Both approaches produces an XML file like the one below:</p>
 
-            <pre class="brush: xml">
+            <pre class="prettyprint">
                 &lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
                 &lt;Division&gt;
                     &lt;people&gt;
@@ -242,13 +229,13 @@
                 useful, it also provides an easy way to reconstitute objects from their persisted form. As shown above, you can write
                 an object to its persisted form in one simple line of code:</p>
 
-            <pre class="brush: java">
+            <pre class="prettyprint">
                 new XmlPersistence().write( division, "person.xml" );
             </pre>
 
             <p>and you can also reconstitute the <b>division</b> object from the "person.xml" file in one simple, but more complex, line of code:</p>
 
-            <pre class="brush: java">
+            <pre class="prettyprint">
                 Division redivision = new XmlPersistence().read( Division.class, "person.xml" );
             </pre>
 
@@ -289,14 +276,14 @@
             <p><b>FreezeDry</b> can also be used to serialize/deserialize objects as XML, JSON, or Java's basic object serialization.
                 As a simple example, we can serialize an object to a <b class="class">FileOutputStream</b>:</p>
 
-            <pre class="brush: java">
+            <pre class="prettyprint">
                 new JsonPersistenceSerializer().serialize( person, new FileOutputStream( filename ) );
             </pre>
 
             <p>which effectively persists the object to a file as JSON. But you could replace the <b class="class">FileOutputStream</b>
                 with an <b class="class">ObjectOutputStream</b> as well. And then to deserialize an object:</p>
 
-            <pre class="brush: java">
+            <pre class="prettyprint">
                 new JsonPersistenceSerializer().deserialize( new FileInputStream( filename ), Person.class );
             </pre>
 
@@ -321,7 +308,7 @@
                 the difference between two objects of the <b class="class">Division</b> class, <b class="class">division1</b>
                 and <b class="class">division2</b>:</p>
 
-            <pre class="brush: java">
+            <pre class="prettyprint">
                 private Division division1;
                 private Division division2;
                 .
@@ -332,7 +319,7 @@
 
             <p>which returns a map containing the field names that differ, associated with the details of the difference.</p>
 
-            <pre class="brush: js">
+            <pre class="prettyprint">
                 {
                     Division.people[0].Person.age => Object: 13; Reference Object: 37,
                     Division.people[0].Person.birthDate => Object: 1963-04-22; Reference Object: 2013-12-05
@@ -375,7 +362,7 @@
 
             <p>To create a semantic model from an object, you use the <b class="class">PersistenceEngine</b> method:</p>
 
-            <pre class="brush: java">
+            <pre class="prettyprint">
                 final InfoNode createSemanticModel( final Object object )
             </pre>
 
@@ -393,13 +380,13 @@
 
             <p>To find out what class is mapped to what <b class="class">NodeBuilder</b> object, you can use the <b class="class">PersistenceEngine</b> method</p>
 
-            <pre class="brush: java">
+            <pre class="prettyprint">
                 final NodeBuilder getNodeBuilder( final Class&lt; ? &gt; clazz )
             </pre>
 
             <p>And to adjust the mapping you can use one of the following methods</p>
 
-            <pre class="brush: java">
+            <pre class="prettyprint">
                 NodeBuilder addNodeBuilder( final Class&lt; ? &gt; clazz, final NodeBuilder builder )
                 NodeBuilder removeNodeBuilder( final Class&lt; ? &gt; clazz )
             </pre>
@@ -408,13 +395,13 @@
 
             <p>To create an object from the semantic model, you use the <b class="class">PersistenceEngine</b> method</p>
 
-            <pre class="brush: java">
+            <pre class="prettyprint">
                 Object parseSemanticModel( final Class&lt; ? &gt; clazz, final InfoNode rootNode )
             </pre>
 
             <p>Naturally, you may ask where the <em>rootNode</em> comes from. Good question. It comes from the <b class="class">Reader</b> method</p>
 
-            <pre class="brush: java">
+            <pre class="prettyprint">
                 InfoNode read( final Class&lt; ? &gt; clazz, final InputStream input )
             </pre>
 
@@ -477,7 +464,7 @@
 
             <p>The <b class="class">NodeBuilder</b> interface has</p>
 
-            <pre class="brush: java">
+            <pre class="prettyprint">
                 InfoNode createInfoNode( Class&lt; ? &gt; containingClass, Object object, String fieldName )
                 Object createObject( final Class&lt; ? &gt; clazz, final InfoNode node )
                 void setPersistenceEngine( final PersistenceEngine engine )
@@ -488,7 +475,7 @@
                 object represents within the containing class. The containing class information turns out to be important when
                 dealing with structures such as</p>
 
-            <pre class="brush: java">
+            <pre class="prettyprint">
                 Map&lt; String, Map&lt; String, List&lt; Double &gt; &gt;
                 List&lt; Person &gt;
             </pre>
@@ -521,7 +508,7 @@
 
             <p>The <b class="class">AbstractNodeBuilder</b> implements manages the reference to the <b class="class">PersistenceEngine</b> but also provides a mapping for instantiating objects for which the type is an interface or abstract. For example, suppose that your class looks like this</p>
 
-            <pre class="brush: java">
+            <pre class="prettyprint">
                 public class Example {
                     private List&lt; Double &gt; numbers;
                     ...
@@ -530,7 +517,7 @@
 
             <p>When attempting to instantiate the field *numbers*, unless the <b class="class">InfoNode</b> has type information that specifies that *numbers* is an <b class="class">ArrayList</b>, the <b class="class">NodeBuilder</b> must rely on some default mechanism to determine what class type to instantiate. The <b class="class">AbstractNodeBuilder</b> provides four methods to deal with this</p>
 
-            <pre class="brush: java">
+            <pre class="prettyprint">
                 /**
                  * Adds and interface to class mapping used when constructing a collection.
                  * @param interfaceClass The interface
@@ -593,7 +580,7 @@
 
             <p>The <b class="class">PersistenceReader</b> and <b class="class">PersistenceWriter</b> interfaces each define one method.</p>
 
-            <pre class="brush: java">
+            <pre class="prettyprint">
                 public interface PersistenceWriter {
                     void write( final InfoNode rootNode, final java.io.Writer output );
                 }
@@ -602,7 +589,7 @@
             <p>The <b class="class">PersistenceWriter</b> accepts the root <b class="class">InfoNode</b> of the semantic model
                 and a <b class="class">java.io.Writer</b> to which to send the persisted form (such as an XML or JSON file).</p>
 
-            <pre class="brush: java">
+            <pre class="prettyprint">
                 public interface PersistenceReader {
                     InfoNode read( final Class&lt; ? &gt; clazz, final java.io.Reader reader );
                 }
@@ -635,7 +622,7 @@
                 below shows what the <b class="class">Division</b> object (standard <b>FreezeDry</b> example) looks like when
                 persisted in a key-value form.</p>
 
-            <pre class="brush: java">
+            <pre class="prettyprint">
                 Division.people[0].Person.givenName = "Johnny"
                 Division.people[0].Person.familyName = "Hernandez"
                 Division.people[0].Person.age = 13
@@ -779,7 +766,7 @@
                 and set that field. In this case, if the <b class="class">InfoNode</b> has a persistence name of <em>LastName</em>,
                 the <em>familyName</em> field will be set.</p>
 
-            <pre class="brush: java">
+            <pre class="prettyprint">
                 public class Person {
                     ...
                     @Persist( persistenceName = "LastName" )
@@ -808,7 +795,7 @@
                 <b class="class">LinkedHashMap&lt; String, String &gt;</b>, and instead instantiate the field as a more simple
                 <b class="class">HashMap&lt; String, String &gt;</b>.</p>
 
-            <pre class="brush: java">
+            <pre class="prettyprint">
                 public class Person {
                     ...
                     @Persist( instantiateAs = HashMap.class, persistenceName = "BuddyList" )
@@ -819,7 +806,7 @@
 
             The <b class="class">Persist</b> annotation is shown below.
 
-            <pre class="brush: java">
+            <pre class="prettyprint">
                 @Retention( RetentionPolicy.RUNTIME )
                 @Target( { ElementType.TYPE, ElementType.FIELD } )
                 public @interface Persist {
@@ -851,7 +838,7 @@
             </table>
 
 
-            <h2 id="whats_new"><a href="#overview" class=scroll-offset">What's New</a></h2>
+            <h2 id="whats_new"><a href="#overview" class="scroll-offset">What's New</a></h2>
 
             <p>This section describes the larger changes. More detailed changes can be found in the README
                 file in the file download area. Most updates will contain bug fixes and minor code refactoring.</p>
@@ -884,12 +871,12 @@
                     <ol>
                         <li>Converted from Ant build to maven.</li>
                         <li>FreezeDry is now available through maven central.
-                            <pre class="brush: java">
-                                <dependency>
-                                    <groupId>com.closure-sys</groupId>
-                                    <artifactId>freezedry</artifactId>
-                                    <version>0.2.7</version>
-                                </dependency>
+                            <pre class="prettyprint">
+                                &lt;dependency>
+                                    &lt;groupId>com.closure-sys&lt;/groupId>
+                                    &lt;artifactId>freezedry&lt;/artifactId>
+                                    &lt;version>0.2.7&lt;/version>
+                                &lt;/dependency>
                             </pre>
                         </li>
                         <li>Added <b class="class">ObjectDifferenceCalculator</b> that compares two objects of the same
@@ -911,7 +898,7 @@
                             was the root object (i.e. not a member of another object) then the <b class="class">ArrayList</b> was persisted as if it
                             were any other object, rather than by using the <b class="class">CollectionNodeBuilder</b>. Version 0.2.5 fixes this.</li>
                         <li>Changed the <b class="class">NodeBuilder</b> interface to have two additional methods that override the
-                            <b class="class">createInfoNode(Class<?>, Object, String)</b> method and the <b class="class">createObject(Class<?>, Class<?>, InfoNode)</b>
+                            <b class="class">createInfoNode(Class&lt;?>, Object, String)</b> method and the <b class="class">createObject(Class&lt;?>, Class&lt;?>, InfoNode)</b>
                             method. These new methods are called when an object has an associated <b class="class">NodeBuilder</b> <em>and</em>
                             is a root object.</li>
                     </ol>
@@ -1013,7 +1000,7 @@
 </div>
 
 <footer>
-    <p>&copy; Robert Philipp 2012</p>
+    <p>&copy; Robert Philipp 2014</p>
 </footer>
 
 </body>

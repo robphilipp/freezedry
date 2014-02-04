@@ -38,22 +38,8 @@
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
-    <script src="scripts/jquery-1.8.3.js"></script>
-    <script src="scripts/ui/jquery-ui-1.9.2.custom.js"></script>
-
-    <!-- Code Syntax Highlighting -->
-    <script src="scripts/syntax_highlight/shCore.js"></script>
-    <script src="scripts/syntax_highlight/shBrushJava.js"></script>
-    <script src="scripts/syntax_highlight/shBrushXml.js"></script>
-    <script src="scripts/syntax_highlight/shBrushPowerShell.js" />
-
-    <!-- Twitter bootstrap -->
-    <script src="scripts/bootstrap/js/bootstrap.js"></script>
-
-    <script src="scripts/toc-creator.js"></script>
-    <script src="scripts/scroll-adjust.js"></script>
-    <script src="scripts/setup.js"></script>
-    <script>
+    <script data-main="scripts/config.js" src="scripts/require.js"></script>
+ <script>
         $(document).ready( function() {
 
             $(function() {
@@ -150,27 +136,27 @@
                 <a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">Java version 7.</a> Once
                 downloaded, change to the distribution's directory, and type</p>
 
-            <pre class="brush: powershell">
+            <pre class="prettyprint">
                 mvn clean install
             </pre>
 
 
             <h4 id="testing"><a href="#overview" class="scroll-offset">Testing</a></h4>
             <p>There are two types of tests available: unit tests and integration tests. Unit tests can be run using:</p>
-            <pre class="brush: powershell">
+            <pre class="prettyprint">
                 mvn clean test
             </pre>
             <p>and integration tests, which run select tests in an OSGi container, can be run using:</p>
-            <pre class="brush: powershell">
+            <pre class="prettyprint">
                 mvn clean verify
             </pre>
             <p>By default, freezedry uses Apache's felix OSGi container, but if you prefer equinox you can add the
             maven profile as such</p>
-            <pre class="brush: powershell">
+            <pre class="prettyprint">
                 mvn clean varify -Pequinox
             </pre>
             <p>Issuing the command</p>
-            <pre class="brush: powershell">
+            <pre class="prettyprint">
                 mvn clean install
             </pre>
             <p>will run both unit and integration tests (use the maven profile for equinox).</p>
@@ -181,7 +167,7 @@
 </div>
 
 <footer>
-    <p>&copy; Robert Philipp 2012</p>
+    <p>&copy; Robert Philipp 2014</p>
 </footer>
 
 </body>

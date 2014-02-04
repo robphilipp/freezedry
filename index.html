@@ -38,35 +38,7 @@
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
-    <script src="scripts/jquery-1.8.3.js"></script>
-    <script src="scripts/ui/jquery-ui-1.9.2.custom.js"></script>
-
-    <!-- Code Syntax Highlighting -->
-    <script src="scripts/syntax_highlight/shCore.js"></script>
-    <script src="scripts/syntax_highlight/shBrushJava.js"></script>
-
-    <!-- Twitter bootstrap -->
-    <script src="scripts/bootstrap/js/bootstrap.js"></script>
-
-    <!--<script src="scripts/toc-creator.js"></script>-->
-    <script src="scripts/scroll-adjust.js"></script>
-    <script src="scripts/setup.js"></script>
-    <script>
-        $(document).ready( function() {
-
-            $(function() {
-                $( "#accordion" ).accordion( {
-                    autoHeight: false,
-                    header: "h3",
-                    collapsible: true,
-                    active: false
-                } );
-                $( "#whats-new-accordion" ).accordion( { autoHeight: false } );
-            });
-
-            setup();
-        }, false );
-    </script>
+    <script data-main="scripts/config.js" src="scripts/require.js"></script>
 
 	<title>FreezeDry</title>
 </head>
@@ -123,13 +95,13 @@
 
             <p>Well now. FreezeDry is really simple to use, right out of the box. Look. Here's how simple it is to persist an object to XML:</p>
 
-            <pre class="brush: java">
+            <pre class="prettyprint">
                 new XmlPersistence().write( division, "person.xml" );
             </pre>
 
             <p>And then to reconstitute the object from XML:</p>
 
-            <pre class="brush: java">
+            <pre class="prettyprint">
                 Division division = new XmlPersistence().read( Division.class, "person.xml" );
             </pre>
 
@@ -149,7 +121,7 @@
 </div>
 
 <footer>
-    <p>&copy; Robert Philipp 2012</p>
+    <p>&copy; Robert Philipp 2014</p>
 </footer>
 
 </body>
