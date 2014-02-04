@@ -434,7 +434,8 @@ public class ObjectDifferenceCalculator {
 			{
 				if( groupNames.contains( entry.getKey() ) )
 				{
-					parent.addValue( entry.getKey(), entry.getValue().toString() );
+					final String value = ( entry.getValue() == null ? null : entry.getValue().toString() );
+					parent.addValue( entry.getKey(), value );
 				}
 			}
 		}
