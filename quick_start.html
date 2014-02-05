@@ -90,8 +90,7 @@
                 <li>Make minor modifications to the code</li>
             </ul>
 
-            <p>See the User Guide for a detailed description of the code, how to extend it, and determining the best approach
-                for extending <b>FreezeDry</b> based on your needs.</p>
+            <p>See the User Guide for a detailed description of the code, how to extend it, and determining the best approach for extending <b>FreezeDry</b> based on your needs.</p>
 
             <h3 id="downloading"><a href="#overview" class="scroll-offset">Downloading</a></h3>
 
@@ -99,8 +98,7 @@
 
             <ul>
                 <li>Download the source code from the <a href="https://github.com/robphilipp/freezedry">GitHub</a></li>
-                <li>Download the <a href="https://sourceforge.net/projects/freezedried/files/FreezeDry/src/">jar files</a> containing
-                    the library, source code, and the java docs.</li>
+                <li>Download the <a href="https://sourceforge.net/projects/freezedried/files/FreezeDry/src/">jar files</a> containing the library, source code, and the java docs.</li>
             </ul>
 
             <h4 id="downloading_git"><a href="#overview" class="scroll-offset">git</a></h4>
@@ -110,21 +108,31 @@
                 The <b>Ant</b> <em>build.xml</em> can be used to create a single JAR containing the dependencies, or a
                 single JAR without the dependencies.</p>
 
-            <h4 id="downloading_single_jar"><a href="#overview" class="scroll-offset">Single JAR</a></h4>
-            <p>A <a href="https://sourceforge.net/projects/freezedried/files/FreezeDry/src/">JAR file</a> contains
-                the <b>FreezeDry</b> JAR.</p>
+            <h4 id="downloading_single_jar"><a href="#overview" class="scroll-offset">Downloading JAR</a></h4>
+            <p>A <a href="https://sourceforge.net/projects/freezedried/files/FreezeDry/src/">JAR file</a> contains the <b>FreezeDry</b> distribution.</p>
 
-            <h3 id="building"><a href="#quick_start" class="scroll-offset">Building</a></h3>
+            <h3 id="building"><a href="#quick_start" class="scroll-offset">Building Freezedry Distribution</a></h3>
 
-            <h4 id="building_java_version"><a href="#overview" class="scroll-offset">Java Version</a></h4>
+            <h4 id="building_java_version"><a href="#overview" class="scroll-offset">Requirements</a></h4>
             <p><b>FreezeDry</b> relies on features made available in
-                <a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">Java version 7.</a> Once
-                downloaded, change to the distribution's directory, and type</p>
+                <a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">Java version 7.</a>
 
+            <h4 id="maven-build"><a href="#overview" class="scroll-offset">Building</a></h4>
+            <p>Once downloaded, change to the distribution's directory, and type</p>
             <pre><code class="language-bash">
                 mvn clean install
             </code></pre>
 
+            <h4 id="maven-dependency"><a href="#overview" class="scroll-offset">Maven Dependency</a></h4>
+            <p><b>FreezeDry</b> jars are on maven central built as OSGi bundles. To use them in your code as plain jars or as bundles, add the following to maven (or similar to gradle):</p>
+               <pre><code class="language-markup">
+                    &lt;dependency>
+                        &lt;groupId>com.closure-sys&lt;/groupId>
+                        &lt;artifactId>freezedry&lt;/artifactId>
+                        &lt;version>x.y.z&lt;/version>
+                    &lt;/dependency>
+                </code></pre>
+            <p>where x.y.z is the version number.</p>
 
             <h4 id="testing"><a href="#overview" class="scroll-offset">Testing</a></h4>
             <p>There are two types of tests available: unit tests and integration tests. Unit tests can be run using:</p>
