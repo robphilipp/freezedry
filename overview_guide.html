@@ -9,9 +9,6 @@
 
     <link rel="stylesheet" type="text/css" href="themes/jquery-ui-1.9.2.custom.css">
 
-    <link rel="stylesheet" type="text/css" href="scripts/syntax_highlight/shCore.css" />
-    <link rel="stylesheet" type="text/css" href="scripts/syntax_highlight/shThemeEclipse.css" />
-
     <!-- Le styles -->
     <link href="scripts/bootstrap/css/bootstrap.css" rel="stylesheet">
     <style type="text/css">
@@ -32,6 +29,7 @@
     </style>
     <link href="scripts/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="freezedry.css"/>
+    <link rel="stylesheet" type="text/css" href="scripts/prism/prism.css">
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -39,23 +37,6 @@
     <![endif]-->
 
     <script data-main="scripts/config.js" src="scripts/require.js"></script>
-
-    <script>
-        $(document).ready( function() {
-
-            $(function() {
-                $( "#accordion" ).accordion( {
-                    autoHeight: false,
-                    header: "h3",
-                    collapsible: true,
-                    active: false
-                } );
-                $( "#whats-new-accordion" ).accordion( { autoHeight: false } );
-            });
-
-            setup();
-        }, false );
-    </script>
 
     <title>FreezeDry Overview</title>
 </head>
@@ -118,24 +99,24 @@
                 objects and lists of key-value pairs. In its most basic form, converting a Java object into a persisted form is as simple as:</p>
 
             <!-- You also need to add some content to highlight, but that is covered elsewhere. -->
-            <pre class="prettyprint">
+            <pre><code class="language-java">
                 final XmlPersistence persistence = new XmlPersistence();
                 persistence.write( division, "person.xml" );
-            </pre>
+            </code></pre>
 
             <p>And to reconstitute the <b>division</b> object from the "person.xml" file, all you need to do is:</p>
 
-            <pre class="prettyprint">
+            <pre><code class="language-java">
                 final XmlPersistence persistence = new XmlPersistence();
                 Division redivision = persistence.read( Division.class, "person.xml" );
-            </pre>
+            </code></pre>
 
             <p>The approach used in version 0.1.0 is still available. In some cases you might find that the older method, although more
                 complicated, provides more control over the transformation of objects and persisted forms into and out of the semantic model.
                 The code below demonstrates how to persist a Java object to an XML file by directly using the <b class="class">PersistenceEngine</b>
                 and an <b class="class">XmlWriter</b>:</p>
 
-            <pre class="prettyprint">
+            <pre><code class="language-java">
                 // create the persistence engine
                 final PersistenceEngine engine = new PersistenceEngine();
 
@@ -154,11 +135,11 @@
                     // deal with any IO exceptions
                     ....
                 }
-            </pre>
+            </code></pre>
 
             <p>Both approaches produces an XML file like the one below:</p>
 
-            <pre class="prettyprint">
+            <pre><code class="language-markup">
                 &lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
                 &lt;Division&gt;
                     &lt;people&gt;
@@ -183,7 +164,7 @@
                             ...
                     &lt;/people&gt;
                 &lt;/Division&gt;
-            </pre>
+            </code></pre>
 
             <p>Don't like the way the XML is mapped to your object? Well, there are ways to alter the XML mapping--either through annotations,
                 by implementing a custom node builder, or by implementing a custom reader and writer.</p>
@@ -229,15 +210,15 @@
                 useful, it also provides an easy way to reconstitute objects from their persisted form. As shown above, you can write
                 an object to its persisted form in one simple line of code:</p>
 
-            <pre class="prettyprint">
+            <pre><code class="language-java">
                 new XmlPersistence().write( division, "person.xml" );
-            </pre>
+            </code></pre>
 
             <p>and you can also reconstitute the <b>division</b> object from the "person.xml" file in one simple, but more complex, line of code:</p>
 
-            <pre class="prettyprint">
+            <pre><code class="language-java">
                 Division redivision = new XmlPersistence().read( Division.class, "person.xml" );
-            </pre>
+            </code></pre>
 
             <p>There are currently three <b class="class">Persistence</b> classes, all of which derive from the
                 <b class="class">Persistence</b> interface. There is an <b class="class">AbstractPersistence</b> class which
@@ -276,16 +257,16 @@
             <p><b>FreezeDry</b> can also be used to serialize/deserialize objects as XML, JSON, or Java's basic object serialization.
                 As a simple example, we can serialize an object to a <b class="class">FileOutputStream</b>:</p>
 
-            <pre class="prettyprint">
+            <pre><code class="language-java">
                 new JsonPersistenceSerializer().serialize( person, new FileOutputStream( filename ) );
-            </pre>
+            </code></pre>
 
             <p>which effectively persists the object to a file as JSON. But you could replace the <b class="class">FileOutputStream</b>
                 with an <b class="class">ObjectOutputStream</b> as well. And then to deserialize an object:</p>
 
-            <pre class="prettyprint">
+            <pre><code class="language-java">
                 new JsonPersistenceSerializer().deserialize( new FileInputStream( filename ), Person.class );
-            </pre>
+            </code></pre>
 
             <p>which loads the object from the file. But, the object could be deserialized from any<b class="class">InputStream</b>.</p>
 
@@ -308,23 +289,23 @@
                 the difference between two objects of the <b class="class">Division</b> class, <b class="class">division1</b>
                 and <b class="class">division2</b>:</p>
 
-            <pre class="prettyprint">
+            <pre><code class="language-java">
                 private Division division1;
                 private Division division2;
                 .
                 .
                 .
                 new ObjectDifferenceCalculator().calculateDifference( division1, division2 );
-            </pre>
+            </code></pre>
 
             <p>which returns a map containing the field names that differ, associated with the details of the difference.</p>
 
-            <pre class="prettyprint">
+            <pre><code class="language-java">
                 {
                     Division.people[0].Person.age => Object: 13; Reference Object: 37,
                     Division.people[0].Person.birthDate => Object: 1963-04-22; Reference Object: 2013-12-05
                 }
-            </pre>
+            </code></pre>
 
             <p>In this case, the age and birth date of the first person in the list of people differed between the two divisions.</p>
 
@@ -362,9 +343,9 @@
 
             <p>To create a semantic model from an object, you use the <b class="class">PersistenceEngine</b> method:</p>
 
-            <pre class="prettyprint">
+            <pre><code class="language-java">
                 final InfoNode createSemanticModel( final Object object )
-            </pre>
+            </code></pre>
 
             <p>to which you pass the object you wish to persist. Upon such a call, the <b class="class">PersistenceEngine</b>
                 will recurse through the object, and for each field construct an <b class="class">InfoNode</b> that holds
@@ -380,30 +361,30 @@
 
             <p>To find out what class is mapped to what <b class="class">NodeBuilder</b> object, you can use the <b class="class">PersistenceEngine</b> method</p>
 
-            <pre class="prettyprint">
+            <pre><code class="language-java">
                 final NodeBuilder getNodeBuilder( final Class&lt; ? &gt; clazz )
-            </pre>
+            </code></pre>
 
             <p>And to adjust the mapping you can use one of the following methods</p>
 
-            <pre class="prettyprint">
+            <pre><code class="language-java">
                 NodeBuilder addNodeBuilder( final Class&lt; ? &gt; clazz, final NodeBuilder builder )
                 NodeBuilder removeNodeBuilder( final Class&lt; ? &gt; clazz )
-            </pre>
+            </code></pre>
 
             <h5 id="semantic_model_to_object"><a href="#overview" class="scroll-offset">Semantic Model to Object</a></h5>
 
             <p>To create an object from the semantic model, you use the <b class="class">PersistenceEngine</b> method</p>
 
-            <pre class="prettyprint">
+            <pre><code class="language-java">
                 Object parseSemanticModel( final Class&lt; ? &gt; clazz, final InfoNode rootNode )
-            </pre>
+            </code></pre>
 
             <p>Naturally, you may ask where the <em>rootNode</em> comes from. Good question. It comes from the <b class="class">Reader</b> method</p>
 
-            <pre class="prettyprint">
+            <pre><code class="language-java">
                 InfoNode read( final Class&lt; ? &gt; clazz, final InputStream input )
-            </pre>
+            </code></pre>
 
             <p>but more on that later. The key point to remember is that the by handing the <b class="class">PersistenceEngine</b>
                 a valid <b>Semantic Model</b> as represented by the root node of the <b class="class">InfoNode</b> tree, and
@@ -464,21 +445,21 @@
 
             <p>The <b class="class">NodeBuilder</b> interface has</p>
 
-            <pre class="prettyprint">
+            <pre><code class="language-java">
                 InfoNode createInfoNode( Class&lt; ? &gt; containingClass, Object object, String fieldName )
                 Object createObject( final Class&lt; ? &gt; clazz, final InfoNode node )
                 void setPersistenceEngine( final PersistenceEngine engine )
-            </pre>
+            </code></pre>
 
             <p>The first two methods are the methods we just mentioned. The first one creates an <b class="class">InfoNode</b>
                 from an object, providing the builder with information about the containing class and the name of the field the
                 object represents within the containing class. The containing class information turns out to be important when
                 dealing with structures such as</p>
 
-            <pre class="prettyprint">
+            <pre><code class="language-java">
                 Map&lt; String, Map&lt; String, List&lt; Double &gt; &gt;
                 List&lt; Person &gt;
-            </pre>
+            </code></pre>
 
             <p>The second method creates an object from an <b class="class">InfoNode</b> using the class type information
                 specified in the method. In cases where the class type is also specified in the <b class="class">InfoNode</b>
@@ -508,16 +489,16 @@
 
             <p>The <b class="class">AbstractNodeBuilder</b> implements manages the reference to the <b class="class">PersistenceEngine</b> but also provides a mapping for instantiating objects for which the type is an interface or abstract. For example, suppose that your class looks like this</p>
 
-            <pre class="prettyprint">
+            <pre><code class="language-java">
                 public class Example {
                     private List&lt; Double &gt; numbers;
                     ...
                 }
-            </pre>
+            </code></pre>
 
             <p>When attempting to instantiate the field *numbers*, unless the <b class="class">InfoNode</b> has type information that specifies that *numbers* is an <b class="class">ArrayList</b>, the <b class="class">NodeBuilder</b> must rely on some default mechanism to determine what class type to instantiate. The <b class="class">AbstractNodeBuilder</b> provides four methods to deal with this</p>
 
-            <pre class="prettyprint">
+            <pre><code class="language-java">
                 /**
                  * Adds and interface to class mapping used when constructing a collection.
                  * @param interfaceClass The interface
@@ -545,7 +526,7 @@
                  * false otherwise
                  */
                 boolean containsInterface( final Class&lt; ? &gt; clazz )
-            </pre>
+            </code></pre>
 
 
             <h5 id="available_node_builders"><a href="#overview" class="scroll-offset">Available NodeBuilders</a></h5>
@@ -580,20 +561,20 @@
 
             <p>The <b class="class">PersistenceReader</b> and <b class="class">PersistenceWriter</b> interfaces each define one method.</p>
 
-            <pre class="prettyprint">
+            <pre><code class="language-java">
                 public interface PersistenceWriter {
                     void write( final InfoNode rootNode, final java.io.Writer output );
                 }
-            </pre>
+            </code></pre>
 
             <p>The <b class="class">PersistenceWriter</b> accepts the root <b class="class">InfoNode</b> of the semantic model
                 and a <b class="class">java.io.Writer</b> to which to send the persisted form (such as an XML or JSON file).</p>
 
-            <pre class="prettyprint">
+            <pre><code class="language-java">
                 public interface PersistenceReader {
                     InfoNode read( final Class&lt; ? &gt; clazz, final java.io.Reader reader );
                 }
-            </pre>
+            </code></pre>
 
             <p>The <b class="class">PersistenceReader</b> accepts an <b class="class">java.io.Reader</b> representing the persisted
                 form (such as an XML or JSON file or stream), a class type that represents the class of the object to create from
@@ -622,7 +603,7 @@
                 below shows what the <b class="class">Division</b> object (standard <b>FreezeDry</b> example) looks like when
                 persisted in a key-value form.</p>
 
-            <pre class="prettyprint">
+            <pre><code class="language-bash">
                 Division.people[0].Person.givenName = "Johnny"
                 Division.people[0].Person.familyName = "Hernandez"
                 Division.people[0].Person.age = 13
@@ -667,7 +648,7 @@
                 Division.personMap{"pretty"}.givenName = "Mendez"
                 Division.personMap{"pretty"}.familyName = "Ginder"
                 Division.personMap{"pretty"}.age = 23
-            </pre>
+            </code></pre>
 
             <h6>Keys and Values</h6>
 
@@ -766,14 +747,14 @@
                 and set that field. In this case, if the <b class="class">InfoNode</b> has a persistence name of <em>LastName</em>,
                 the <em>familyName</em> field will be set.</p>
 
-            <pre class="prettyprint">
+            <pre><code class="language-java">
                 public class Person {
                     ...
                     @Persist( persistenceName = "LastName" )
                     private String familyName;
                     ...
                 }
-            </pre>
+            </code></pre>
 
             <p>"But", you may wonder, "didn't you say that often when reading a persisted form into the semantic model,
                 only the persistence name and value are specified?" And, you may question further, "Doesn't that mean that
@@ -795,18 +776,18 @@
                 <b class="class">LinkedHashMap&lt; String, String &gt;</b>, and instead instantiate the field as a more simple
                 <b class="class">HashMap&lt; String, String &gt;</b>.</p>
 
-            <pre class="prettyprint">
+            <pre><code class="language-java">
                 public class Person {
                     ...
                     @Persist( instantiateAs = HashMap.class, persistenceName = "BuddyList" )
                     private Map&lt; String, String &gt; friends;
                     ...
                 }
-            </pre>
+            </code></pre>
 
             The <b class="class">Persist</b> annotation is shown below.
 
-            <pre class="prettyprint">
+            <pre><code class="language-java">
                 @Retention( RetentionPolicy.RUNTIME )
                 @Target( { ElementType.TYPE, ElementType.FIELD } )
                 public @interface Persist {
@@ -814,7 +795,7 @@
                     Class&lt; ? &gt; instantiateAs() default Null.class;
                     public static class Null { }
                 }
-            </pre>
+            </code></pre>
 
             <p>Notice that the retention policy states that the annotation is available at run-time, and that the targets are types and fields.</p>
 
@@ -871,13 +852,13 @@
                     <ol>
                         <li>Converted from Ant build to maven.</li>
                         <li>FreezeDry is now available through maven central.
-                            <pre class="prettyprint">
+                            <pre><code class="language-markup">
                                 &lt;dependency>
                                     &lt;groupId>com.closure-sys&lt;/groupId>
                                     &lt;artifactId>freezedry&lt;/artifactId>
                                     &lt;version>0.2.7&lt;/version>
                                 &lt;/dependency>
-                            </pre>
+                            </code></pre>
                         </li>
                         <li>Added <b class="class">ObjectDifferenceCalculator</b> that compares two objects of the same
                             type and shows which fields are different. Uses FreezeDry's key-value pair writer to generate

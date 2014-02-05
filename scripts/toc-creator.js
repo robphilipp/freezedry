@@ -214,6 +214,9 @@ function createToc( divClassName, depth, title )
 
     // grab the div that holds the toc list
     var tocDiv = $getElementByClassName( "div", divClassName );
+    if( typeof tocDiv == 'undefined' ) {
+        return;
+    }
 
     // recursively build the list
     var headers = $grabHeaders();

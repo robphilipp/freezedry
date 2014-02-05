@@ -39,22 +39,7 @@
     <![endif]-->
 
     <script data-main="scripts/config.js" src="scripts/require.js"></script>
- <script>
-        $(document).ready( function() {
-
-            $(function() {
-                $( "#accordion" ).accordion( {
-                    autoHeight: false,
-                    header: "h3",
-                    collapsible: true,
-                    active: false
-                } );
-                $( "#whats-new-accordion" ).accordion( { autoHeight: false } );
-            });
-
-            setup();
-        }, false );
-    </script>
+    <link rel="stylesheet" type="text/css" href="scripts/prism/prism.css">
 
     <title>FreezeDry Overview</title>
 </head>
@@ -136,29 +121,29 @@
                 <a href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">Java version 7.</a> Once
                 downloaded, change to the distribution's directory, and type</p>
 
-            <pre class="prettyprint">
+            <pre><code class="language-bash">
                 mvn clean install
-            </pre>
+            </code></pre>
 
 
             <h4 id="testing"><a href="#overview" class="scroll-offset">Testing</a></h4>
             <p>There are two types of tests available: unit tests and integration tests. Unit tests can be run using:</p>
-            <pre class="prettyprint">
+            <pre><code class="language-bash">
                 mvn clean test
-            </pre>
+            </code></pre>
             <p>and integration tests, which run select tests in an OSGi container, can be run using:</p>
-            <pre class="prettyprint">
+            <pre><code class="language-bash">
                 mvn clean verify
-            </pre>
+            </code></pre>
             <p>By default, freezedry uses Apache's felix OSGi container, but if you prefer equinox you can add the
             maven profile as such</p>
-            <pre class="prettyprint">
+            <pre><code class="language-bash">
                 mvn clean varify -Pequinox
-            </pre>
+            </code></pre>
             <p>Issuing the command</p>
-            <pre class="prettyprint">
+            <pre><code class="language-bash">
                 mvn clean install
-            </pre>
+            </code></pre>
             <p>will run both unit and integration tests (use the maven profile for equinox).</p>
             
             <p>That's it.</p>
