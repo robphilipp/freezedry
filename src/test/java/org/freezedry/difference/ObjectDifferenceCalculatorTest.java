@@ -35,7 +35,7 @@ public class ObjectDifferenceCalculatorTest {
 	{
 		final ObjectDifferenceCalculator diffCalc = new ObjectDifferenceCalculator( "." );
 		final Map< String, ObjectDifferenceCalculator.Difference> differences = diffCalc.calculateDifference( modifiedObject, referenceObject );
-		Assert.assertEquals( "Number of Differences", 19, differences.size() );
+		Assert.assertEquals( "Number of Differences", 20, differences.size() );
 		final ObjectDifferenceCalculator.Difference age = differences.get( "Division.people[0].Person.age" );
 		Assert.assertEquals( "Division.people[0].Person.age (reference.)", age.getReferenceObject(), "13" );
 		Assert.assertEquals( "Division.people[0].Person.age (modified)", age.getObject(), "37" );
@@ -102,6 +102,10 @@ public class ObjectDifferenceCalculatorTest {
 		col = differences.get( "Division.threeD[0][2][2]" );
 		Assert.assertEquals( "Division.threeD[0][2][2] (reference.)" , col.getReferenceObject(), "22" );
 		Assert.assertEquals( "Division.threeD[0][2][2] (modified)" , col.getObject(), "10" );
+
+		col = differences.get( "Division.threeD[1][1][1]" );
+		Assert.assertEquals( "Division.threeD[1][1][1] (reference.)" , col.getReferenceObject(), "111" );
+		Assert.assertEquals( "Division.threeD[1][1][1] (modified)" , col.getObject(), "31415" );
 	}
 
 	@Test
@@ -109,13 +113,17 @@ public class ObjectDifferenceCalculatorTest {
 	{
 		final ObjectDifferenceCalculator diffCalc = new ObjectDifferenceCalculator( "." ).listOrderIgnored();
 		final Map< String, ObjectDifferenceCalculator.Difference> differences = diffCalc.calculateDifference( modifiedObject, referenceObject );
-		Assert.assertEquals( "Number of Differences", 2, differences.size() );
+		Assert.assertEquals( "Number of Differences", 3, differences.size() );
 		final ObjectDifferenceCalculator.Difference age = differences.get( "Division.people[0].Person.age" );
 		Assert.assertEquals( "Division.people[0].Person.age (reference)", age.getReferenceObject(), "13" );
 		Assert.assertEquals( "Division.people[0].Person.age (modified)", age.getObject(), "37" );
 		final ObjectDifferenceCalculator.Difference dob = differences.get( "Division.people[0].Person.birthDate" );
 		Assert.assertEquals( "Division.people[0].Person.birthDate (reference)", dob.getReferenceObject(), "1963-04-22" );
 		Assert.assertEquals( "Division.people[0].Person.birthDate (modified)", dob.getObject(), "2014-01-28" );
+
+		final ObjectDifferenceCalculator.Difference col = differences.get( "Division.threeD[1][1][1]" );
+		Assert.assertEquals( "Division.threeD[1][1][1] (reference.)" , col.getReferenceObject(), "111" );
+		Assert.assertEquals( "Division.threeD[1][1][1] (modified)" , col.getObject(), "31415" );
 	}
 
 	@Test
@@ -465,6 +473,8 @@ public class ObjectDifferenceCalculatorTest {
 		threeD[ 0 ][ 2 ][ 0 ] = 12;
 		threeD[ 0 ][ 2 ][ 1 ] = 11;
 		threeD[ 0 ][ 2 ][ 2 ] = 10;
+
+		threeD[ 1 ][ 1 ][ 1 ] = 31415;
 		division.setThreeD( threeD );
 
 		return division;
