@@ -152,15 +152,6 @@
                         </Private-Package>
                     </instructions>
                 </configuration>
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<id>bundle-manifest</id>-->
-                        <!--<phase>process-classes</phase>-->
-                        <!--<goals>-->
-                            <!--<goal>manifest</goal>-->
-                        <!--</goals>-->
-                    <!--</execution>-->
-                <!--</executions>-->
             </plugin>
         </plugins>
 
@@ -179,6 +170,14 @@
             </activation>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>com.atlassian.maven.plugins</groupId>
+                        <artifactId>maven-jgitflow-plugin</artifactId>
+                        <version>1.0-alpha27</version>
+                        <configuration>
+                            <!-- see goals wiki page for configuration options -->
+                        </configuration>
+                    </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
