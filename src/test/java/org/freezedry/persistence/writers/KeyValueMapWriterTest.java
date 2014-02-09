@@ -116,6 +116,20 @@ public class KeyValueMapWriterTest {
 	}
 
 	@Test
+	public void testNullValues() throws Exception
+	{
+		final Division division = new Division();
+		final PersistenceEngine engine = new PersistenceEngine().withPersistNullValues();
+		final InfoNode rootNode = engine.createSemanticModel( division );
+
+		final KeyValueMapWriter writer = new KeyValueMapWriter();
+		final KeyValueBuilder builder = writer.getBuilder();
+		builder.putRenderer( Collection.class, new FlatteningCollectionRenderer( builder ) );
+		writer.setKeyElementSeparator( "." );
+		Map< String, Object > flattenedObject = writer.createMap( rootNode );
+	}
+
+	@Test
 	public void testGetKeyValueFlattener() throws Exception
 	{
 		assertNotNull( new KeyValueMapWriter().getKeyValueFlattener() );

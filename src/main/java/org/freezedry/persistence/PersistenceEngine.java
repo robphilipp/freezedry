@@ -15,21 +15,16 @@
  */
 package org.freezedry.persistence;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.freezedry.persistence.annotations.Persist;
-import org.freezedry.persistence.annotations.PersistCollection;
-import org.freezedry.persistence.annotations.PersistDateAs;
 import org.freezedry.persistence.builders.*;
 import org.freezedry.persistence.readers.PersistenceReader;
 import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.Constants;
 import org.freezedry.persistence.utils.ReflectionUtils;
 import org.freezedry.persistence.writers.PersistenceWriter;
-import org.xml.sax.SAXException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
 import java.lang.reflect.*;
 import java.util.*;
 
@@ -56,10 +51,10 @@ import java.util.*;
  * {@code LinkedMapNodeBuilder}.<p>
  * 
  * To customize the behavior of any {@link NodeBuilder} you write, you may also define annotations that works in
- * conjunction with your {@link NodeBuilder}. For example, the {@link PersistCollection} annotation works in 
+ * conjunction with your {@link NodeBuilder}. For example, the {@link org.freezedry.persistence.annotations.PersistCollection} annotation works in
  * conjunction with the {@link CollectionNodeBuilder}. The field annotation argument {@code elementPersistName}
  * allows you to define the name that is used to persist each element, and the {@code elementType} allows you to define
- * the type ({@link Class}) of each element. Or as another example, the {@link PersistDateAs} annotation allows
+ * the type ({@link Class}) of each element. Or as another example, the {@link org.freezedry.persistence.annotations.PersistDateAs} annotation allows
  * you to define the format with which a date is persisted.
  * 
  * By default, class constants (i.e. static final fields) are not persisted. Use the {@link #setPersistClassConstants(boolean)}
@@ -90,6 +85,7 @@ public class PersistenceEngine {
 	private final Map< Class< ? >, NodeBuilder > nodeBuilders;
 	private ArrayNodeBuilder genaralArrayNodeBuilder;
 	private boolean isPersistClassConstants = false;
+	private boolean isPersistNullValues = false;
 	
 	private final Map< Class< ? >, Object > defaultInstances;
 	
@@ -150,14 +146,14 @@ public class PersistenceEngine {
 	private static Map< Class< ? >, Object > createPrimitives()
 	{
 		final Map< Class< ? >, Object > primitives = new HashMap<>();
-		primitives.put( Integer.TYPE, new Integer( 0 ) );
-		primitives.put( Long.TYPE, new Long( 0 ) );
-		primitives.put( Short.TYPE, new Short( Short.MAX_VALUE ) );
-		primitives.put( Double.TYPE, new Double( 0.0 ) );
+		primitives.put( Integer.TYPE, 0 );
+		primitives.put( Long.TYPE, (long) 0 );
+		primitives.put( Short.TYPE, Short.MAX_VALUE );
+		primitives.put( Double.TYPE, 0.0 );
 		primitives.put( Float.TYPE, new Float( 0.0 ) );
-		primitives.put( Boolean.TYPE, new Boolean( true ) );
-		primitives.put( Byte.TYPE, new Byte( Byte.MAX_VALUE ) );
-		primitives.put( Character.TYPE, new Character( '0' ) );
+		primitives.put( Boolean.TYPE, true );
+		primitives.put( Byte.TYPE, Byte.MAX_VALUE );
+		primitives.put( Character.TYPE, '0' );
 		return primitives;
 	}
 	
@@ -167,8 +163,7 @@ public class PersistenceEngine {
 	 */
 	private static Set< Class< ? > > nonRootObjects()
 	{
-		final Set< Class< ? > > primitives = new HashSet<>();
-		return primitives;
+		return new HashSet<>();
 	}
 	
 	/**
@@ -178,14 +173,14 @@ public class PersistenceEngine {
 	{
 		final Map< Class< ? >, Object > defaults = new HashMap<>();
 		defaults.putAll( createPrimitives() );
-		defaults.put( Integer.class, new Integer( 0 ) );
-		defaults.put( Long.class, new Long( 0 ) );
-		defaults.put( Short.class, new Short( Short.MAX_VALUE ) );
-		defaults.put( Double.class, new Double( 0.0 ) );
+		defaults.put( Integer.class, 0 );
+		defaults.put( Long.class, (long) 0 );
+		defaults.put( Short.class, Short.MAX_VALUE );
+		defaults.put( Double.class, 0.0 );
 		defaults.put( Float.class, new Float( 0.0 ) );
-		defaults.put( Boolean.class, new Boolean( true ) );
-		defaults.put( Byte.class, new Byte( Byte.MAX_VALUE ) );
-		defaults.put( Character.class, new Character( '0' ) );
+		defaults.put( Boolean.class, true );
+		defaults.put( Byte.class, Byte.MAX_VALUE );
+		defaults.put( Character.class, '0' );
 		return defaults;
 	}
 	
@@ -198,7 +193,36 @@ public class PersistenceEngine {
 	{
 		this.isPersistClassConstants = isPersistClassConstants;
 	}
-	
+
+	/**
+	 * When set to {@code true} null values will be persisted. The default behaviour is not to persist null values.
+	 * @param isPersistNullValues whether or not to persist null values.
+	 */
+	public void setPersistNullValues( final boolean isPersistNullValues )
+	{
+		this.isPersistNullValues = isPersistNullValues;
+	}
+
+	/**
+	 * Tells the persistence engine to persist null values
+	 * @return This {@link org.freezedry.persistence.PersistenceEngine}
+	 */
+	public PersistenceEngine withPersistNullValues()
+	{
+		this.isPersistNullValues = true;
+		return this;
+	}
+
+	/**
+	 * Tells the persistence engine to persist class constants
+	 * @return This {@link org.freezedry.persistence.PersistenceEngine}
+	 */
+	public PersistenceEngine withPersistClassConstants()
+	{
+		this.isPersistClassConstants = true;
+		return this;
+	}
+
 	/**
 	 * Adds a {@link NodeBuilder} to be used for generating {@link InfoNode}s for the specified {@link Class}
 	 * @param clazz The {@link Class} of the object to persist and, therefore, for which to generate a node
@@ -243,7 +267,7 @@ public class PersistenceEngine {
 				contains = ReflectionUtils.hasNodeBuilderAnnotation( clazz, fieldName );
 			}
 		}
-		catch( IllegalArgumentException e ) {}	// swallow the exception
+		catch( IllegalArgumentException e ) { /* swallow the exception */ }
 		
 		return contains;
 	}
@@ -306,9 +330,10 @@ public class PersistenceEngine {
 	}
 	
 	/**
-	 * 
-	 * @param clazz
-	 * @return
+	 * Returns a default instance of the type specified by the class
+	 * @param clazz The class for which to return an instance based on the default instances defined in the
+	 *              default instances map
+	 * @return The default instance
 	 */
 	private Object getDefaultInstance( final Class< ? > clazz )
 	{
@@ -342,11 +367,12 @@ public class PersistenceEngine {
 		this.genaralArrayNodeBuilder = builder;
 	}
 
-	/*
+	/**
 	 * Searches through the existing node builders to see if they are of the specified {@link Class}.
 	 * If it doesn't find one, then it instantiates a new {@link NodeBuilder} and sets its {@link PersistenceEngine}
 	 * to this object.
-	 * @param nodeBuilderClass The {@link NodeBuilder} {@link Class} to be used for instantiating the object
+	 * @param clazz The {@link NodeBuilder} {@link Class} to be used for instantiating the object
+	 * @param fieldName The name of the field for which to get the node builder
 	 * @return a {@link NodeBuilder} object associated with the specified node builder {@link Class}
 	 */
 	private NodeBuilder getAnnotatedNodeBuilder( final Class< ? > clazz, final String fieldName )
@@ -376,9 +402,9 @@ public class PersistenceEngine {
 			}
 			catch( InstantiationException | IllegalAccessException e )
 			{
-				final StringBuffer message = new StringBuffer();
-				message.append( "Unable to instantiate the NodeBuilder class." + Constants.NEW_LINE );
-				message.append( "  NodeBuilder Class: " + nodeBuilderClass.getName() );
+				final StringBuilder message = new StringBuilder();
+				message.append( "Unable to instantiate the NodeBuilder class." ).append( Constants.NEW_LINE );
+				message.append( "  NodeBuilder Class: " ).append( nodeBuilderClass.getName() );
 				LOGGER.error( message.toString() );
 				throw new IllegalStateException( message.toString(), e );
 			}
@@ -401,7 +427,7 @@ public class PersistenceEngine {
 		// object we are being asked to persist.
 		final Class< ? > clazz = object.getClass();
 		
-		InfoNode rootNode = null;
+		InfoNode rootNode;
 		
 		// if the object is an array of one or more dimensions, then we need to replace the
 		// "[]" which the array suffix (by default = "Array"). Then we use the array node
@@ -411,14 +437,13 @@ public class PersistenceEngine {
 			final String persistName = clazz.getSimpleName().replaceAll( "\\[\\]", genaralArrayNodeBuilder.getCompoundArrayNameSuffix() );
 			try
 			{
-//				rootNode = genaralArrayNodeBuilder.createInfoNode( null, object, persistName );
 				rootNode = genaralArrayNodeBuilder.createInfoNode( object, persistName );
 			}
 			catch( ReflectiveOperationException e )
 			{
-				final StringBuffer message = new StringBuffer();
-				message.append( "Error building the root node" + Constants.NEW_LINE );
-				message.append( "  Class: " + clazz.getName() );
+				final StringBuilder message = new StringBuilder();
+				message.append( "Error building the root node" ).append( Constants.NEW_LINE );
+				message.append( "  Class: " ).append( clazz.getName() );
 				LOGGER.error( message.toString(), e );
 				throw new IllegalArgumentException( message.toString(), e );
 			}
@@ -433,9 +458,9 @@ public class PersistenceEngine {
 			}
 			catch( ReflectiveOperationException e )
 			{
-				final StringBuffer message = new StringBuffer();
-				message.append( "Error building the root node" + Constants.NEW_LINE );
-				message.append( "  Class: " + clazz.getName() );
+				final StringBuilder message = new StringBuilder();
+				message.append( "Error building the root node" ).append( Constants.NEW_LINE );
+				message.append( "  Class: " ).append( clazz.getName() );
 				LOGGER.error( message.toString(), e );
 				throw new IllegalArgumentException( message.toString(), e );
 			}
@@ -495,19 +520,14 @@ public class PersistenceEngine {
 				// create and add the node representing this object to the current node, unless the
 				// node has a null value.
 				final Object fieldObject = field.get( object );
-				if( fieldObject != null )
+				if( fieldObject != null || isPersistNullValues )
 				{
 					currentNode.addChild( createNode( clazz, fieldObject, field.getName() ) );
 				}
 			}
 			catch( IllegalAccessException e )
 			{
-				final StringBuffer message = new StringBuffer();
-				message.append( "Attempted to access a field that doesn't exist." );
-				message.append( Constants.NEW_LINE );
-				message.append( "  Object " + clazz.getName() + Constants.NEW_LINE );
-				message.append( "  Field Name: " + field.getName() + Constants.NEW_LINE );
-				LOGGER.error( message.toString(), e );
+				LOGGER.error( "Attempted to access a field that doesn't exist." + Constants.NEW_LINE + "  Object " + clazz.getName() + Constants.NEW_LINE + "  Field Name: " + field.getName() + Constants.NEW_LINE, e );
 			}
 		}
 		return currentNode;
@@ -522,6 +542,12 @@ public class PersistenceEngine {
 	 */
 	public final InfoNode createNode( final Class< ? > containingClass, final Object object, final String fieldName )
 	{
+		InfoNode node;
+		if( object == null )
+		{
+			return InfoNode.createLeafNode( fieldName, null, fieldName, Object.class );
+		}
+
 		// create the InfoNode object (we first have to determine the node type, down the road, we'll check the
 		// factories for registered node info node builders for the Class< ? > of the object)
 		final Class< ? > clazz = object.getClass();
@@ -539,7 +565,6 @@ public class PersistenceEngine {
 		// the first two cases are handled by the info node builders in the info node builders map. even
 		// the leaf node info node builders may need to be overridden. the third case is handled
 		// by the compound node
-		InfoNode node = null;
 		if( containsAnnotatedNodeBuilder( containingClass, fieldName ) )
 		{
 			final NodeBuilder builder = getAnnotatedNodeBuilder( containingClass, fieldName );
@@ -549,12 +574,12 @@ public class PersistenceEngine {
 			}
 			catch( ReflectiveOperationException e )
 			{
-				final StringBuffer message = new StringBuffer();
-				message.append( "Node Builder failed to create InfoNode:" + Constants.NEW_LINE );
-				message.append( "  Builder: " + builder.getClass().getName() + Constants.NEW_LINE );
-				message.append( "  Containing Class Name: " + containingClass.getName() + Constants.NEW_LINE );
-				message.append( "  Object: " + clazz.getName() + Constants.NEW_LINE );
-				message.append( "  Field Name: " + fieldName + Constants.NEW_LINE );
+				final StringBuilder message = new StringBuilder();
+				message.append( "Node Builder failed to create InfoNode:" ).append( Constants.NEW_LINE );
+				message.append( "  Builder: " ).append( builder.getClass().getName() ).append( Constants.NEW_LINE );
+				message.append( "  Containing Class Name: " ).append( containingClass.getName() ).append( Constants.NEW_LINE );
+				message.append( "  Object: " ).append( clazz.getName() ).append( Constants.NEW_LINE );
+				message.append( "  Field Name: " ).append( fieldName ).append( Constants.NEW_LINE );
 				LOGGER.error( message.toString() );
 				throw new IllegalStateException( message.toString(), e );
 			}
@@ -577,12 +602,12 @@ public class PersistenceEngine {
 			}
 			catch( ReflectiveOperationException e )
 			{
-				final StringBuffer message = new StringBuffer();
-				message.append( "Node Builder failed to create InfoNode:" + Constants.NEW_LINE );
-				message.append( "  Builder: " + builder.getClass().getName() + Constants.NEW_LINE );
-				message.append( "  Containing Class Name: " + containingClass.getName() + Constants.NEW_LINE );
-				message.append( "  Object: " + clazz.getName() + Constants.NEW_LINE );
-				message.append( "  Field Name: " + fieldName + Constants.NEW_LINE );
+				final StringBuilder message = new StringBuilder();
+				message.append( "Node Builder failed to create InfoNode:" ).append( Constants.NEW_LINE );
+				message.append( "  Builder: " ).append( builder.getClass().getName() ).append( Constants.NEW_LINE );
+				message.append( "  Containing Class Name: " ).append( containingClass == null ? "[null]" : containingClass.getName() ).append( Constants.NEW_LINE );
+				message.append( "  Object: " ).append( clazz.getName() ).append( Constants.NEW_LINE );
+				message.append( "  Field Name: " ).append( fieldName ).append( Constants.NEW_LINE );
 				LOGGER.error( message.toString() );
 				throw new IllegalStateException( message.toString(), e );
 			}
@@ -595,12 +620,12 @@ public class PersistenceEngine {
 			}
 			catch( ReflectiveOperationException e )
 			{
-				final StringBuffer message = new StringBuffer();
-				message.append( "Default Array Node Builder failed to create InfoNode:" + Constants.NEW_LINE );
-				message.append( "  Builder: " + genaralArrayNodeBuilder.getClass().getName() + Constants.NEW_LINE );
-				message.append( "  Containing Class Name: " + containingClass.getName() + Constants.NEW_LINE );
-				message.append( "  Object: " + clazz.getName() + Constants.NEW_LINE );
-				message.append( "  Field Name: " + fieldName + Constants.NEW_LINE );
+				final StringBuilder message = new StringBuilder();
+				message.append( "Default Array Node Builder failed to create InfoNode:" ).append( Constants.NEW_LINE );
+				message.append( "  Builder: " ).append( genaralArrayNodeBuilder.getClass().getName() ).append( Constants.NEW_LINE );
+				message.append( "  Containing Class Name: " ).append( containingClass.getName() ).append( Constants.NEW_LINE );
+				message.append( "  Object: " ).append( clazz.getName() ).append( Constants.NEW_LINE );
+				message.append( "  Field Name: " ).append( fieldName ).append( Constants.NEW_LINE );
 				LOGGER.error( message.toString() );
 				throw new IllegalStateException( message.toString(), e );
 			}
@@ -633,7 +658,7 @@ public class PersistenceEngine {
 	 */
 	public Object parseSemanticModel( final Class< ? > clazz, final InfoNode rootNode )
 	{
-		Object object = null;
+		Object object;
 		
 		if( clazz.isArray() )
 		{
@@ -643,9 +668,9 @@ public class PersistenceEngine {
 			}
 			catch( ReflectiveOperationException e )
 			{
-				final StringBuffer message = new StringBuffer();
-				message.append( "Error creating object" + Constants.NEW_LINE );
-				message.append( "  Class: " + clazz.getName() );
+				final StringBuilder message = new StringBuilder();
+				message.append( "Error creating object" ).append( Constants.NEW_LINE );
+				message.append( "  Class: " ).append( clazz.getName() );
 				LOGGER.error( message.toString(), e );
 				throw new IllegalArgumentException( message.toString(), e );
 			}
@@ -659,9 +684,9 @@ public class PersistenceEngine {
 			}
 			catch( ReflectiveOperationException e )
 			{
-				final StringBuffer message = new StringBuffer();
-				message.append( "Error creating object" + Constants.NEW_LINE );
-				message.append( "  Class: " + clazz.getName() );
+				final StringBuilder message = new StringBuilder();
+				message.append( "Error creating object" ).append( Constants.NEW_LINE );
+				message.append( "  Class: " ).append( clazz.getName() );
 				LOGGER.error( message.toString(), e );
 				throw new IllegalArgumentException( message.toString(), e );
 			}
@@ -676,7 +701,7 @@ public class PersistenceEngine {
 		return object;
 	}
 	
-	/*
+	/**
 	 * Instantiates an object of the specified class by calling the constructor with the smallest
 	 * number of arguments. If a no-arg constructor exists, then that is what will be called. Constructors
 	 * that have arguments will be passed null objects, and then the fields will be set reflectively
@@ -693,7 +718,7 @@ public class PersistenceEngine {
 		final Class< ? > rootClass = ReflectionUtils.getMostSpecificClass( clazz, rootNode );
 		
 		// instantiate the object represented by the root node
-		Object object = null;
+		Object object;
 		try
 		{
 			// find the constructor, and if it exists, then use it to create a new instance
@@ -701,7 +726,7 @@ public class PersistenceEngine {
 			// number of arguments, and create dummy arguments, and call the newInstance method
 			// on that constructor (the fields will get set with the appropriate values)
 			final Constructor< ? >[] constructors = rootClass.getConstructors();
-			Object instance = null;
+			Object instance;
 			if( ( instance = getDefaultInstance( clazz ) ) != null )
 			{
 				object = instance;
@@ -728,7 +753,18 @@ public class PersistenceEngine {
 						minParamTypes = paramTypes;
 					}
 				}
-				
+
+				// if no constructor was found, then throw an exception
+				if( minParamConstructor == null )
+				{
+					final StringBuilder message = new StringBuilder();
+					message.append( "Could not find an appropriate constructor to instantiate the Class." ).append( Constants.NEW_LINE )
+							.append( "  Specified Class Name: " ).append( clazz.getName() ).append( Constants.NEW_LINE )
+							.append( "  Number of Constructors Searched: " ).append( constructors.length );
+					LOGGER.error( message.toString() );
+					throw new IllegalArgumentException( message.toString() );
+				}
+
 				// create the parameter array (use default values that will get overriden
 				// during the object creation anyway)
 				final Object[] params = createConstructorParameters( minParamTypes );
@@ -748,25 +784,25 @@ public class PersistenceEngine {
 		}
 		catch( IllegalAccessException e )
 		{
-			final StringBuffer message = new StringBuffer();
-			message.append( "Failed to instantiate object from Class. Either the Class or the" + Constants.NEW_LINE );
-			message.append( "nullary constructor were not available." + Constants.NEW_LINE );
-			message.append( "  Specified Class Name: " + clazz.getName() + Constants.NEW_LINE );
-			message.append( "  Most Specific Class Name: " + rootClass.getName() + Constants.NEW_LINE );
-			message.append( "  InfoNode: " + rootNode.getClass().getName() + Constants.NEW_LINE );
+			final StringBuilder message = new StringBuilder();
+			message.append( "Failed to instantiate object from Class. Either the Class or the" ).append( Constants.NEW_LINE );
+			message.append( "nullary constructor were not available." ).append( Constants.NEW_LINE );
+			message.append( "  Specified Class Name: " ).append( clazz.getName() ).append( Constants.NEW_LINE );
+			message.append( "  Most Specific Class Name: " ).append( rootClass.getName() ).append( Constants.NEW_LINE );
+			message.append( "  InfoNode: " ).append( rootNode.getClass().getName() ).append( Constants.NEW_LINE );
 			LOGGER.error( message.toString(), e );
 			throw new IllegalStateException( message.toString(), e );
 		}
 		catch( InstantiationException | InvocationTargetException e )
 		{
-			final StringBuffer message = new StringBuffer();
-			message.append( "Failed to instantiate object from Class. This Class represents an " + Constants.NEW_LINE );
-			message.append( "abstract class, an interface, an array class, a primitive type, or " + Constants.NEW_LINE );
-			message.append( "void; or the class has no nullary constructor; or the instantiation " + Constants.NEW_LINE );
-			message.append( "failed for some other reason." + Constants.NEW_LINE );
-			message.append( "  Specified Class Name: " + clazz.getName() + Constants.NEW_LINE );
-			message.append( "  Most Specific Class Name: " + rootClass.getName() + Constants.NEW_LINE );
-			message.append( "  InfoNode: " + rootNode.getClass().getName() + Constants.NEW_LINE );
+			final StringBuilder message = new StringBuilder();
+			message.append( "Failed to instantiate object from Class. This Class represents an " ).append( Constants.NEW_LINE );
+			message.append( "abstract class, an interface, an array class, a primitive type, or " ).append( Constants.NEW_LINE );
+			message.append( "void; or the class has no nullary constructor; or the instantiation " ).append( Constants.NEW_LINE );
+			message.append( "failed for some other reason." ).append( Constants.NEW_LINE );
+			message.append( "  Specified Class Name: " ).append( clazz.getName() ).append( Constants.NEW_LINE );
+			message.append( "  Most Specific Class Name: " ).append( rootClass.getName() ).append( Constants.NEW_LINE );
+			message.append( "  InfoNode: " ).append( rootNode.getClass().getName() ).append( Constants.NEW_LINE );
 			LOGGER.error( message.toString(), e );
 			throw new IllegalStateException( message.toString(), e );
 		}
@@ -880,12 +916,11 @@ public class PersistenceEngine {
 					{
 						if( LOGGER.isInfoEnabled() )
 						{
-							final StringBuffer message = new StringBuffer();
-							message.append( "Ignoring field because it has \"static final\" modifiers:" + Constants.NEW_LINE );
-							message.append( "  Containing Class: " + object.getClass().getName() + Constants.NEW_LINE );
-							message.append( "  Field Name: " + fieldName + Constants.NEW_LINE );
-							message.append( "  Field Modifiers: " + Modifier.toString( modifiers ) + Constants.NEW_LINE );
-							LOGGER.info( message.toString() );
+							final String message = "Ignoring field because it has \"static final\" modifiers:" + Constants.NEW_LINE +
+									"  Containing Class: " + object.getClass().getName() + Constants.NEW_LINE +
+									"  Field Name: " + fieldName + Constants.NEW_LINE +
+									"  Field Modifiers: " + Modifier.toString( modifiers ) + Constants.NEW_LINE;
+							LOGGER.info( message );
 						}
 					}
 					else
@@ -896,11 +931,11 @@ public class PersistenceEngine {
 				}
 				catch( IllegalAccessException e )
 				{
-					final StringBuffer message = new StringBuffer();
-					message.append( "Attempted to perform an invalid operation on field:" + Constants.NEW_LINE );
-					message.append( "  Field Name: " + fieldName + Constants.NEW_LINE );
-					message.append( "  Field Modifiers: " + Modifier.toString( field.getModifiers() ) + Constants.NEW_LINE );
-					message.append( "  Containing Class: " + object.getClass().getName() + Constants.NEW_LINE );
+					final StringBuilder message = new StringBuilder();
+					message.append( "Attempted to perform an invalid operation on field:" ).append( Constants.NEW_LINE );
+					message.append( "  Field Name: " ).append( fieldName ).append( Constants.NEW_LINE );
+					message.append( "  Field Modifiers: " ).append( Modifier.toString( field.getModifiers() ) ).append( Constants.NEW_LINE );
+					message.append( "  Containing Class: " ).append( object.getClass().getName() ).append( Constants.NEW_LINE );
 					LOGGER.error( message.toString(), e );
 					throw new IllegalStateException( message.toString(), e );
 				}
@@ -908,10 +943,10 @@ public class PersistenceEngine {
 			}
 			catch( NoSuchFieldException e )
 			{
-				final StringBuffer message = new StringBuffer();
-				message.append( "Attempted to retrieve field for an invalid field name:" + Constants.NEW_LINE );
-				message.append( "  Field Name: " + fieldName + Constants.NEW_LINE );
-				message.append( "  Containing Class: " + object.getClass().getName() + Constants.NEW_LINE );
+				final StringBuilder message = new StringBuilder();
+				message.append( "Attempted to retrieve field for an invalid field name:" ).append( Constants.NEW_LINE );
+				message.append( "  Field Name: " ).append( fieldName ).append( Constants.NEW_LINE );
+				message.append( "  Containing Class: " ).append( object.getClass().getName() ).append( Constants.NEW_LINE );
 				LOGGER.error( message.toString() );
 				throw new IllegalStateException( message.toString(), e );
 			}
@@ -950,7 +985,7 @@ public class PersistenceEngine {
 		// find the node builder need to create the object. if there is
 		// no node builder, then instantiate the object and make a recursive call
 		// to the buildObject(...) method.
-		Object object = null;
+		Object object;
 		if( containsAnnotatedNodeBuilder( containingClass, fieldName ) )
 		{
 			final NodeBuilder builder = getAnnotatedNodeBuilder( containingClass, fieldName );
@@ -960,11 +995,11 @@ public class PersistenceEngine {
 			}
 			catch( ReflectiveOperationException e )
 			{
-				final StringBuffer message = new StringBuffer();
-				message.append( "Node Builder failed to create object from Class and InfoNode:" + Constants.NEW_LINE );
-				message.append( "  Class Name: " + clazz.getName() + Constants.NEW_LINE );
-				message.append( "  Builder: " + builder.getClass().getName() + Constants.NEW_LINE );
-				message.append( "  InfoNode: " + currentNode.toString() + Constants.NEW_LINE );
+				final StringBuilder message = new StringBuilder();
+				message.append( "Node Builder failed to create object from Class and InfoNode:" ).append( Constants.NEW_LINE );
+				message.append( "  Class Name: " ).append( clazz.getName() ).append( Constants.NEW_LINE );
+				message.append( "  Builder: " ).append( builder.getClass().getName() ).append( Constants.NEW_LINE );
+				message.append( "  InfoNode: " ).append( currentNode.toString() ).append( Constants.NEW_LINE );
 				LOGGER.error( message.toString(), e );
 				throw new IllegalStateException( message.toString(), e );
 			}
@@ -987,11 +1022,11 @@ public class PersistenceEngine {
 			}
 			catch( ReflectiveOperationException e )
 			{
-				final StringBuffer message = new StringBuffer();
-				message.append( "Node Builder failed to create object from Class and InfoNode:" + Constants.NEW_LINE );
-				message.append( "  Class Name: " + clazz.getName() + Constants.NEW_LINE );
-				message.append( "  Builder: " + builder.getClass().getName() + Constants.NEW_LINE );
-				message.append( "  InfoNode: " + currentNode.toString() + Constants.NEW_LINE );
+				final StringBuilder message = new StringBuilder();
+				message.append( "Node Builder failed to create object from Class and InfoNode:" ).append( Constants.NEW_LINE );
+				message.append( "  Class Name: " ).append( clazz.getName() ).append( Constants.NEW_LINE );
+				message.append( "  Builder: " ).append( builder.getClass().getName() ).append( Constants.NEW_LINE );
+				message.append( "  InfoNode: " ).append( currentNode.toString() ).append( Constants.NEW_LINE );
 				LOGGER.error( message.toString() );
 				throw new IllegalStateException( message.toString(), e );
 			}
@@ -1004,11 +1039,11 @@ public class PersistenceEngine {
 			}
 			catch( ReflectiveOperationException e )
 			{
-				final StringBuffer message = new StringBuffer();
-				message.append( "Default Array Node Builder failed to create object from Class and InfoNode:" + Constants.NEW_LINE );
-				message.append( "  Class Name: " + clazz.getName() + Constants.NEW_LINE );
-				message.append( "  Builder: " + genaralArrayNodeBuilder.getClass().getName() + Constants.NEW_LINE );
-				message.append( "  InfoNode: " + currentNode.toString() + Constants.NEW_LINE );
+				final StringBuilder message = new StringBuilder();
+				message.append( "Default Array Node Builder failed to create object from Class and InfoNode:" ).append( Constants.NEW_LINE );
+				message.append( "  Class Name: " ).append( clazz.getName() ).append( Constants.NEW_LINE );
+				message.append( "  Builder: " ).append( genaralArrayNodeBuilder.getClass().getName() ).append( Constants.NEW_LINE );
+				message.append( "  InfoNode: " ).append( currentNode.toString() ).append( Constants.NEW_LINE );
 				LOGGER.error( message.toString() );
 				throw new IllegalStateException( message.toString(), e );
 			}

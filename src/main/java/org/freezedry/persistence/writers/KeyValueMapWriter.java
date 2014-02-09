@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Robert Philipp, InvestLab Technology LLC
+ * Copyright 2013 Robert Philipp
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -15,17 +15,14 @@
  */
 package org.freezedry.persistence.writers;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.freezedry.persistence.containers.Pair;
 import org.freezedry.persistence.keyvalue.KeyValueBuilder;
 import org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer;
 import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.text.ParseException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -144,10 +141,10 @@ public class KeyValueMapWriter {
 
 		if( LOGGER.isTraceEnabled() )
 		{
-			final StringBuffer message = new StringBuffer();
+			final StringBuilder message = new StringBuilder();
 			for( final Pair< String, Object > pair : keyValuePairs )
 			{
-				message.append( pair.getFirst() + " = " + pair.getSecond().toString() + Constants.NEW_LINE );
+				message.append( pair.getFirst() ).append( " = " ).append( pair.getSecond().toString() ).append( Constants.NEW_LINE );
 			}
 			LOGGER.trace( message.toString() );
 		}

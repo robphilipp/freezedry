@@ -15,7 +15,7 @@
 
     <groupId>com.closure-sys</groupId>
     <artifactId>freezedry</artifactId>
-    <version>0.2.9</version>
+    <version>0.3.0</version>
     <packaging>bundle</packaging>
 
     <name>freezedry</name>
@@ -29,7 +29,8 @@
         <maven.bundle.plugin.version>2.4.0</maven.bundle.plugin.version>
 
         <!-- logging -->
-        <slf4j.version>1.7.5</slf4j.version>
+        <!--<slf4j.version>1.7.5</slf4j.version>-->
+        <slf4j.version>1.6.6</slf4j.version>
         <logback.version>1.0.13</logback.version>
 
         <!-- testing -->
@@ -142,24 +143,15 @@
                 <configuration>
                     <instructions>
                         <Export-Package>
-                            org.freezedry.difference*;verision=${project.version},
-                            org.freezedry.persistence*;verision=${project.version},
-                            org.freezedry.serialization*;verision=${project.version}
+                            org.freezedry.difference*;version=${project.version},
+                            org.freezedry.persistence*;version=${project.version},
+                            org.freezedry.serialization*;version=${project.version}
                         </Export-Package>
                         <Private-Package>
                             org.freezedry.*
                         </Private-Package>
                     </instructions>
                 </configuration>
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<id>bundle-manifest</id>-->
-                        <!--<phase>process-classes</phase>-->
-                        <!--<goals>-->
-                            <!--<goal>manifest</goal>-->
-                        <!--</goals>-->
-                    <!--</execution>-->
-                <!--</executions>-->
             </plugin>
         </plugins>
 
@@ -178,6 +170,14 @@
             </activation>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>com.atlassian.maven.plugins</groupId>
+                        <artifactId>maven-jgitflow-plugin</artifactId>
+                        <version>1.0-alpha27</version>
+                        <configuration>
+                            <!-- see goals wiki page for configuration options -->
+                        </configuration>
+                    </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
