@@ -15,7 +15,7 @@
 
     <groupId>com.closure-sys</groupId>
     <artifactId>freezedry</artifactId>
-    <version>0.2.10-SNAPSHOT</version>
+    <version>0.3.0</version>
     <packaging>bundle</packaging>
 
     <name>freezedry</name>
