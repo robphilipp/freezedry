@@ -2,6 +2,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <!-- Sonatype POM as parent so that we can deploy to their maven repo -->
+    <!-- To cut a release using git-flow (*** preferred method ***)
+            1. mvn jgitflow:release-start
+            2. mvn jgitflow:release-finish (obviously, do 2 only when release is ready to be deployed -->
     <!-- To cut a release:
             1. mvn clean install (make sure it builds properly)
             2. mvn release:clean
@@ -15,7 +18,7 @@
 
     <groupId>com.closure-sys</groupId>
     <artifactId>freezedry</artifactId>
-    <version>0.3.0</version>
+    <version>0.3.1-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <name>freezedry</name>
