@@ -214,7 +214,7 @@ public class JsonReader implements PersistenceReader {
 		
 		// create the list of names
 		final List< String > jsonNames = new ArrayList<>();
-		for( int i = 0; i < names.length(); ++i )
+		for( int i = 0; names != null && i < names.length(); ++i )
 		{
 			try
 			{
