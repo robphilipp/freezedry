@@ -22,8 +22,7 @@ import org.junit.Test;
 
 import java.util.Map;
 
-import static org.junit.Assert.assertTrue;
-
+import static junit.framework.Assert.assertTrue;
 
 public class JsonPersistenceTest extends AbstractPersistenceTest {
 

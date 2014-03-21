@@ -16,6 +16,7 @@
 package org.freezedry.persistence;
 
 import org.freezedry.difference.ObjectDifferenceCalculator;
+import org.freezedry.persistence.tests.BadPerson;
 import org.freezedry.persistence.tests.Division;
 import org.junit.Test;
 
@@ -38,6 +39,20 @@ public class KeyValuePersistenceTest extends AbstractPersistenceTest {
 		final Division redivision = persistence.read( Division.class, output );
 		final ObjectDifferenceCalculator calculator = new ObjectDifferenceCalculator();
 		final Map< String, ObjectDifferenceCalculator.Difference > differences = calculator.calculateDifference( redivision, division );
+		assertTrue( differences == null || differences.isEmpty() );
+	}
+
+	@Test
+	public void testEmptyList()
+	{
+		final String output = OUTPUT_DIR + "bad-person.txt";
+
+		final BadPerson person = new BadPerson( "evil", "johnny", 666 );
+		persistence.write( person, output );
+		final BadPerson rePerson = persistence.read( BadPerson.class, output );
+
+		final ObjectDifferenceCalculator calculator = new ObjectDifferenceCalculator();
+		final Map< String, ObjectDifferenceCalculator.Difference > differences = calculator.calculateDifference( rePerson, person );
 		assertTrue( differences == null || differences.isEmpty() );
 	}
 }
