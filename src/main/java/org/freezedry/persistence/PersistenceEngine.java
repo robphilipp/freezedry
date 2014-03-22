@@ -84,6 +84,7 @@ public class PersistenceEngine {
 	
 	private final Map< Class< ? >, NodeBuilder > nodeBuilders;
 	private ArrayNodeBuilder genaralArrayNodeBuilder;
+	private EnumNodeBuilder generalEnumNodeBuilder;
 	private boolean isPersistClassConstants = false;
 	private boolean isPersistNullValues = false;
 	
@@ -96,6 +97,7 @@ public class PersistenceEngine {
 	{
 		this.nodeBuilders = createDefaultNodeBuilders();
 		this.genaralArrayNodeBuilder = new ArrayNodeBuilder( this );
+		this.generalEnumNodeBuilder = new EnumNodeBuilder( this );
 		this.defaultInstances = createDefaultInstances();
 	}
 	
@@ -368,6 +370,20 @@ public class PersistenceEngine {
 	}
 
 	/**
+	 * Sets the default {@link NodeBuilder} used for enums, for which objects for which a specific {@link NodeBuilder}
+	 * hasn't been specified. You can add a specific enum {@link NodeBuilder} to using {@link #addNodeBuilder(Class, NodeBuilder)} method.
+	 * For example:<p>
+	 * {@code builder.addNodeBuilder( String[].class, new EnumNodeBuilder() )}<p>
+	 * maps all {@code String[]} objects to use the {@link EnumNodeBuilder}.
+	 * @param builder The default {@link NodeBuilder} to use for arrays for which a specific {@link NodeBuilder}
+	 * hasn't been specified.
+	 */
+	public void setGeneralEnumNodeBuilder( final EnumNodeBuilder builder )
+	{
+		this.generalEnumNodeBuilder = builder;
+	}
+
+	/**
 	 * Searches through the existing node builders to see if they are of the specified {@link Class}.
 	 * If it doesn't find one, then it instantiates a new {@link NodeBuilder} and sets its {@link PersistenceEngine}
 	 * to this object.
@@ -447,6 +463,10 @@ public class PersistenceEngine {
 				LOGGER.error( message.toString(), e );
 				throw new IllegalArgumentException( message.toString(), e );
 			}
+		}
+		else if( clazz.isEnum() )
+		{
+			rootNode = generalEnumNodeBuilder.createInfoNode( object, clazz.getSimpleName() );
 		}
 		// if the override node builder map contains a node builder for this specific class, and
 		// the class is allowed to be a root object, then we'll use it
@@ -630,6 +650,10 @@ public class PersistenceEngine {
 				throw new IllegalStateException( message.toString(), e );
 			}
 		}
+		else if( clazz.isEnum() )
+		{
+			node = generalEnumNodeBuilder.createInfoNode( containingClass, object, fieldName );
+		}
 		else
 		{
 			// create a new compound node to holds this, since it isn't a leaf node, and
@@ -674,6 +698,10 @@ public class PersistenceEngine {
 				LOGGER.error( message.toString(), e );
 				throw new IllegalArgumentException( message.toString(), e );
 			}
+		}
+		else if( clazz.isEnum() )
+		{
+			object = generalEnumNodeBuilder.createObject( null, clazz, rootNode );
 		}
 		// if the override node builders contains a node builder for this specific class, then we'll use it
 		else if( containsNodeBuilder( clazz ) && isAllowedRootObject( clazz ) )
@@ -730,6 +758,10 @@ public class PersistenceEngine {
 			if( ( instance = getDefaultInstance( clazz ) ) != null )
 			{
 				object = instance;
+			}
+			else if( rootClass.isEnum() )
+			{
+				object = rootClass.getEnumConstants();
 			}
 			else if( constructors.length > 0 )
 			{
@@ -1047,6 +1079,10 @@ public class PersistenceEngine {
 				LOGGER.error( message.toString() );
 				throw new IllegalStateException( message.toString(), e );
 			}
+		}
+		else if( clazz.isEnum() )
+		{
+			object = generalEnumNodeBuilder.createObject( containingClass, clazz, currentNode );
 		}
 		else
 		{
