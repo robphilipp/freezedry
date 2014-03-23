@@ -135,7 +135,19 @@ public class LeafNodeRenderer extends AbstractPersistenceRenderer {
 		
 		final String key = keyValues.get( 0 ).getFirst();
 		final String value = keyValues.get( 0 ).getSecond();
-		final String rawValue = getDecorator( value ).undecorate( value );
+
+		// grab the decorator for the value. if no decorator is found, then use the raw value as is, which
+		// means that it'll be treated as a string value
+		final Decorator decorator = getDecorator( value );
+		String rawValue;
+		if( decorator == null )
+		{
+			rawValue = value;
+		}
+		else
+		{
+			rawValue = decorator.undecorate( value );
+		}
 		final InfoNode node = InfoNode.createLeafNode( null, rawValue, key, null );
 		parentNode.addChild( node );
 	}

@@ -1,10 +1,14 @@
 package org.freezedry.difference;
 
-import junit.framework.Assert;
 import org.junit.Test;
 
 import java.util.Map;
 import java.util.Set;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * [Description]
@@ -19,7 +23,7 @@ public class GroupTest
 	{
 		final String groupName = "this is a test of group name";
 		final Group group = new Group( groupName );
-		Assert.assertEquals( "Group names", groupName, group.getName() );
+		assertEquals( "Group names", groupName, group.getName() );
 	}
 
 	@Test
@@ -28,7 +32,7 @@ public class GroupTest
 		final Group root = new Group( "parent" );
 		final Group child = new Group( "child" );
 		root.addChild( child );
-		Assert.assertEquals( "Parent returned for child", root, child.getParent() );
+		assertEquals( "Parent returned for child", root, child.getParent() );
 	}
 
 	@Test
@@ -37,8 +41,8 @@ public class GroupTest
 		final Group root = new Group( "parent" );
 		final Group child = new Group( "child" );
 		root.addChild( child );
-		Assert.assertEquals( "Number of children", 1, root.getChildren().size() );
-		Assert.assertEquals( "Child", child, root.getChildren().get( 0 ) );
+		assertEquals( "Number of children", 1, root.getChildren().size() );
+		assertEquals( "Child", child, root.getChildren().get( 0 ) );
 	}
 
 	@Test
@@ -53,10 +57,10 @@ public class GroupTest
 		final Group root = new Group( "parent" );
 		final Group child = new Group( "child" );
 		root.addChild( child );
-		Assert.assertEquals( "Number of children", 1, root.getChildren().size() );
-		Assert.assertEquals( "Child", child, root.getChildren().get( 0 ) );
+		assertEquals( "Number of children", 1, root.getChildren().size() );
+		assertEquals( "Child", child, root.getChildren().get( 0 ) );
 		root.removeChild( child );
-		Assert.assertEquals( "Number of children", 0, root.getChildren().size() );
+		assertEquals( "Number of children", 0, root.getChildren().size() );
 	}
 
 	@Test
@@ -71,10 +75,10 @@ public class GroupTest
 		group.addValue( "matrix[0][5]", "02" );
 
 		final Map< String, Set< String >> values = group.getValues();
-		Assert.assertEquals( "Number of elements", 3, values.size() );
-		Assert.assertEquals( "Number of 00", 1, values.get( "00" ).size() );
-		Assert.assertEquals( "Number of 01", 2, values.get( "01" ).size() );
-		Assert.assertEquals( "Number of 02", 3, values.get( "02" ).size() );
+		assertEquals( "Number of elements", 3, values.size() );
+		assertEquals( "Number of 00", 1, values.get( "00" ).size() );
+		assertEquals( "Number of 01", 2, values.get( "01" ).size() );
+		assertEquals( "Number of 02", 3, values.get( "02" ).size() );
 	}
 
 	@Test
@@ -95,20 +99,20 @@ public class GroupTest
 		group.addValue( "matrix[0][5]", "02" );
 
 		final Map< String, Set< String >> values = group.getValues();
-		Assert.assertEquals( "Number of elements", 3, values.size() );
-		Assert.assertEquals( "Number of 00", 1, values.get( "00" ).size() );
-		Assert.assertEquals( "Number of 01", 2, values.get( "01" ).size() );
-		Assert.assertEquals( "Number of 02", 3, values.get( "02" ).size() );
+		assertEquals( "Number of elements", 3, values.size() );
+		assertEquals( "Number of 00", 1, values.get( "00" ).size() );
+		assertEquals( "Number of 01", 2, values.get( "01" ).size() );
+		assertEquals( "Number of 02", 3, values.get( "02" ).size() );
 
 		group.removeValue( "matrix[0][1]", "01" );
-		Assert.assertEquals( "Number of 00", 1, values.get( "00" ).size() );
-		Assert.assertEquals( "Number of 01", 1, values.get( "01" ).size() );
-		Assert.assertEquals( "Number of 02", 3, values.get( "02" ).size() );
+		assertEquals( "Number of 00", 1, values.get( "00" ).size() );
+		assertEquals( "Number of 01", 1, values.get( "01" ).size() );
+		assertEquals( "Number of 02", 3, values.get( "02" ).size() );
 
 		group.removeValue( "matrix[0][2]", "01" );
-		Assert.assertEquals( "Number of 00", 1, values.get( "00" ).size() );
-		Assert.assertEquals( "Number of 01", null, values.get( "01" ) );
-		Assert.assertEquals( "Number of 02", 3, values.get( "02" ).size() );
+		assertEquals( "Number of 00", 1, values.get( "00" ).size() );
+		assertEquals( "Number of 01", null, values.get( "01" ) );
+		assertEquals( "Number of 02", 3, values.get( "02" ).size() );
 	}
 
 	@Test
@@ -130,7 +134,7 @@ public class GroupTest
 		referenceGroup.addValue( "matrix[0][0]", "02" );
 		referenceGroup.addValue( "matrix[0][5]", "00" );
 
-		Assert.assertTrue( "Groups equivalent", group.equivalentValues( referenceGroup ) );
+		assertTrue( "Groups equivalent", group.equivalentValues( referenceGroup ) );
 	}
 
 	@Test
@@ -139,8 +143,8 @@ public class GroupTest
 		final Group root = new Group( "parent" );
 		final Group child = new Group( "child" );
 		root.addChild( child );
-		Assert.assertFalse( "Root is not leaf", root.isLeaf() );
-		Assert.assertTrue( "Child is leaf", child.isLeaf() );
+		assertFalse( "Root is not leaf", root.isLeaf() );
+		assertTrue( "Child is leaf", child.isLeaf() );
 	}
 
 	@Test
@@ -168,14 +172,14 @@ public class GroupTest
 		}
 
 		final Group group = root.findGroup( "name[1][2][3][*]" );
-		Assert.assertNotNull( "Find name[1][2][3][*]", group );
+		assertNotNull( "Find name[1][2][3][*]", group );
 		final Map< String, Set< String >> values = group.getValues();
 		for( int n = 0; n < 10; ++n )
 		{
 			final String value = Integer.toString( 1 * 2 * 3 + n );
 			final String key = "name[1][2][3][" + n + "]";
-			Assert.assertTrue( key, values.containsKey( value ) );
-			Assert.assertTrue( key, values.get( value ).contains( key ) );
+			assertTrue( key, values.containsKey( value ) );
+			assertTrue( key, values.get( value ).contains( key ) );
 		}
 	}
 }
