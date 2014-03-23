@@ -112,7 +112,7 @@ public class ArrayNodeBuilder extends AbstractNodeBuilder {
 		return compoundArrayNameSuffix;
 	}
 
-	/*
+	/**
 	 * @return the default mapping between the {@link Collection} interfaces and their concrete classes
 	 */
 	private static Map< Class< ? >, Class< ? > > createDefaultConcreteClasses()
@@ -135,9 +135,15 @@ public class ArrayNodeBuilder extends AbstractNodeBuilder {
 		return map;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.freezedry.persistence.generators.Generator#generateNode(java.lang.Class, java.lang.Object, java.lang.String)
+	/**
+	 * Generates an {@link InfoNode} from the specified {@link Object}. The specified containing {@link Class}
+	 * is the {@link Class} in which the specified field name lives. And the object is the value of
+	 * the field name.
+	 * @param containingClass The {@link Class} that contains the specified field name
+	 * @param object The value of the field with the specified field name
+	 * @param fieldName The name of the field for which the object is the value
+	 * @return The constructed {@link InfoNode} based on the specified information
+	 * @throws ReflectiveOperationException
 	 */
 	@Override
 	public InfoNode createInfoNode( final Class< ? > containingClass, final Object object, final String fieldName ) throws ReflectiveOperationException
@@ -159,11 +165,9 @@ public class ArrayNodeBuilder extends AbstractNodeBuilder {
 			}
 			catch( ReflectiveOperationException e )
 			{
-				final StringBuffer message = new StringBuffer();
-				message.append( "Field not found in containing class:" + Constants.NEW_LINE );
-				message.append( "  Containing class: " + containingClass.getName() + Constants.NEW_LINE );
-				message.append( "  Field name: " + fieldName + Constants.NEW_LINE );
-				LOGGER.warn( message.toString(), e );
+				LOGGER.warn( "Field not found in containing class:" + Constants.NEW_LINE +
+						"  Containing class: " + containingClass.getName() + Constants.NEW_LINE +
+						"  Field name: " + fieldName + Constants.NEW_LINE, e );
 			}
 		}
 		if( persistName == null || persistName.isEmpty() )
@@ -193,11 +197,9 @@ public class ArrayNodeBuilder extends AbstractNodeBuilder {
 		}
 		catch( ReflectiveOperationException e )
 		{
-			final StringBuffer message = new StringBuffer();
-			message.append( "Field not found in containing class:" + Constants.NEW_LINE );
-			message.append( "  Containing class: " + containingClass.getName() + Constants.NEW_LINE );
-			message.append( "  Field name: " + fieldName + Constants.NEW_LINE );
-			LOGGER.warn( message.toString(), e );
+			LOGGER.warn( "Field not found in containing class:" + Constants.NEW_LINE +
+					"  Containing class: " + containingClass.getName() + Constants.NEW_LINE +
+					"  Field name: " + fieldName + Constants.NEW_LINE, e );
 		}
 		
 		// run through the Collection elements, recursively calling createNode(...) to create
@@ -235,10 +237,14 @@ public class ArrayNodeBuilder extends AbstractNodeBuilder {
 		
 		return node;
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.freezedry.persistence.builders.NodeBuilder#createInfoNode(java.lang.Object)
+
+	/**
+	 * Generates an {@link InfoNode} from the specified {@link Object}. This method is used for objects that have
+	 * an overriding node builder and are not contained within a class. For example, suppose you would like
+	 * to persist an {@link ArrayList} for serialization and would like to maintain the type information.
+	 * @param object The value of the field with the specified field name
+	 * @return The constructed {@link InfoNode} based on the specified information
+	 * @throws ReflectiveOperationException
 	 */
 	@Override
 	public InfoNode createInfoNode( final Object object, final String persistName ) throws ReflectiveOperationException
@@ -273,9 +279,15 @@ public class ArrayNodeBuilder extends AbstractNodeBuilder {
 		return node;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.freezedry.persistence.builders.infonodes.NodeBuilder#createObject(java.lang.Class, org.freezedry.persistence.tree.nodes.InfoNode)
+	/**
+	 * Creates an object of the specified {@link Class} based on the information in the {@link InfoNode}. Note that
+	 * the {@link org.freezedry.persistence.tree.InfoNode} may also contain type information about the class to generate. The specified {@link Class}
+	 * overrides that value. This is done to avoid modifying the {@link org.freezedry.persistence.tree.InfoNode} tree when supplemental information becomes
+	 * available.
+	 * @param containingClass The {@link Class} containing the clazz, represented by the {@link InfoNode}
+	 * @param clazz The {@link Class} of the object to create
+	 * @param node The information about the object to create
+	 * @return The object constructed based on the info node.
 	 */
 	@Override
 	public Object createObject( final Class< ? > containingClass, final Class< ? > clazz, final InfoNode node ) throws ReflectiveOperationException
@@ -288,7 +300,7 @@ public class ArrayNodeBuilder extends AbstractNodeBuilder {
 		int index = 0;
 		for( InfoNode element : node.getChildren() ) 
 		{
-			Object object = null;
+			Object object;
 			if( element.getClazz() != null && element.getClazz().isArray() )
 			{
 				object = createObject( containingClass, element.getClazz(), element );
@@ -307,10 +319,16 @@ public class ArrayNodeBuilder extends AbstractNodeBuilder {
 		// return the newly created and populated collection
 		return collection;
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.freezedry.persistence.builders.NodeBuilder#createObject(java.lang.Class, org.freezedry.persistence.tree.InfoNode)
+
+	/**
+	 * Creates an object of the specified {@link Class} based on the information in the {@link InfoNode}.
+	 * This method is used for objects that have an overriding node builder and are not contained within a
+	 * class. For example, suppose you would like to persist an {@link ArrayList} for serialization and would
+	 * like to maintain the type information.
+	 * @param clazz The {@link Class} of the object to create
+	 * @param node The information about the object to create
+	 * @return The object constructed based on the info node.
+	 * @throws ReflectiveOperationException
 	 */
 	@Override
 	public Object createObject( Class< ? > clazz, InfoNode node ) throws ReflectiveOperationException
@@ -318,13 +336,11 @@ public class ArrayNodeBuilder extends AbstractNodeBuilder {
 		return createObject( null, clazz, node );
 	}
 
-	/*
-	 * Instantiates a {@link Collection} object based on the specified {@link Class}. However, if the specified {@link Class}
-	 * is an interface, then it used the default concrete {@link Collection} class found in {@link #concreteCollectionClass}. 
-	 * @param clazz The {@link Class} from which to build the {@link Collection}
+	/**
+	 * Instantiates an array object based on the specified {@link Class}.
+	 * @param clazz The {@link Class} from which to build the array
 	 * @param length The length of the array 
-	 * @return The newly constructed {@link Collection}
-	 * @see #setDefaultMapClass(Class)
+	 * @return The newly constructed array
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
@@ -337,16 +353,18 @@ public class ArrayNodeBuilder extends AbstractNodeBuilder {
 			classType = getClassForInterface( clazz );
 		}
 		
-		// instantiate
-		final Object array = Array.newInstance( classType, length );
-		
 		// done...
-		return array;
+		return Array.newInstance( classType, length );
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see com.synapse.copyable.Copyable#getCopy()
+
+	/**
+	 * Creates and returns a copy of the object <code>x</code> that meets the following criteria
+	 * <ol>
+	 * 	<li>The expressions <code>x.getCopy() != x</code> evaluates as <code>true</code></li>
+	 * 	<li>The expressions <code>x.getCopy().equals( x )</code> evaluates as <code>true</code></li>
+	 * 	<li>The expressions <code>x.getCopy().getClass() == x.getClass()</code> evaluates as <code>true</code></li>
+	 * </ol>
+	 * @return a copy of the object that meets the above criteria
 	 */
 	@Override
 	public ArrayNodeBuilder getCopy()

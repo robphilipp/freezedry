@@ -181,9 +181,14 @@ public class DateNodeBuilder extends AbstractLeafNodeBuilder {
 		return outputDateFormat;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.freezedry.persistence.builders.infonodes.LeafNodeBuilder#createInfoNode(java.lang.Class, java.lang.Object, java.lang.String)
+	/**
+	 * Generates an {@link InfoNode} from the specified {@link Object}. The specified containing {@link Class}
+	 * is the {@link Class} in which the specified field name lives. And the object is the value of
+	 * the field name.
+	 * @param containingClass The {@link Class} that contains the specified field name
+	 * @param object The value of the field with the specified field name
+	 * @param fieldName The name of the field for which the object is the value
+	 * @return The constructed {@link InfoNode} based on the specified information
 	 */
 	@Override
 	public InfoNode createInfoNode( final Class< ? > containingClass, final Object object, final String fieldName )
@@ -213,27 +218,28 @@ public class DateNodeBuilder extends AbstractLeafNodeBuilder {
 			// with the default date format
 			final Field field = ReflectionUtils.getDeclaredField( containingClass, fieldName );
 			final PersistDateAs annotation = field.getAnnotation( PersistDateAs.class );
-			field.getAnnotations();
 			if( annotation != null )
 			{
 				dateFormat = annotation.value();
 			}
 		}
-		catch( NoSuchFieldException e ) {}
+		catch( NoSuchFieldException e ) { /* empty on purpose */ }
 		
 		// we must convert the object to the appropriate format
 		final String date = DateUtils.createStringFromDate( (Calendar)object, dateFormat );
 		
 		// create a new leaf node with the new date string
-		final InfoNode node = InfoNode.createLeafNode( fieldName, date, persistName, clazz );
-		
+
 		// return the node
-		return node;
+		return InfoNode.createLeafNode( fieldName, date, persistName, clazz );
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.freezedry.persistence.builders.NodeBuilder#createInfoNode(java.lang.Object)
+
+	/**
+	 * Generates an {@link InfoNode} from the specified {@link Object}. This method is used for objects that have
+	 * an overriding node builder and are not contained within a class. For example, suppose you would like
+	 * to persist an {@link java.util.ArrayList} for serialization and would like to maintain the type information.
+	 * @param object The value of the field with the specified field name
+	 * @return The constructed {@link InfoNode} based on the specified information
 	 */
 	@Override
 	public InfoNode createInfoNode( final Object object, final String persistName )
@@ -253,9 +259,15 @@ public class DateNodeBuilder extends AbstractLeafNodeBuilder {
 		return node;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.freezedry.persistence.builders.infonodes.NodeBuilder#createObject(java.lang.Class, org.freezedry.persistence.tree.nodes.InfoNode)
+	/**
+	 * Creates an object of the specified {@link Class} based on the information in the {@link InfoNode}. Note that
+	 * the {@link com.sun.org.apache.xalan.internal.lib.NodeInfo} may also contain type information about the class to generate. The specified {@link Class}
+	 * overrides that value. This is done to avoid modifying the {@link com.sun.org.apache.xalan.internal.lib.NodeInfo} tree when supplemental information becomes
+	 * available.
+	 * @param containingClass The {@link Class} containing the clazz, represented by the {@link InfoNode}
+	 * @param clazz The {@link Class} of the object to create
+	 * @param node The information about the object to create
+	 * @return The object constructed based on the info node.
 	 */
 	@Override
 	public Calendar createObject( final Class< ? > containingClass, final Class< ? > clazz, final InfoNode node )
@@ -266,30 +278,24 @@ public class DateNodeBuilder extends AbstractLeafNodeBuilder {
 		Calendar date = DateUtils.createDateFromString( value, parsingDateFormats );
 		if( date != null )
 		{
-			final StringBuffer message = new StringBuffer();
-			message.append( "Converted from list of allowed formats to date." + Constants.NEW_LINE );
-			message.append( "  Date String: " + value );
-			LOGGER.info( message.toString() );
+			LOGGER.info( ("Converted from list of allowed formats to date." + Constants.NEW_LINE) + "  Date String: " + value );
 		}
 		else
 		{
 			date = DateUtils.createDateFromIso8601( value );
 			if( date != null )
 			{
-				final StringBuffer message = new StringBuffer();
-				message.append( "Converted from ISO 8601 format to date." + Constants.NEW_LINE );
-				message.append( "  Date String: " + value );
-				LOGGER.info( message.toString() );
+				LOGGER.info( ("Converted from ISO 8601 format to date." + Constants.NEW_LINE) + "  Date String: " + value );
 			}
 			else
 			{
-				final StringBuffer message = new StringBuffer();
-				message.append( "Could not convert string date to a date object." + Constants.NEW_LINE );
-				message.append( "  Date String: " + value );
-				message.append( "  Attempted the following formats:" + Constants.NEW_LINE );
+				final StringBuilder message = new StringBuilder();
+				message.append( "Could not convert string date to a date object." ).append( Constants.NEW_LINE );
+				message.append( "  Date String: " ).append( value );
+				message.append( "  Attempted the following formats:" ).append( Constants.NEW_LINE );
 				for( String format : Constants.DATE_FORMATS )
 				{
-					message.append( "    " + format + Constants.NEW_LINE );
+					message.append( "    " ).append( format ).append( Constants.NEW_LINE );
 				}
 				LOGGER.info( message.toString() );
 			}
@@ -297,10 +303,15 @@ public class DateNodeBuilder extends AbstractLeafNodeBuilder {
 		
 		return date;
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.freezedry.persistence.builders.AbstractLeafNodeBuilder#createObject(java.lang.Class, org.freezedry.persistence.tree.InfoNode)
+
+	/**
+	 * Creates an object of the specified {@link Class} based on the information in the {@link InfoNode}.
+	 * This method is used for objects that have an overriding node builder and are not contained within a
+	 * class. For example, suppose you would like to persist an {@link java.util.ArrayList} for serialization and would
+	 * like to maintain the type information.
+	 * @param clazz The {@link Class} of the object to create
+	 * @param node The information about the object to create
+	 * @return The object constructed based on the info node.
 	 */
 	@Override
 	public Calendar createObject( final Class< ? > clazz, final InfoNode node )
@@ -308,25 +319,30 @@ public class DateNodeBuilder extends AbstractLeafNodeBuilder {
 		final InfoNode valueNode = node.getChild( 0 );
 		final String value = (String)valueNode.getValue();
 		// try the ISO 8601 format (strict)
-		Calendar date = null;
+		Calendar date;
 		try
 		{
 			date = DateUtils.createDateFromString( value, ISO_8601_DATE_FORMAT );
 		}
 		catch( ParseException e )
 		{
-			final StringBuffer message = new StringBuffer();
-			message.append( "Could not convert string to ISO 8601 date" + Constants.NEW_LINE );
-			message.append( "  Date String: " + value );
+			final StringBuilder message = new StringBuilder();
+			message.append( "Could not convert string to ISO 8601 date" ).append( Constants.NEW_LINE );
+			message.append( "  Date String: " ).append( value );
 			LOGGER.info( message.toString() );
 			throw new IllegalArgumentException( message.toString(), e );
 		}
 		return date;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see com.synapse.copyable.Copyable#getCopy()
+	/**
+	 * Creates and returns a copy of the object <code>x</code> that meets the following criteria
+	 * <ol>
+	 * 	<li>The expressions <code>x.getCopy() != x</code> evaluates as <code>true</code></li>
+	 * 	<li>The expressions <code>x.getCopy().equals( x )</code> evaluates as <code>true</code></li>
+	 * 	<li>The expressions <code>x.getCopy().getClass() == x.getClass()</code> evaluates as <code>true</code></li>
+	 * </ol>
+	 * @return a copy of the object that meets the above criteria
 	 */
 	@Override
 	public DateNodeBuilder getCopy()
