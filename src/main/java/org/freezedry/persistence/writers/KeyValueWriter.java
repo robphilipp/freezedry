@@ -48,7 +48,7 @@ public class KeyValueWriter implements PersistenceWriter {
 	private final KeyValueFlattener keyValueFlattener;
 
 	private String keyValueSeparator;
-	
+
 	/**
 	 * Constructs a basic key-value writer that uses the specified renderers and separator.
 	 * @param renderers The mapping between the {@link Class} represented by an {@link InfoNode} and
@@ -181,10 +181,10 @@ public class KeyValueWriter implements PersistenceWriter {
 		
 		if( LOGGER.isInfoEnabled() )
 		{
-			final StringBuffer message = new StringBuffer();
+			final StringBuilder message = new StringBuilder();
 			for( final Pair< String, Object > pair : keyValuePairs )
 			{
-				message.append( pair.getFirst() + " = " + pair.getSecond().toString() + Constants.NEW_LINE );
+				message.append( pair.getFirst() ).append( " = " ).append( pair.getSecond().toString() ).append( Constants.NEW_LINE );
 			}
 			LOGGER.info( message.toString() );
 		}

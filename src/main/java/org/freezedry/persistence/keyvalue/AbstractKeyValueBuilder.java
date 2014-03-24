@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.freezedry.persistence.keyvalue.renderers.decorators.StringDecorator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.freezedry.persistence.keyvalue.renderers.CollectionRenderer;
@@ -246,10 +247,13 @@ public abstract class AbstractKeyValueBuilder implements KeyValueBuilder {
 			{
 				message.append( Constants.NEW_LINE ).append( "  " ).append( renderer.getClass().getName() );
 			}
+//			message.append( Constants.NEW_LINE ).append( "Using " ).append( renderers.get( String.class ).getClass().getName() )
+//					.append( ", which is the default for a string" );
 			LOGGER.info( message.toString() );
 		}
 
 		return null;
+//		return renderers.get( String.class );
 	}
 
 	/**

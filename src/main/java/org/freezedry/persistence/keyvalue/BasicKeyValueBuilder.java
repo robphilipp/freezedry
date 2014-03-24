@@ -15,20 +15,15 @@
  */
 package org.freezedry.persistence.keyvalue;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.freezedry.persistence.containers.Pair;
 import org.freezedry.persistence.keyvalue.renderers.PersistenceRenderer;
 import org.freezedry.persistence.keyvalue.utils.KeyValueUtils;
 import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 /**
  * Basic key-value list builder that flattens the semantic model and returns a list of key-value pairs.
@@ -75,9 +70,13 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 		super();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.freezedry.persistence.keyvalue.KeyValueBuilder#buildKeyValuePairs(org.freezedry.persistence.tree.InfoNode)
+	/**
+	 * The entry point for building the {@link List} of key-value pairs from the semantic model,
+	 * through a recursive algorithm ({@link #buildKeyValuePairs(InfoNode, String, List)}. Effectively,
+	 * this will flatten the tree into a list of key-value pairs.
+	 * @param rootInfoNode The root {@link InfoNode} of the semantic model
+	 * @return the {@link List} of key-value pairs
+	 * @see #buildKeyValuePairs(InfoNode, String, List)
 	 */
 	@Override
 	public List< Pair< String, Object > > buildKeyValuePairs( final InfoNode rootInfoNode )
@@ -95,9 +94,11 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 		return keyValuePairs;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.freezedry.persistence.keyvalue.KeyValueBuilder#buildKeyValuePairs(org.freezedry.persistence.tree.InfoNode, java.lang.String, java.util.List)
+	/**
+	 * The recursive algorithm for flattening the semantic model into a {@link List} of key-value pairs.
+	 * @param infoNode The current node in the semantic model ({@link InfoNode}) for processing.
+	 * @param key The current key, which has accumulated the parents persistence names as part of the flattening
+	 * @param keyValues The current list of key-values to which to add the ones created in this algorithm.
 	 */
 	@Override
 	public void buildKeyValuePairs( final InfoNode infoNode, final String key, final List< Pair< String, Object > > keyValues )
@@ -121,9 +122,15 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.freezedry.persistence.keyvalue.KeyValueBuilder#createKeyValuePairs(org.freezedry.persistence.tree.InfoNode, java.lang.String, java.util.List, boolean)
+	/**
+	 * Creates the actual key-value pair, though for compound nodes, it calls back its calling method,
+	 * {@link #buildKeyValuePairs(InfoNode, String, List)}.
+	 * @param infoNode The current node in the semantic model ({@link InfoNode}) for processing.
+	 * @param key The current key, which has accumulated the parents persistence names as part of the flattening
+	 * @param keyValues The current list of key-values to which to add the ones created in this algorithm.
+	 * @param isWithholdPersitName true if the current persistence name should not be added to the key; false otherwise.
+	 * This parameter allows {@link PersistenceRenderer}s to suppress the persistence name when it is appropriate. For
+	 * example, in a {@link List} of {@link String}, you may not want to at "{@code String}" to the key.
 	 */
 	@Override
 	public void createKeyValuePairs( final InfoNode infoNode, final String key, final List< Pair< String, Object > > keyValues, final boolean isWithholdPersitName )
@@ -164,7 +171,7 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 		}
 	}
 	
-	/*
+	/**
 	 * Creates a key based on the specified information. In particular, it deals with the suppression
 	 * of the leading separators when the specified key is null or empty. Also withholds the persistence name
 	 * from the key if it is intended to be withheld.
@@ -195,11 +202,12 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 		
 		return newKey.toString();
 	}
-	
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.freezedry.persistence.keyvalue.KeyValueBuilder#buildInfoNode(java.lang.Class, java.util.List)
+
+	/**
+	 * Main entry point for building the semantic model from a list of key-value pairs and the target class.
+	 * @param clazz The target class for the building of the semantic model
+	 * @param keyValues The key-value pairs
+	 * @return The root {@link InfoNode} of the semantic model
 	 */
 	@Override
 	public InfoNode buildInfoNode( final Class< ? > clazz, final List< Pair< String, String > > keyValues )
@@ -216,9 +224,12 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 		return rootNode;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.freezedry.persistence.keyvalue.KeyValueBuilder#buildInfoNode(org.freezedry.persistence.tree.InfoNode, java.util.List)
+	/**
+	 * Recursively builds the semantic model. The keys in the key-value list should all have as their
+	 * first element, the name found in the parentNode's persistence name.
+	 * @param parentNode The node to which to add the child nodes
+	 * @param keyValues The list of key-value pairs. The first key element of every key should match
+	 * the persistence name of the parent node.
 	 */
 	@Override
 	public void buildInfoNode( final InfoNode parentNode, final List< Pair< String, String > > keyValues )
@@ -229,7 +240,7 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 		validiateRootKey( keyValues, getSeparator(), rootKey );
 		
 		// strip the root key element from all the keys. For example, suppose the keys all start with
-		// "Division:". And suppose further that the rootKey = "Division". The "Division:" will be
+		// "Division.". And suppose further that the rootKey = "Division". The "Division." will be
 		// stripped from each key in the list. So, "Division.people.Person[1]" would become "people.Person[1]".
 		final List< Pair< String, String > > strippedKeyValues = KeyValueUtils.stripFirstKeyElement( keyValues, getSeparator() );
 
@@ -242,9 +253,14 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.freezedry.persistence.keyvalue.KeyValueBuilder#createInfoNode(org.freezedry.persistence.tree.InfoNode, java.lang.String, java.util.List)
+	/**
+	 * Creates an {@link InfoNode} based on the group name and the specified key-value pairs. Part of the
+	 * recursive algorithm to build the semantic model.
+	 * @param parentNode The node to which to add the child nodes
+	 * @param groupName The name of the group that will appear as the persistence name
+	 * @param keyValues The list of key-value pairs. The first key element of every key should match
+	 * the persistence name of the parent node.
+	 * @see #buildInfoNode(InfoNode, List)
 	 */
 	@Override
 	public void createInfoNode( final InfoNode parentNode, final String groupName, final List< Pair< String, String > > keyValues )
@@ -272,7 +288,7 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 			throw new IllegalArgumentException( message.toString() );
 		}
 		// leaf node
-		else if( keyValues.size() == 1 )
+		else if( keyValues.size() == 1 && !keyValues.get( 0 ).getFirst().contains( getSeparator() ) )
 		{
 			// grab the key and make sure that it matches the group name. at this point it shouldn't
 			// have any decorations (i.e. for collection or map or anything else)
@@ -290,9 +306,14 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 			}
 
 			// in this case, the renderer for the key name should be a leaf-node renderer, so
-			// lets pull it, and then asky it to build the info node for us, and add that new
+			// lets pull it, and then ask it to build the info node for us, and add that new
 			// info node to the parent, and then we're done
-			getRenderer( name ).buildInfoNode( parentNode, keyValues );
+			PersistenceRenderer renderer = getRenderer( name );
+			if( renderer == null )
+			{
+				renderer = getRenderer( String.class );
+			}
+			renderer.buildInfoNode( parentNode, keyValues );
 		}
 		// for compound nodes, we need to call the appropriate renderer's buildInfoNode(...) method. and
 		// let the recursion begin.
@@ -317,7 +338,7 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 			}
 		}
 	}
-		
+
 	/**
 	 * In cases where the key-value pairs don't ALL begin with the SAME root key, this method
 	 * allows you to tell the reader to use the target class name as the root key. This will cause 
@@ -451,7 +472,7 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 		return groups;
 	}
 
-	/*
+	/**
 	 * Returns the group name by finding the renderer for which the specified key
 	 * matches its regular expression, and then uses that renderer to parse the
 	 * group name. Returns null if no renderer was found.

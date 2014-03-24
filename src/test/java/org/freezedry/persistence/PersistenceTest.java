@@ -156,24 +156,6 @@ public class PersistenceTest {
 	 */
 	private void writeXml( final InfoNode node, final String fileName, final boolean isDisplayTypeInfo ) throws IOException
 	{
-//		// write out XML
-//		final File file = new File( PATH + fileName );
-//		if( !file.exists() )
-//		{
-//			file.mkdirs();
-//		}
-//		try( final PrintWriter printWriter = new PrintWriter( file ) )
-////		try( final PrintWriter printWriter = new PrintWriter( new FileWriter( PATH + fileName ) ) )
-//		{
-//			final XmlWriter writer = new XmlWriter();
-//			writer.setDisplayTypeInfo( isDisplayTypeInfo );
-//			writer.write( node, printWriter );
-//		}
-//		catch( IOException e )
-//		{
-//			throw new IOException( e );
-//		}
-
 		final XmlWriter writer = new XmlWriter();
 		writer.setDisplayTypeInfo( isDisplayTypeInfo );
 		writeFile( node, fileName, writer );
@@ -202,22 +184,6 @@ public class PersistenceTest {
 	 */
 	private void writeJson( final InfoNode node, final String fileName ) throws IOException
 	{
-//		// write out JSON
-//		final File file = new File( PATH + fileName );
-//		if( !file.exists() )
-//		{
-//			file.mkdirs();
-//		}
-//		try( final PrintWriter printWriter = new PrintWriter( file ) )
-////		try( final PrintWriter printWriter = new PrintWriter( new FileWriter( PATH + fileName ) ) )
-//		{
-//			final JsonWriter writer = new JsonWriter();
-//			writer.write( node, printWriter );
-//		}
-//		catch( IOException e )
-//		{
-//			throw new IOException( e );
-//		}
 		writeFile( node, fileName, new JsonWriter() );
 	}
 
@@ -445,7 +411,6 @@ public class PersistenceTest {
 	@Test
 	public void testDoubleArraysJson()
 	{
-//		testJson( new double[] { 3, 1, 4, 1, 5, 9, 2, 6 }, "double_array.json" );
 		testJson( new double[] { 3.14, 1.41, 4.15, 1.59, 5.92, 9.26, 2.6, 6. }, "double_array.json" );
 	}
 	

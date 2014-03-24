@@ -16,9 +16,7 @@
 package org.freezedry.persistence;
 
 import org.freezedry.difference.ObjectDifferenceCalculator;
-import org.freezedry.persistence.tests.BadPerson;
-import org.freezedry.persistence.tests.Division;
-import org.freezedry.persistence.tests.ThingWithEnum;
+import org.freezedry.persistence.tests.*;
 import org.junit.Test;
 
 import java.util.Map;
@@ -69,4 +67,18 @@ public class JsonPersistenceTest extends AbstractPersistenceTest {
 		assertTrue( differences == null || differences.isEmpty() );
 	}
 
+	@Test
+	public void testGenericClass()
+	{
+		final String output = OUTPUT_DIR + "generic-type-class.json";
+
+		final GenericTypeClass<GenericTypeSubclass> mySubclass = new GenericTypeClass<>( new GenericTypeSubclass( "3.151592653" ) );
+//		final GenericTypeClass< Double > myDouble = new GenericTypeClass<>( 3.141592653 );
+		persistence.write( mySubclass, output );
+		final GenericTypeClass<GenericTypeSubclass> reMySubclass = persistence.read( GenericTypeClass.class, output );
+
+		final ObjectDifferenceCalculator calculator = new ObjectDifferenceCalculator();
+		final Map< String, ObjectDifferenceCalculator.Difference > differences = calculator.calculateDifference( reMySubclass, mySubclass );
+		assertTrue( differences == null || differences.isEmpty() );
+	}
 }
