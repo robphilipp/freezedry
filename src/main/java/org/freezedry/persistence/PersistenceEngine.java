@@ -247,6 +247,15 @@ public class PersistenceEngine {
 	}
 
 	/**
+	 * @return the separator used when the a class has a generic type for which we need to store the {@link java.lang.Class}
+	 * of the member instance so that the object can be reconstructed.
+	 */
+	public String getGenericTypeSeparator()
+	{
+		return genericTypeSeparator;
+	}
+
+	/**
 	 * Adds a {@link NodeBuilder} to be used for generating {@link InfoNode}s for the specified {@link Class}
 	 * @param clazz The {@link Class} of the object to persist and, therefore, for which to generate a node
 	 * @param builder The {@link NodeBuilder} used to generate {@link InfoNode}s for the specified {@link Class}
@@ -954,7 +963,7 @@ public class PersistenceEngine {
 					final String genericType = components[ 1 ].replace( '_', '.' );
 
 					// if the generic type has a value, then hand it to the node
-					if( genericType != null && !genericType.isEmpty() )
+					if( !genericType.isEmpty() )
 					{
 						try
 						{

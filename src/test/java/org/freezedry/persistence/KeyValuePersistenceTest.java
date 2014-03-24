@@ -70,6 +70,6 @@ public class KeyValuePersistenceTest extends AbstractPersistenceTest {
 
 		final ObjectDifferenceCalculator calculator = new ObjectDifferenceCalculator();
 		final Map< String, ObjectDifferenceCalculator.Difference > differences = calculator.calculateDifference( reMySubclass, mySubclass );
-		Assert.assertTrue( differences == null || differences.isEmpty() );
+		assertTrue( differences == null || differences.isEmpty() );
 	}
 }

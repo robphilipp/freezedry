@@ -60,7 +60,7 @@ public class LeafNodeRenderer extends AbstractPersistenceRenderer {
 	
 	/**
 	 * Copy constructor
-	 * @param renderer
+	 * @param renderer The key-value renderer to copy
 	 */
 	public LeafNodeRenderer( final LeafNodeRenderer renderer )
 	{
@@ -77,14 +77,14 @@ public class LeafNodeRenderer extends AbstractPersistenceRenderer {
 		// ensure that the info node is a leaf
 		if( !infoNode.isLeafNode() )
 		{
-			final StringBuffer message = new StringBuffer();
-			message.append( "To render a key-value pair as a String, the info node must be a leaf node." + Constants.NEW_LINE );
-			message.append( "  Current Key:" + key + Constants.NEW_LINE );
-			message.append( "  InfoNode:" + Constants.NEW_LINE );
-			message.append( "    Persist Name: " + infoNode.getPersistName() + Constants.NEW_LINE );
-			message.append( "    Node Type: " + infoNode.getNodeType().name() + Constants.NEW_LINE );
-			message.append( "    Child Nodes: " + infoNode.getChildCount() + Constants.NEW_LINE );
-			message.append( "    Node Class Type: " + infoNode.getClazz().getName() + Constants.NEW_LINE );
+			final StringBuilder message = new StringBuilder();
+			message.append( "To render a key-value pair as a String, the info node must be a leaf node." ).append( Constants.NEW_LINE )
+					.append( "  Current Key:" ).append( key ).append( Constants.NEW_LINE )
+					.append( "  InfoNode:" ).append( Constants.NEW_LINE )
+					.append( "    Persist Name: " ).append( infoNode.getPersistName() ).append( Constants.NEW_LINE )
+					.append( "    Node Type: " ).append( infoNode.getNodeType().name() ).append( Constants.NEW_LINE )
+					.append( "    Child Nodes: " ).append( infoNode.getChildCount() ).append( Constants.NEW_LINE )
+					.append( "    Node Class Type: " ).append( infoNode.getClazz().getName() ).append( Constants.NEW_LINE );
 			LOGGER.error( message.toString() );
 			throw new IllegalArgumentException( message.toString() );
 		}
@@ -121,13 +121,21 @@ public class LeafNodeRenderer extends AbstractPersistenceRenderer {
 		// make sure there is one and ONLY one key-value pair
 		if( keyValues.size() != 1 )
 		{
-			final StringBuffer message = new StringBuffer();
-			message.append( "A leaf node can only have one key (name) and on value." + Constants.NEW_LINE );
-			message.append( "  Parent Node's Persistence Name: " + parentNode.getPersistName() + Constants.NEW_LINE );
-			message.append( "  Number of Key-Value Pairs: " + ( keyValues == null ? "[null]" : keyValues.size() ) + Constants.NEW_LINE );
-			for( Pair< String, String > keyValue : keyValues )
+			final StringBuilder message = new StringBuilder()
+					.append( "A leaf node can only have one key (name) and on value." ).append( Constants.NEW_LINE )
+					.append( "  Parent Node's Persistence Name: " ).append( parentNode.getPersistName() ).append( Constants.NEW_LINE )
+					.append( "  Number of Key-Value Pairs: " );
+			if( keyValues == null )
 			{
-				message.append( "    " + keyValue + Constants.NEW_LINE );
+				message.append( "[null]" ).append( Constants.NEW_LINE );
+			}
+			else
+			{
+				message.append( keyValues.size() ).append( Constants.NEW_LINE );
+				for( Pair<String, String> keyValue : keyValues )
+				{
+					message.append( "    " ).append( keyValue ).append( Constants.NEW_LINE );
+				}
 			}
 			LOGGER.error( message.toString() );
 			throw new IllegalStateException( message.toString() );
@@ -147,7 +155,7 @@ public class LeafNodeRenderer extends AbstractPersistenceRenderer {
 	@Override
 	public boolean isRenderer( String keyElement )
 	{
-		return Pattern.matches( "^\\w+$", keyElement );
+		return Pattern.matches( "^[\\w\\_]+$", keyElement );
 	}
 
 	/*
@@ -157,7 +165,7 @@ public class LeafNodeRenderer extends AbstractPersistenceRenderer {
 	@Override
 	public String getGroupName( final String key )
 	{
-		final Pattern decorationPattern = Pattern.compile( "^\\w+$" );
+		final Pattern decorationPattern = Pattern.compile( "^[\\w\\_]+$" );
 		final Matcher matcher = decorationPattern.matcher( key );
 		String group = null;
 		if( matcher.find() )
