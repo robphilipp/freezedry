@@ -685,7 +685,7 @@ public class PersistenceEngine {
 			String persistName = fieldName;
 			try
 			{
-				if( containingClass.getDeclaredField( fieldName ).getGenericType() != null )
+				if( containingClass != null && containingClass.getDeclaredField( fieldName ).getGenericType() != null )
 				{
 					final String className = object.getClass().getName().replace( ".", "_" );
 					persistName += genericTypeSeparator + className;
