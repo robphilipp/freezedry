@@ -15,13 +15,11 @@
  */
 package org.freezedry.persistence.builders;
 
-import java.util.ArrayList;
-
-import javax.sound.midi.MidiDevice.Info;
-
 import org.freezedry.persistence.PersistenceEngine;
 import org.freezedry.persistence.copyable.Copyable;
 import org.freezedry.persistence.tree.InfoNode;
+
+import java.util.ArrayList;
 
 
 /**
@@ -57,12 +55,11 @@ public interface NodeBuilder extends Copyable< NodeBuilder > {
 	 * @throws ReflectiveOperationException
 	 */
 	InfoNode createInfoNode( final Object object, final String persistName ) throws ReflectiveOperationException;
-//	InfoNode createInfoNode( final Object object ) throws ReflectiveOperationException;
 
 	/**
 	 * Creates an object of the specified {@link Class} based on the information in the {@link InfoNode}. Note that
-	 * the {@link Info} may also contain type information about the class to generate. The specified {@link Class}
-	 * overrides that value. This is done to avoid modifying the {@link Info} tree when supplemental information becomes
+	 * the {@link com.sun.org.apache.xalan.internal.lib.NodeInfo} may also contain type information about the class to generate. The specified {@link Class}
+	 * overrides that value. This is done to avoid modifying the {@link com.sun.org.apache.xalan.internal.lib.NodeInfo} tree when supplemental information becomes
 	 * available.
 	 * @param containingClass The {@link Class} containing the clazz, represented by the {@link InfoNode}
 	 * @param clazz The {@link Class} of the object to create 

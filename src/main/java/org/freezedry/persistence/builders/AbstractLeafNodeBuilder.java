@@ -60,9 +60,15 @@ public abstract class AbstractLeafNodeBuilder extends AbstractNodeBuilder {
 		super( generator );
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.freezedry.persistence.generators.Generator#generateNode(java.lang.Class, java.lang.Object, java.lang.String)
+	/**
+	 * Generates an {@link InfoNode} from the specified {@link Object}. The specified containing {@link Class}
+	 * is the {@link Class} in which the specified field name lives. And the object is the value of
+	 * the field name.
+	 * @param containingClass The {@link Class} that contains the specified field name
+	 * @param object The value of the field with the specified field name
+	 * @param fieldName The name of the field for which the object is the value
+	 * @return The constructed {@link InfoNode} based on the specified information
+	 * @throws ReflectiveOperationException
 	 */
 	@Override
 	public InfoNode createInfoNode( final Class< ? > containingClass, final Object object, final String fieldName )
@@ -90,10 +96,14 @@ public abstract class AbstractLeafNodeBuilder extends AbstractNodeBuilder {
 		// return the node
 		return node;
 	}
-	
-	/*
-	 * (non-Javadoc)
-	 * @see org.freezedry.persistence.builders.NodeBuilder#createInfoNode(java.lang.Object)
+
+	/**
+	 * Generates an {@link InfoNode} from the specified {@link Object}. This method is used for objects that have
+	 * an overriding node builder and are not contained within a class. For example, suppose you would like
+	 * to persist an {@link java.util.ArrayList} for serialization and would like to maintain the type information.
+	 * @param object The value of the field with the specified field name
+	 * @return The constructed {@link InfoNode} based on the specified information
+	 * @throws ReflectiveOperationException
 	 */
 	@Override
 	public InfoNode createInfoNode( final Object object, final String persistName )
@@ -109,9 +119,15 @@ public abstract class AbstractLeafNodeBuilder extends AbstractNodeBuilder {
 		return node;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.freezedry.persistence.builders.NodeBuilder#createObject(java.lang.Class, org.freezedry.persistence.tree.InfoNode)
+	/**
+	 * Creates an object of the specified {@link Class} based on the information in the {@link InfoNode}.
+	 * This method is used for objects that have an overriding node builder and are not contained within a
+	 * class. For example, suppose you would like to persist an {@link java.util.ArrayList} for serialization and would
+	 * like to maintain the type information.
+	 * @param clazz The {@link Class} of the object to create
+	 * @param node The information about the object to create
+	 * @return The object constructed based on the info node.
+	 * @throws ReflectiveOperationException
 	 */
 	@Override
 	public Object createObject( Class< ? > clazz, InfoNode node ) throws ReflectiveOperationException

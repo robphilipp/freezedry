@@ -20,6 +20,9 @@ import org.freezedry.persistence.builders.StringNodeBuilder;
 import org.junit.Before;
 import org.junit.Test;
 
+import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+
 /**
  * Created with IntelliJ IDEA.
  * User: rob
@@ -29,91 +32,14 @@ import org.junit.Test;
  */
 public class PersistenceEngineTest {
 
-	@Before
-	public void setUp() throws Exception
-	{
-	}
-
-	@Test
-	public void testSetPersistClassConstants() throws Exception
-	{
-
-	}
-
 	@Test
 	public void testAddNodeBuilder() throws Exception
 	{
 		final PersistenceEngine engine = new PersistenceEngine();
 		engine.removeNodeBuilder( String.class );
-		Assert.assertFalse( engine.containsNodeBuilder( String.class ) );
+		assertFalse( engine.containsNodeBuilder( String.class ) );
 
 		engine.addNodeBuilder( String.class, new StringNodeBuilder() );
-		Assert.assertTrue( engine.containsNodeBuilder( String.class ) );
-	}
-
-	@Test
-	public void testContainsNodeBuilder() throws Exception
-	{
-
-	}
-
-	@Test
-	public void testContainsAnnotatedNodeBuilder() throws Exception
-	{
-
-	}
-
-	@Test
-	public void testGetNodeBuilder() throws Exception
-	{
-
-	}
-
-	@Test
-	public void testIsForbiddenRootObject() throws Exception
-	{
-
-	}
-
-	@Test
-	public void testIsAllowedRootObject() throws Exception
-	{
-
-	}
-
-	@Test
-	public void testRemoveNodeBuilder() throws Exception
-	{
-
-	}
-
-	@Test
-	public void testSetGeneralArrayNodeBuilder() throws Exception
-	{
-
-	}
-
-	@Test
-	public void testCreateSemanticModel() throws Exception
-	{
-
-	}
-
-	@Test
-	public void testCreateNode() throws Exception
-	{
-
-	}
-
-	@Test
-	public void testParseSemanticModel() throws Exception
-	{
-
-	}
-
-	@Test
-	public void testCreateObject() throws Exception
-	{
-
+		assertTrue( engine.containsNodeBuilder( String.class ) );
 	}
 }

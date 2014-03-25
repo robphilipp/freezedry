@@ -41,7 +41,7 @@ import org.freezedry.persistence.utils.Constants;
  */
 public abstract class AbstractFileBasedPersistence extends AbstractPersistence {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger( XmlPersistence.class );
+	private static final Logger LOGGER = LoggerFactory.getLogger( AbstractFileBasedPersistence.class );
 
 	/**
 	 * Writes the specified object into the file using the persistence mechanism implemented in
@@ -57,10 +57,10 @@ public abstract class AbstractFileBasedPersistence extends AbstractPersistence {
 		}
 		catch( IOException e )
 		{
-			final StringBuffer message = new StringBuffer();
-			message.append( "Unable to open the file for writing" + Constants.NEW_LINE );
-			message.append( "  File Name: " + fileName + Constants.NEW_LINE );
-			message.append( "  Object: " + object.toString() );
+			final StringBuilder message = new StringBuilder();
+			message.append( "Unable to open the file for writing" ).append( Constants.NEW_LINE );
+			message.append( "  File Name: " ).append( fileName ).append( Constants.NEW_LINE );
+			message.append( "  Object: " ).append( object.toString() );
 			LOGGER.error( message.toString() );
 			throw new IllegalArgumentException( message.toString(), e );
 		}
@@ -75,7 +75,7 @@ public abstract class AbstractFileBasedPersistence extends AbstractPersistence {
 	 */
 	public < T > T read( final Class< ? extends T > clazz, final String fileName )
 	{
-		Object object = null;
+		Object object;
 		try( final InputStream inputStream = new BufferedInputStream( new FileInputStream( fileName ) ) )
 		{
 			final Reader input = new InputStreamReader( inputStream );
@@ -83,10 +83,10 @@ public abstract class AbstractFileBasedPersistence extends AbstractPersistence {
 		}
 		catch( IOException e )
 		{
-			final StringBuffer message = new StringBuffer();
-			message.append( "Unable to open the file for reading" + Constants.NEW_LINE );
-			message.append( "  File Name: " + fileName + Constants.NEW_LINE );
-			message.append( "  Class: " + clazz.getName() );
+			final StringBuilder message = new StringBuilder();
+			message.append( "Unable to open the file for reading" ).append( Constants.NEW_LINE );
+			message.append( "  File Name: " ).append( fileName ).append( Constants.NEW_LINE );
+			message.append( "  Class: " ).append( clazz.getName() );
 			LOGGER.error( message.toString() );
 			throw new IllegalArgumentException( message.toString(), e );
 		}

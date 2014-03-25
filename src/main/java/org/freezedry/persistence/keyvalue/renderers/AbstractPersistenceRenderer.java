@@ -104,6 +104,8 @@ public abstract class AbstractPersistenceRenderer implements PersistenceRenderer
 		decorators.put( Short.TYPE, new IntegerDecorator() );
 		decorators.put( Double.TYPE, new DoubleDecorator() );
 		decorators.put( Boolean.TYPE, new BooleanDecorator() );
+
+		decorators.put( String.class, new StringDecorator() );
 		
 		return decorators;
 	}

@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Creates a semantic model of the specified {@link Object}, and creates a specified {@link Object} form
@@ -78,16 +79,22 @@ import java.util.*;
 public class PersistenceEngine {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger( PersistenceEngine.class );
+
+	// todo make this a configuration that can be passed in
+	public static final String GENERIC_TYPE_SEPARATOR = "___";
 	
 	private static final Map< Class< ? >, Object > PRIMITIVE_TYPES = createPrimitives();
 	private static final Set< Class< ? > > NON_ROOT_OBJECTS = nonRootObjects();
 	
 	private final Map< Class< ? >, NodeBuilder > nodeBuilders;
 	private ArrayNodeBuilder genaralArrayNodeBuilder;
+	private EnumNodeBuilder generalEnumNodeBuilder;
 	private boolean isPersistClassConstants = false;
 	private boolean isPersistNullValues = false;
 	
 	private final Map< Class< ? >, Object > defaultInstances;
+
+	private String genericTypeSeparator = GENERIC_TYPE_SEPARATOR;
 	
 	/**
 	 * Constructs a {@link PersistenceEngine} with the default {@link InfoNode} info node builders
@@ -96,6 +103,7 @@ public class PersistenceEngine {
 	{
 		this.nodeBuilders = createDefaultNodeBuilders();
 		this.genaralArrayNodeBuilder = new ArrayNodeBuilder( this );
+		this.generalEnumNodeBuilder = new EnumNodeBuilder( this );
 		this.defaultInstances = createDefaultInstances();
 	}
 	
@@ -221,6 +229,30 @@ public class PersistenceEngine {
 	{
 		this.isPersistClassConstants = true;
 		return this;
+	}
+
+	/**
+	 * Sets the separator used when the a class has a generic type for which we need to store the {@link java.lang.Class}
+	 * of the member instance so that the object can be reconstructed.
+	 * @param separator The separator used when the a class has a generic type
+	 * @return This {@link org.freezedry.persistence.PersistenceEngine} for chaining
+	 */
+	public PersistenceEngine withGenericTypeSeparator( final String separator )
+	{
+		if( separator != null && !separator.isEmpty() )
+		{
+			this.genericTypeSeparator = separator;
+		}
+		return this;
+	}
+
+	/**
+	 * @return the separator used when the a class has a generic type for which we need to store the {@link java.lang.Class}
+	 * of the member instance so that the object can be reconstructed.
+	 */
+	public String getGenericTypeSeparator()
+	{
+		return genericTypeSeparator;
 	}
 
 	/**
@@ -368,6 +400,20 @@ public class PersistenceEngine {
 	}
 
 	/**
+	 * Sets the default {@link NodeBuilder} used for enums, for which objects for which a specific {@link NodeBuilder}
+	 * hasn't been specified. You can add a specific enum {@link NodeBuilder} to using {@link #addNodeBuilder(Class, NodeBuilder)} method.
+	 * For example:<p>
+	 * {@code builder.addNodeBuilder( String[].class, new EnumNodeBuilder() )}<p>
+	 * maps all {@code String[]} objects to use the {@link EnumNodeBuilder}.
+	 * @param builder The default {@link NodeBuilder} to use for arrays for which a specific {@link NodeBuilder}
+	 * hasn't been specified.
+	 */
+	public void setGeneralEnumNodeBuilder( final EnumNodeBuilder builder )
+	{
+		this.generalEnumNodeBuilder = builder;
+	}
+
+	/**
 	 * Searches through the existing node builders to see if they are of the specified {@link Class}.
 	 * If it doesn't find one, then it instantiates a new {@link NodeBuilder} and sets its {@link PersistenceEngine}
 	 * to this object.
@@ -447,6 +493,10 @@ public class PersistenceEngine {
 				LOGGER.error( message.toString(), e );
 				throw new IllegalArgumentException( message.toString(), e );
 			}
+		}
+		else if( clazz.isEnum() )
+		{
+			rootNode = generalEnumNodeBuilder.createInfoNode( object, clazz.getSimpleName() );
 		}
 		// if the override node builder map contains a node builder for this specific class, and
 		// the class is allowed to be a root object, then we'll use it
@@ -562,6 +612,7 @@ public class PersistenceEngine {
 		//    method recursively to construct the nodes.
 		// 4. the object is an array, and the array class hasn't been specified in the node 
 		//    builder map, then we must treat it as a generic array.
+		// 5. the object is an enum, and must be treated as an enum, which may have a special get name method
 		// the first two cases are handled by the info node builders in the info node builders map. even
 		// the leaf node info node builders may need to be overridden. the third case is handled
 		// by the compound node
@@ -630,12 +681,34 @@ public class PersistenceEngine {
 				throw new IllegalStateException( message.toString(), e );
 			}
 		}
+		else if( clazz.isEnum() )
+		{
+			node = generalEnumNodeBuilder.createInfoNode( containingClass, object, fieldName );
+		}
 		else
 		{
+			// check to see if the field has a generic type. for example, suppose that the containing
+			// class is defined as: class A< T extends B > { .... }
+			// if class A has a member defined as: T member
+			// then we want to store the member's acutal class.
+			String persistName = fieldName;
+			try
+			{
+				if( containingClass != null && containingClass.getDeclaredField( fieldName ).getGenericType() != null )
+				{
+					final String className = object.getClass().getName().replace( ".", "_" );
+					persistName += genericTypeSeparator + className;
+				}
+			}
+			catch( NoSuchFieldException e )
+			{
+				/* this is empty purposely */
+			}
+
 			// create a new compound node to holds this, since it isn't a leaf node, and
 			// call (recursively) the addNodes(...) method to add the nodes representing the
 			// fields of this object to the newly created compound node.
-			final InfoNode compoundNode = InfoNode.createCompoundNode( fieldName, fieldName, clazz );
+			final InfoNode compoundNode = InfoNode.createCompoundNode( fieldName, persistName, clazz );
 			node = addNodes( compoundNode, object );
 		}
 		
@@ -674,6 +747,10 @@ public class PersistenceEngine {
 				LOGGER.error( message.toString(), e );
 				throw new IllegalArgumentException( message.toString(), e );
 			}
+		}
+		else if( clazz.isEnum() )
+		{
+			object = generalEnumNodeBuilder.createObject( null, clazz, rootNode );
 		}
 		// if the override node builders contains a node builder for this specific class, then we'll use it
 		else if( containsNodeBuilder( clazz ) && isAllowedRootObject( clazz ) )
@@ -730,6 +807,10 @@ public class PersistenceEngine {
 			if( ( instance = getDefaultInstance( clazz ) ) != null )
 			{
 				object = instance;
+			}
+			else if( rootClass.isEnum() )
+			{
+				object = rootClass.getEnumConstants();
 			}
 			else if( constructors.length > 0 )
 			{
@@ -872,8 +953,34 @@ public class PersistenceEngine {
 			// grab the class' field
 			try
 			{
+				// check to see if this type may be a generic type. in that case, the field name is listed first, and
+				// then its class is appended, so we grab the field name and set it to the first part, and tell the node
+				// that it should instantiate this class (note: this may be overridden by annotations)
+				if( fieldName.contains( genericTypeSeparator ) )
+				{
+					final String[] components = fieldName.split( Pattern.quote( genericTypeSeparator ) );
+					fieldName = components[ 0 ];
+					final String genericType = components[ 1 ].replace( '_', '.' );
+
+					// if the generic type has a value, then hand it to the node
+					if( !genericType.isEmpty() )
+					{
+						try
+						{
+							node.setClazz( Class.forName( genericType ) );
+						}
+						catch( ClassNotFoundException e )
+						{
+							final String warn = "Attempted to load the class for the generic type specified, but was unable to. " + Constants.NEW_LINE +
+									"  Object class: " + object.getClass().getSimpleName() + Constants.NEW_LINE +
+									"  Field name: " + fieldName + Constants.NEW_LINE +
+									"  Generic Type: " + genericType;
+							LOGGER.warn( warn, e );
+						}
+					}
+				}
 				final Field field = ReflectionUtils.getDeclaredField( clazz, fieldName );
-				
+
 				// grab the generic parameter type of the field and add it to the info node
 				final Type type = field.getGenericType();
 				if( type instanceof ParameterizedType )
@@ -881,7 +988,7 @@ public class PersistenceEngine {
 					final List< Type > types = Arrays.asList( ((ParameterizedType)type).getActualTypeArguments() );
 					node.setGenericParameterTypes( types );
 				}
-				
+
 				// see if the field has a @Persist( instantiateAs = XXXX.class ) annotation
 				final Persist annotation = field.getAnnotation( Persist.class );
 				if( annotation != null )
@@ -1047,6 +1154,10 @@ public class PersistenceEngine {
 				LOGGER.error( message.toString() );
 				throw new IllegalStateException( message.toString(), e );
 			}
+		}
+		else if( clazz.isEnum() )
+		{
+			object = generalEnumNodeBuilder.createObject( containingClass, clazz, currentNode );
 		}
 		else
 		{
