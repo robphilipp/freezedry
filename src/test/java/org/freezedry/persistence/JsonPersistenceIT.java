@@ -1,5 +1,6 @@
 package org.freezedry.persistence;
 
+import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
@@ -19,6 +20,7 @@ import static org.ops4j.pax.exam.OptionUtils.combine;
  * @author rob
  *         12/28/13 4:36 PM
  */
+@Ignore
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerMethod.class)
 public class JsonPersistenceIT extends JsonPersistenceTest {

@@ -38,8 +38,8 @@
 
         <!-- testing -->
         <junit.version>4.8.1</junit.version>
-        <maven.surefire.version>2.16</maven.surefire.version>
-        <maven.failsage.version>2.16</maven.failsage.version>
+        <maven.surefire.version>2.17</maven.surefire.version>
+        <maven.failsage.version>2.17</maven.failsage.version>
         <exam.version>3.4.0</exam.version>
         <url.version>1.6.0</url.version>
 
@@ -104,8 +104,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.1</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
 
@@ -146,13 +146,13 @@
                 <configuration>
                     <instructions>
                         <Export-Package>
-                            org.freezedry.difference*;version=${project.version},
-                            org.freezedry.persistence*;version=${project.version},
-                            org.freezedry.serialization*;version=${project.version}
+                            org.freezedry.difference.*;version=${project.version},
+                            org.freezedry.persistence.*;version=${project.version},
+                            org.freezedry.serialization.*;version=${project.version}
                         </Export-Package>
-                        <Private-Package>
-                            org.freezedry.*
-                        </Private-Package>
+                        <!--<Private-Package>-->
+                            <!--org.freezedry.*-->
+                        <!--</Private-Package>-->
                     </instructions>
                 </configuration>
             </plugin>
@@ -223,7 +223,7 @@
                 <dependency>
                     <groupId>org.apache.felix</groupId>
                     <artifactId>org.apache.felix.framework</artifactId>
-                    <version>3.2.2</version>
+                    <version>4.2.1</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
@@ -271,9 +271,9 @@
             </properties>
             <dependencies>
                 <dependency>
-                    <groupId>org.eclipse.osgi</groupId>
-                    <artifactId>org.eclipse.osgi</artifactId>
-                    <version>3.6.0.v20100517</version>
+                    <groupId>org.eclipse</groupId>
+                    <artifactId>osgi</artifactId>
+                    <version>3.9.1-v20140110-1610</version>
                     <scope>test</scope>
                 </dependency>
                 <!-- doesn't work...some dependency issue on org.osgi...?-->
@@ -285,7 +285,7 @@
                 <!--</dependency>-->
             </dependencies>
         </profile>
-        <!-- end of testing profiles -->
+        <!--end of testing profiles-->
 
     </profiles>
 
@@ -329,7 +329,7 @@
             <!--<version>${felix.version}</version>-->
             <!--<scope>test</scope>-->
         <!--</dependency>-->
-        <!--&lt;!&ndash; end of testing &ndash;&gt;-->
+        <!-- end of testing -->
 
         <!-- logging -->
         <dependency>
