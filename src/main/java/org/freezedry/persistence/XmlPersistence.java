@@ -67,10 +67,11 @@ public class XmlPersistence extends AbstractFileBasedPersistence {
 		return isDisplayTypeInfo;
 	}
 	
-	/*
+	/**
 	 * Creates the {@link XmlWriter} if it hasn't yet been instantiated, and returns it
 	 * @return the {@link XmlWriter}
 	 */
+	@Override
 	protected XmlWriter getPersistenceWriter()
 	{
 		if( xmlWriter == null )
@@ -81,10 +82,11 @@ public class XmlPersistence extends AbstractFileBasedPersistence {
 		return xmlWriter;
 	}
 	
-	/*
+	/**
 	 * Creates the {@link XmlReader} if it hasn't yet been instantiated, and returns it
 	 * @return the {@link XmlReader}
 	 */
+	@Override
 	protected XmlReader getPersistenceReader()
 	{
 		if( xmlReader == null )

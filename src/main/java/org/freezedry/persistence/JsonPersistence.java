@@ -23,10 +23,11 @@ public class JsonPersistence extends AbstractFileBasedPersistence {
 	private JsonWriter jsonWriter;
 	private JsonReader jsonReader;
 	
-	/*
+	/**
 	 * Creates the {@link JsonWriter} if it hasn't yet been instantiated, and returns it
 	 * @return the {@link JsonWriter}
 	 */
+	@Override
 	protected JsonWriter getPersistenceWriter()
 	{
 		if( jsonWriter == null )
@@ -36,10 +37,11 @@ public class JsonPersistence extends AbstractFileBasedPersistence {
 		return jsonWriter;
 	}
 
-	/*
+	/**
 	 * Creates the {@link JsonReader} if it hasn't yet been instantiated, and returns it
 	 * @return the {@link JsonReader}
 	 */
+	@Override
 	protected JsonReader getPersistenceReader()
 	{
 		if( jsonReader == null )

@@ -39,14 +39,14 @@ public class DomUtils {
 		return toString( node, 0 );
 	}
 	
-	/*
+	/**
 	 * The recursive method from printing the DOM tree.
 	 * @param node The current {@link Node} to log
 	 * @param level current level in the tree. Root node = 0; next level = 1, etc.
 	 */
 	private static String toString( final Node node, final int level )
 	{
-		final StringBuffer buffer = new StringBuffer();
+		final StringBuilder buffer = new StringBuilder();
 		
 		// add a level of indent
 		for( int i = 0; i < level; ++i )
@@ -65,7 +65,7 @@ public class DomUtils {
 			for( int i = 0; i < nodeMap.getLength(); ++i )
 			{
 				final Node attr = nodeMap.item( i );
-				buffer.append( attr + ( i < nodeMap.getLength()-1 ? "; " : "" ) ); 
+				buffer.append( attr ).append( i < nodeMap.getLength() - 1 ? "; " : "" );
 			}
 			buffer.append( ")" );
 		}
@@ -109,9 +109,9 @@ public class DomUtils {
 		return document;
 	}
 	
-	/*
+	/**
 	 * Removes empty spaces from elements
-	 * @param document The root {@link Node} of the DOM tree
+	 * @param node The root {@link Node} of the DOM tree
 	 * @param regexPattern The pattern describing what an empty element looks like.
 	 */
 	private static void cleanTextNodes( final Node node, final Pattern regexPattern )
@@ -122,7 +122,7 @@ public class DomUtils {
 			final Node testNode = nodes.item( i );
 			if( testNode.getNodeType() == Node.TEXT_NODE  )
 			{
-				final Matcher matcher = regexPattern.matcher( testNode.getTextContent().toString() );
+				final Matcher matcher = regexPattern.matcher( testNode.getTextContent() );
 				if( matcher.matches() )
 				{
 					node.removeChild( testNode );
