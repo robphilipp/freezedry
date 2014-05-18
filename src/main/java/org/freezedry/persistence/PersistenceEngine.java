@@ -107,7 +107,7 @@ public class PersistenceEngine {
 		this.defaultInstances = createDefaultInstances();
 	}
 	
-	/*
+	/**
 	 * @return a {@link Map} containing the {@link Class}es and their associated {@link InfoNode} {@link Generator}
 	 */
 	private Map< Class< ? >, NodeBuilder > createDefaultNodeBuilders()

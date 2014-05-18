@@ -116,6 +116,7 @@ public class Pair< F, S > implements Copyable< Pair< F, S > > {
 	 * (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
+	@Override
 	public boolean equals( final Object obj )
 	{
 		// same object
@@ -160,10 +161,7 @@ public class Pair< F, S > implements Copyable< Pair< F, S > > {
 	@Override
 	public String toString()
 	{
-		final StringBuffer asString = new StringBuffer( "[" );
-		asString.append( (first != null ? first.toString() : "[null]" ) ).append( ", " );
-		asString.append( (second != null ? second.toString() : "[null]" ) ).append( "]" );
-		return asString.toString();
+		return "[" + (first != null ? first.toString() : "[null]") + ", " + (second != null ? second.toString() : "[null]") + "]";
 	}
 
 	/*
@@ -173,6 +171,6 @@ public class Pair< F, S > implements Copyable< Pair< F, S > > {
 	@Override
 	public Pair< F, S > getCopy()
 	{
-		return new Pair< F, S >( this );
+		return new Pair<>( this );
 	}
 }

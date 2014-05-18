@@ -85,7 +85,7 @@ public class DateNodeBuilder extends AbstractLeafNodeBuilder {
 		this.outputDateFormat = builder.outputDateFormat;
 	}
 	
-	/*
+	/**
 	 * @return a default set of date formats for parsing {@link String}s into {@link Calendar}
 	 */
 	private static List< String > createDefaultParsingDateFormats()
