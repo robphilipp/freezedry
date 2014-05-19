@@ -15,23 +15,19 @@
  */
 package org.freezedry.persistence.builders;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.freezedry.persistence.PersistenceEngine;
 import org.freezedry.persistence.annotations.PersistMap;
 import org.freezedry.persistence.containers.Pair;
 import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.Constants;
 import org.freezedry.persistence.utils.ReflectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Type;
+import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Handles the persistence and serialization of {@link Map} objects. When use for serialization
@@ -430,7 +426,10 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 	private Pair< String, String > getKeyValueNames( final Class< ? > containingClass, final InfoNode node )
 	{
 		// create the pair containing the default key and value names
-		final Pair< String, String > keyValue = new Pair<>( PersistMap.KEY_PERSIST_NAME, PersistMap.VALUE_PERSIST_NAME );
+//		final Pair< String, String > keyValue = new Pair<>( PersistMap.KEY_PERSIST_NAME, PersistMap.VALUE_PERSIST_NAME );
+		final Pair.Builder< String, String > builder = Pair.< String, String >builder()
+				.withFirst( PersistMap.KEY_PERSIST_NAME )
+				.withSecond( PersistMap.VALUE_PERSIST_NAME );
 		
 		// attempt to grab the field with the node's persistence name (in this case this would be the
 		// field name)
@@ -455,18 +454,18 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 				final String keyName = mapAnnotation.keyPersistName();
 				if( keyName != null && !keyName.isEmpty() )
 				{
-					keyValue.setFirst( keyName );
+					builder.withFirst( keyName );
 				}
 				
 				final String valueName = mapAnnotation.valuePersistName();
 				if( valueName != null && !valueName.isEmpty() )
 				{
-					keyValue.setSecond( valueName );
+					builder.withSecond( valueName );
 				}
 			}
 		}
 		
-		return keyValue;
+		return builder.build();
 	}
 	
 	/*
