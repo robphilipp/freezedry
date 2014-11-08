@@ -15,12 +15,6 @@ Please see the Website (http://robphilipp.github.io/freezedry) for documentation
    running quickly.
 
 -----------------------------------------------------------------------------------
-   Contiuous Integration
------------------------------------------------------------------------------------
-I use cloudbees for CI. You can view the results of master and develop branch
-builds at https://robphilipp.ci.cloudbees.com/.
-
------------------------------------------------------------------------------------
    Changes from version 0.2.8 to version 0.2.9
 -----------------------------------------------------------------------------------
 1. freezedry jar is now an OSGi bundle
