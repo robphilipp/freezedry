@@ -107,8 +107,8 @@ public class PersistenceEngine {
 		this.defaultInstances = createDefaultInstances();
 	}
 	
-	/*
-	 * @return a {@link Map} containing the {@link Class}es and their associated {@link InfoNode} {@link Generator}
+	/**
+	 * @return a {@link Map} containing the {@link Class}es and their associated {@link InfoNode} {@link org.freezedry.persistence.builders.NodeBuilder}
 	 */
 	private Map< Class< ? >, NodeBuilder > createDefaultNodeBuilders()
 	{
@@ -136,7 +136,7 @@ public class PersistenceEngine {
 		builders.put( String.class, new StringNodeBuilder( this ) );
 		
 		// other leaf nodes
-		builders.put( Calendar.class, new DateNodeBuilder( this ) );
+		builders.put( Calendar.class, new CalendarNodeBuilder( this ) );
 		
 		// collection info node builder (specific info node builder)
 		builders.put( Collection.class, new CollectionNodeBuilder( this ) );

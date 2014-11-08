@@ -15,15 +15,6 @@
  */
 package org.freezedry.persistence.keyvalue.renderers;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.freezedry.persistence.annotations.PersistMap;
 import org.freezedry.persistence.containers.Pair;
 import org.freezedry.persistence.keyvalue.KeyValueBuilder;
@@ -31,6 +22,15 @@ import org.freezedry.persistence.keyvalue.renderers.decorators.StringDecorator;
 import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.Constants;
 import org.freezedry.persistence.utils.ReflectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Renders the subtree of the semantic model that represents a {@link Map}. {@link Map}s are rendered
@@ -238,13 +238,11 @@ public class MapRenderer extends AbstractPersistenceRenderer {
 				}
 				else
 				{
-					final String message = new StringBuilder()
-							.append( "The MapRenderer expects MapEntry nodes to have a key subnode and a value subnode." ).append( Constants.NEW_LINE )
-							.append( "  Required Key Sub-node Persist Name: " ).append( mapKeyName ).append( Constants.NEW_LINE )
-							.append( "  Required Value Sub-node Persist Name: " ).append( mapValueName ).append( Constants.NEW_LINE )
-							.append( "  First Node's Persist Name: " ).append( name1 ).append( Constants.NEW_LINE )
-							.append( "  Second Node's Persist Name: " ).append( name2 )
-							.toString();
+					final String message = "The MapRenderer expects MapEntry nodes to have a key subnode and a value subnode." + Constants.NEW_LINE +
+							"  Required Key Sub-node Persist Name: " + mapKeyName + Constants.NEW_LINE +
+							"  Required Value Sub-node Persist Name: " + mapValueName + Constants.NEW_LINE +
+							"  First Node's Persist Name: " + name1 + Constants.NEW_LINE +
+							"  Second Node's Persist Name: " + name2;
 					LOGGER.error( message );
 					throw new IllegalStateException( message );
 				}

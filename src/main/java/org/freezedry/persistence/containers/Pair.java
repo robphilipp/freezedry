@@ -18,7 +18,9 @@ package org.freezedry.persistence.containers;
 import org.freezedry.persistence.copyable.Copyable;
 
 /**
- * Simple class to represent the concept of a pair. 
+ * Simple, immutable class to represent the concept of a pair. Can use the standard
+ * constructor, getCopy() method, or the builder for constructing a pair object. Once
+ * constructed, the pair is immutable.
  * 
  * @author Robert Philipp
  */
@@ -48,11 +50,6 @@ public class Pair< F, S > implements Copyable< Pair< F, S > > {
 	}
 	
 	/**
-	 * Default constructor
-	 */
-	public Pair() {}
-	
-	/**
 	 * Copy constructor
 	 * @param pair The pair to copy
 	 */
@@ -61,16 +58,16 @@ public class Pair< F, S > implements Copyable< Pair< F, S > > {
 		this.first = pair.first;
 		this.second = pair.second;
 	}
-	
+
 	/**
-	 * Allows the setting of the pair in one call 
-	 * @param first The first of the pair
-	 * @param second The second of the pair
+	 * Builder for the immutable pair.
+	 * @param <F> The first parameter
+	 * @param <S> The second parameter
+	 * @return The pair builder
 	 */
-	public void set( final F first, final S second )
+	public static < F, S > Builder< F, S > builder()
 	{
-		setFirst( first );
-		setSecond( second );
+		return new Builder<>();
 	}
 	
 	/**
@@ -83,16 +80,6 @@ public class Pair< F, S > implements Copyable< Pair< F, S > > {
 	}
 	
 	/**
-	 * Sets the value of the first
-	 * @param first The value with which to set the first
-	 */
-	public void setFirst( final F first )
-	{
-		this.first = first;
-		hashCode = 0;
-	}
-	
-	/**
 	 * Returns the second of the pair
 	 * @return the second of the pair
 	 */
@@ -102,20 +89,11 @@ public class Pair< F, S > implements Copyable< Pair< F, S > > {
 		
 	}
 	
-	/**
-	 * Sets the value fo the second of the pair
-	 * @param second The value with which to set the second
-	 */
-	public void setSecond( final S second )
-	{
-		this.second = second;
-		hashCode = 0;
-	}
-	
 	/*
 	 * (non-Javadoc)
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
+	@Override
 	public boolean equals( final Object obj )
 	{
 		// same object
@@ -160,10 +138,7 @@ public class Pair< F, S > implements Copyable< Pair< F, S > > {
 	@Override
 	public String toString()
 	{
-		final StringBuffer asString = new StringBuffer( "[" );
-		asString.append( (first != null ? first.toString() : "[null]" ) ).append( ", " );
-		asString.append( (second != null ? second.toString() : "[null]" ) ).append( "]" );
-		return asString.toString();
+		return "[" + (first != null ? first.toString() : "[null]") + ", " + (second != null ? second.toString() : "[null]") + "]";
 	}
 
 	/*
@@ -173,6 +148,29 @@ public class Pair< F, S > implements Copyable< Pair< F, S > > {
 	@Override
 	public Pair< F, S > getCopy()
 	{
-		return new Pair< F, S >( this );
+		return new Pair<>( this );
+	}
+
+	public static class Builder< F, S >
+	{
+		private F first;
+		private S second;
+
+		public Builder< F, S > withFirst( final F value )
+		{
+			this.first = value;
+			return this;
+		}
+
+		public Builder< F, S > withSecond( final S value )
+		{
+			this.second = value;
+			return this;
+		}
+
+		public Pair< F, S > build()
+		{
+			return new Pair<>( first, second );
+		}
 	}
 }

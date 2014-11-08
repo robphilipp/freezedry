@@ -1,3 +1,4 @@
+![develop](https://travis-ci.org/robphilipp/freezedry.svg?branch=develop)
 freezedry
 =========
 
@@ -13,10 +14,17 @@ Please see the Website (http://robphilipp.github.io/freezedry) for documentation
    running quickly.
 
 -----------------------------------------------------------------------------------
-   Contiuous Integration
+   Changes from version 0.2.9 to version 0.3.2
 -----------------------------------------------------------------------------------
-I use cloudbees for CI. You can view the results of master and develop branch
-builds at https://robphilipp.ci.cloudbees.com/.
+1. Support for top-level generic types. For example, persisting a List< MyClass >.
+2. Annotation (@PersistEnum) for persisting enums, specifying the method that returns
+   the value of the enum.
+3. Object-difference calculator that reports the differences between objects of
+   the same type.
+4. Difference calculator allows comparison of lists, ignoring order
+5. Completely removed OSGi support
+6. Switched to Java 8
+7. Fixed bug related to JSON and empty lists
 
 -----------------------------------------------------------------------------------
    Changes from version 0.2.8 to version 0.2.9
