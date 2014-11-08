@@ -68,7 +68,6 @@ public abstract class AbstractLeafNodeBuilder extends AbstractNodeBuilder {
 	 * @param object The value of the field with the specified field name
 	 * @param fieldName The name of the field for which the object is the value
 	 * @return The constructed {@link InfoNode} based on the specified information
-	 * @throws ReflectiveOperationException
 	 */
 	@Override
 	public InfoNode createInfoNode( final Class< ? > containingClass, final Object object, final String fieldName )
@@ -91,10 +90,7 @@ public abstract class AbstractLeafNodeBuilder extends AbstractNodeBuilder {
 		}
 
 		// create a new leaf node
-		final InfoNode node = InfoNode.createLeafNode( fieldName, object, persistName, clazz );
-		
-		// return the node
-		return node;
+		return InfoNode.createLeafNode( fieldName, object, persistName, clazz );
 	}
 
 	/**
@@ -103,20 +99,12 @@ public abstract class AbstractLeafNodeBuilder extends AbstractNodeBuilder {
 	 * to persist an {@link java.util.ArrayList} for serialization and would like to maintain the type information.
 	 * @param object The value of the field with the specified field name
 	 * @return The constructed {@link InfoNode} based on the specified information
-	 * @throws ReflectiveOperationException
 	 */
 	@Override
 	public InfoNode createInfoNode( final Object object, final String persistName )
 	{
-		// grab the class for the object to persist
-		final Class< ? > clazz = object.getClass();
-		
 		// create a new leaf node
-		final String name = persistName;//clazz.getName();
-		final InfoNode node = InfoNode.createLeafNode( name, object, name, clazz );
-		
-		// return the node
-		return node;
+		return  InfoNode.createLeafNode( persistName, object, persistName, object.getClass() );
 	}
 
 	/**

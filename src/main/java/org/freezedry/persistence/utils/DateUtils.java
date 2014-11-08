@@ -66,7 +66,7 @@ public class DateUtils {
 		{
 			try 
 			{
-				calendarDate = DateUtils.createDateFromString( date, format );
+				calendarDate = createDateFromString( date, format );
 	            break;
 			} 
 			catch( ParseException exception ) 
@@ -97,7 +97,7 @@ public class DateUtils {
 	 */
 	public static List< String > createStringsFromDates( final List< Calendar > dates, final String format )
 	{
-		final List< String > strings = new ArrayList< String >( dates.size() );
+		final List< String > strings = new ArrayList<>( dates.size() );
 
 		for( Calendar date : dates )
 		{
@@ -154,7 +154,7 @@ public class DateUtils {
 	 * </ol>
 	 * <p>A standard referencing this profile should permit one or both of these ways of handling time zone offsets.</p>
 	 * 
-	 * @param dateString
+	 * @param dateString an string representing an ISO 8601 date/time
 	 * @return The {@link Calendar} object of the string representation
 	 */
 	public static Calendar createDateFromIso8601( final String dateString )
@@ -261,7 +261,7 @@ public class DateUtils {
 			{
 				final String[] elements = dateString.split( "T" );
 				final String[] dates = elements[ 0 ].split( "-" );
-				String[] timeElements = null;
+				String[] timeElements;
 				String offsetSign;
 				if( elements[ 1 ].contains( "+" ) )
 				{
@@ -287,7 +287,7 @@ public class DateUtils {
 			{
 				final String[] elements = dateString.split( "T" );
 				final String[] dates = elements[ 0 ].split( "-" );
-				String[] timeElements = null;
+				String[] timeElements;
 				String offsetSign;
 				if( elements[ 1 ].contains( "+" ) )
 				{
@@ -314,7 +314,7 @@ public class DateUtils {
 			{
 				final String[] elements = dateString.split( "T" );
 				final String[] dates = elements[ 0 ].split( "-" );
-				String[] timeElements = null;
+				String[] timeElements;
 				String offsetSign;
 				if( elements[ 1 ].contains( "+" ) )
 				{
@@ -341,11 +341,7 @@ public class DateUtils {
 			}
 			else // not valid format...shouldn't have gotten here
 			{
-				final StringBuffer message = new StringBuffer();
-				message.append( "Invalid ISO 8601 date format. But you should have never reached this point." + Constants.NEW_LINE );
-				message.append( "The fact that you got to this point is highly disturbing. So disurbing, " + Constants.NEW_LINE );
-				message.append( "in fact, that I'm just going to stop, and let the returned date remain null." );
-				LOGGER.warn( message.toString() );
+				LOGGER.warn( "Invalid ISO 8601 date format. But you should have never reached this point." );
 			}
 		}
 		return date;

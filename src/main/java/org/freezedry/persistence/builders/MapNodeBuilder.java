@@ -15,22 +15,19 @@
  */
 package org.freezedry.persistence.builders;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.freezedry.persistence.PersistenceEngine;
 import org.freezedry.persistence.annotations.PersistMap;
 import org.freezedry.persistence.containers.Pair;
 import org.freezedry.persistence.tree.InfoNode;
 import org.freezedry.persistence.utils.Constants;
 import org.freezedry.persistence.utils.ReflectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Type;
+import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Handles the persistence and serialization of {@link Map} objects. When use for serialization
@@ -112,11 +109,7 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 			}
 			catch( ReflectiveOperationException e )
 			{
-				final StringBuffer message = new StringBuffer();
-				message.append( "Field not found in containing class:" + Constants.NEW_LINE );
-				message.append( "  Containing class: " + containingClass.getName() + Constants.NEW_LINE );
-				message.append( "  Field name: " + fieldName + Constants.NEW_LINE );
-				LOGGER.debug( message.toString() );
+				LOGGER.debug( ("Field not found in containing class:" + Constants.NEW_LINE) + "  Containing class: " + containingClass.getName() + Constants.NEW_LINE + "  Field name: " + fieldName + Constants.NEW_LINE );
 			}
 		}
 		if( persistName == null || persistName.isEmpty() )
@@ -153,11 +146,9 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 		}
 		catch( ReflectiveOperationException e )
 		{
-			final StringBuffer message = new StringBuffer();
-			message.append( "Field not found in containing class:" + Constants.NEW_LINE );
-			message.append( "  Containing class: " + containingClass.getName() + Constants.NEW_LINE );
-			message.append( "  Field name: " + fieldName + Constants.NEW_LINE );
-			LOGGER.debug( message.toString() );
+			LOGGER.debug( "Field not found in containing class:" + Constants.NEW_LINE +
+					"  Containing class: " + (containingClass != null ? containingClass.getName() : "[null]" ) + Constants.NEW_LINE +
+					"  Field name: " + fieldName + Constants.NEW_LINE );
 		}
 		
 		// run through the Map entries, recursively calling createNode(...) to create
@@ -231,16 +222,16 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 		final List< Type > types = node.getGenericParameterTypes();
 		if( types.size() != 2 )
 		{
-			final StringBuffer message = new StringBuffer();
-			message.append( "Must have two generic parameter in map (one for the key and one for the value):" + Constants.NEW_LINE );
-			message.append( "  Number of Generic Parameters: " + types.size() + Constants.NEW_LINE );
-			message.append( "  Class name: " + clazz.getName() + Constants.NEW_LINE );
-			message.append( "  Field name: " + node.getFieldName() + Constants.NEW_LINE );
-			message.append( "  Persist name: " + node.getPersistName() + Constants.NEW_LINE );
-			message.append( "  Generic Parameters: " + Constants.NEW_LINE );
+			final StringBuilder message = new StringBuilder();
+			message.append( "Must have two generic parameter in map (one for the key and one for the value):" ).append( Constants.NEW_LINE );
+			message.append( "  Number of Generic Parameters: " ).append( types.size() ).append( Constants.NEW_LINE );
+			message.append( "  Class name: " ).append( clazz.getName() ).append( Constants.NEW_LINE );
+			message.append( "  Field name: " ).append( node.getFieldName() ).append( Constants.NEW_LINE );
+			message.append( "  Persist name: " ).append( node.getPersistName() ).append( Constants.NEW_LINE );
+			message.append( "  Generic Parameters: " ).append( Constants.NEW_LINE );
 			for( Type type : types )
 			{
-				message.append( "    " + ((Class< ? >)type).getName() + Constants.NEW_LINE );
+				message.append( "    " ).append( ((Class<?>) type).getName() ).append( Constants.NEW_LINE );
 			}
 			throw new IllegalArgumentException( message.toString() );
 		}
@@ -277,13 +268,13 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 			final List< InfoNode > keyValue = entryNode.getChildren();
 			if( keyValue.size() != 2 )
 			{
-				final StringBuffer message = new StringBuffer();
-				message.append( "The info node for this map must have two nodes. Aw snap! But it doesn't" + Constants.NEW_LINE );
-				message.append( "  Number of nodes: " + keyValue.size() + Constants.NEW_LINE );
-				message.append( "  Node names: " + Constants.NEW_LINE );
+				final StringBuilder message = new StringBuilder();
+				message.append( "The info node for this map must have two nodes. Aw snap! But it doesn't" ).append( Constants.NEW_LINE );
+				message.append( "  Number of nodes: " ).append( keyValue.size() ).append( Constants.NEW_LINE );
+				message.append( "  Node names: " ).append( Constants.NEW_LINE );
 				for( InfoNode childNode : keyValue )
 				{
-					message.append( "    " + childNode.getPersistName() + Constants.NEW_LINE );
+					message.append( "    " ).append( childNode.getPersistName() ).append( Constants.NEW_LINE );
 				}
 				LOGGER.error( message.toString() );
 				throw new IllegalArgumentException( message.toString() );
@@ -334,13 +325,13 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 			final List< InfoNode > keyValue = entryNode.getChildren();
 			if( keyValue.size() != 2 )
 			{
-				final StringBuffer message = new StringBuffer();
-				message.append( "The info node for this map must have two nodes. But snap! It doesn't" + Constants.NEW_LINE );
-				message.append( "  Number of nodes: " + keyValue.size() + Constants.NEW_LINE );
-				message.append( "  Node names: " + Constants.NEW_LINE );
+				final StringBuilder message = new StringBuilder();
+				message.append( "The info node for this map must have two nodes. But snap! It doesn't" ).append( Constants.NEW_LINE );
+				message.append( "  Number of nodes: " ).append( keyValue.size() ).append( Constants.NEW_LINE );
+				message.append( "  Node names: " ).append( Constants.NEW_LINE );
 				for( InfoNode childNode : keyValue )
 				{
-					message.append( "    " + childNode.getPersistName() + Constants.NEW_LINE );
+					message.append( "    " ).append( childNode.getPersistName() ).append( Constants.NEW_LINE );
 				}
 				LOGGER.error( message.toString() );
 				throw new IllegalArgumentException( message.toString() );
@@ -363,7 +354,10 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 			}
 
 			// add the new objects to the map
-			map.put( keyValuePair.getFirst(), keyValuePair.getSecond() );
+			if( keyValuePair != null )
+			{
+				map.put( keyValuePair.getFirst(), keyValuePair.getSecond() );
+			}
 		}
 		
 		// return the newly created and populated collection
@@ -380,15 +374,15 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 	 */
 	private Pair< Object, Object > getKeyValuePair( final InfoNode keyNode, final InfoNode valueNode, final InfoNode parentNode ) throws ReflectiveOperationException
 	{
-		final Class< ? > keyClass = Class.forName( keyNode.getPersistName().split( "\\" + KEY_VALUE_SEPARATOR )[ 1 ] );
+		final Class< ? > keyClass = Class.forName( keyNode.getPersistName().split( Pattern.quote( KEY_VALUE_SEPARATOR ) )[ 1 ] );
 		final List< Type > keyTypes = Arrays.asList( (Type)keyClass );
 		final Object key = buildObject( null, keyClass, keyTypes, keyNode, parentNode );
 
-		final Class< ? > valueClass = Class.forName( valueNode.getPersistName().split( "\\" + KEY_VALUE_SEPARATOR )[ 1 ] );
+		final Class< ? > valueClass = Class.forName( valueNode.getPersistName().split( Pattern.quote( KEY_VALUE_SEPARATOR ) )[ 1 ] );
 		final List< Type > valueTypes = Arrays.asList( (Type)valueClass );
 		final Object value = buildObject( null, valueClass, valueTypes, valueNode, parentNode );
 		
-		return new Pair< Object, Object >( key, value );
+		return new Pair<>( key, value );
 	}
 	
 	/*
@@ -432,12 +426,15 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 	private Pair< String, String > getKeyValueNames( final Class< ? > containingClass, final InfoNode node )
 	{
 		// create the pair containing the default key and value names
-		final Pair< String, String > keyValue = new Pair< String, String >( PersistMap.KEY_PERSIST_NAME, PersistMap.VALUE_PERSIST_NAME );
+//		final Pair< String, String > keyValue = new Pair<>( PersistMap.KEY_PERSIST_NAME, PersistMap.VALUE_PERSIST_NAME );
+		final Pair.Builder< String, String > builder = Pair.< String, String >builder()
+				.withFirst( PersistMap.KEY_PERSIST_NAME )
+				.withSecond( PersistMap.VALUE_PERSIST_NAME );
 		
 		// attempt to grab the field with the node's persistence name (in this case this would be the
 		// field name)
 		final String persistName = node.getPersistName();
-		Field field = null;
+		Field field;
 		try
 		{
 			field = ReflectionUtils.getDeclaredField( containingClass, persistName );
@@ -457,18 +454,18 @@ public class MapNodeBuilder extends AbstractNodeBuilder {
 				final String keyName = mapAnnotation.keyPersistName();
 				if( keyName != null && !keyName.isEmpty() )
 				{
-					keyValue.setFirst( keyName );
+					builder.withFirst( keyName );
 				}
 				
 				final String valueName = mapAnnotation.valuePersistName();
 				if( valueName != null && !valueName.isEmpty() )
 				{
-					keyValue.setSecond( valueName );
+					builder.withSecond( valueName );
 				}
 			}
 		}
 		
-		return keyValue;
+		return builder.build();
 	}
 	
 	/*

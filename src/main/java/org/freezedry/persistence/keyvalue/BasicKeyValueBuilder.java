@@ -128,15 +128,15 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 	 * @param infoNode The current node in the semantic model ({@link InfoNode}) for processing.
 	 * @param key The current key, which has accumulated the parents persistence names as part of the flattening
 	 * @param keyValues The current list of key-values to which to add the ones created in this algorithm.
-	 * @param isWithholdPersitName true if the current persistence name should not be added to the key; false otherwise.
+	 * @param isWithholdPersistName true if the current persistence name should not be added to the key; false otherwise.
 	 * This parameter allows {@link PersistenceRenderer}s to suppress the persistence name when it is appropriate. For
 	 * example, in a {@link List} of {@link String}, you may not want to at "{@code String}" to the key.
 	 */
 	@Override
-	public void createKeyValuePairs( final InfoNode infoNode, final String key, final List< Pair< String, Object > > keyValues, final boolean isWithholdPersitName )
+	public void createKeyValuePairs( final InfoNode infoNode, final String key, final List< Pair< String, Object > > keyValues, final boolean isWithholdPersistName )
 	{
 		// determine whether to show the persistence name. the isShowFullKey is top dog.
-		final boolean isHidePersistName = (!isShowFullKey() && isWithholdPersitName);
+		final boolean isHidePersistName = (!isShowFullKey() && isWithholdPersistName);
 		
 		// grab the persistence renderer for the class or for its closest ancestor, or for the 
 		// array renderer if the class is an array
@@ -153,7 +153,8 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 		{
 			// create the new key based on the specified key and the persistence name
 			final String newKey = createKey( infoNode, key, isHidePersistName );
-			final Pair< String, Object > keyValuePair = new Pair<>( newKey, null );
+			final Pair.Builder< String, Object > builder = Pair.< String, Object >builder()
+					.withFirst( newKey ).withSecond( null );
 			
 			// if the node is a leaf node, then it has a value, and we need to create a key-value pair
 			// otherwise we need to recurse back to the calling method to build out the key-value pairs
@@ -161,8 +162,8 @@ public class BasicKeyValueBuilder extends AbstractKeyValueBuilder {
 			if( infoNode.isLeafNode() )
 			{
 				// create the key-value pair and add it to the list of key-values
-				keyValuePair.setSecond( infoNode.getValue() );
-				keyValues.add( keyValuePair );
+				builder.withSecond( infoNode.getValue() );
+				keyValues.add( builder.build() );
 			}
 			else
 			{
