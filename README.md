@@ -1,4 +1,4 @@
-![develop](https://travis-ci.org/robphilipp/freezedry.svg?branch=develop)
+![master](https://travis-ci.org/robphilipp/freezedry.svg?branch=master)
 
 freezedry
 =========
