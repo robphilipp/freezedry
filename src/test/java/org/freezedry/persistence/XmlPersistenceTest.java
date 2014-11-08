@@ -17,10 +17,12 @@ package org.freezedry.persistence;
 
 import org.freezedry.difference.ObjectDifferenceCalculator;
 import org.freezedry.persistence.tests.BadPerson;
+import org.freezedry.persistence.tests.Cube;
 import org.freezedry.persistence.tests.Division;
 import org.freezedry.persistence.tests.ThingWithEnum;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import static junit.framework.Assert.assertTrue;
@@ -66,6 +68,19 @@ public class XmlPersistenceTest  extends AbstractPersistenceTest {
 
 		final ObjectDifferenceCalculator calculator = new ObjectDifferenceCalculator();
 		final Map< String, ObjectDifferenceCalculator.Difference > differences = calculator.calculateDifference( rething, thing );
+		assertTrue( differences == null || differences.isEmpty() );
+	}
+
+	@Test
+	public void testCube()
+	{
+		final String output = OUTPUT_DIR + "cube.xml";
+		final Cube cube = new Cube(Arrays.asList( 2.0, 2.0, 2.0 ) );
+		persistence.write( cube, output );
+		final Cube recube = persistence.read( Cube.class, output );
+
+		final ObjectDifferenceCalculator calculator = new ObjectDifferenceCalculator();
+		final Map< String, ObjectDifferenceCalculator.Difference > differences = calculator.calculateDifference( recube, cube );
 		assertTrue( differences == null || differences.isEmpty() );
 	}
 }
