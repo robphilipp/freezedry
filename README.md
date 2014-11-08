@@ -1,3 +1,4 @@
+![develop](https://travis-ci.org/robphilipp/freezedry.svg?branch=develop)
 freezedry
 =========
 
