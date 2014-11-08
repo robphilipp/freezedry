@@ -24,7 +24,7 @@ import java.util.Map;
 import org.freezedry.persistence.annotations.Persist;
 import org.freezedry.persistence.annotations.PersistCollection;
 import org.freezedry.persistence.annotations.PersistDateAs;
-import org.freezedry.persistence.builders.DateNodeBuilder;
+import org.freezedry.persistence.builders.CalendarNodeBuilder;
 import org.freezedry.persistence.utils.Constants;
 import org.freezedry.persistence.utils.DateUtils;
 
@@ -170,7 +170,7 @@ public class Person {
 		buffer.append( "  Age: " + age + Constants.NEW_LINE );
 		if( birthDate != null )
 		{
-			buffer.append( "  Birthdate: " + DateUtils.createStringFromDate( birthDate, DateNodeBuilder.ISO_8601_DATE_FORMAT ) );
+			buffer.append( "  Birthdate: " + DateUtils.createStringFromDate( birthDate, CalendarNodeBuilder.ISO_8601_DATE_FORMAT ) );
 			buffer.append( Constants.NEW_LINE );
 		}
 		if( mood != null )

@@ -37,9 +37,9 @@ import org.freezedry.persistence.utils.ReflectionUtils;
  *  
  * @author Robert Philipp
  */
-public class DateNodeBuilder extends AbstractLeafNodeBuilder {
+public class CalendarNodeBuilder extends AbstractLeafNodeBuilder {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger( DateNodeBuilder.class );
+	private static final Logger LOGGER = LoggerFactory.getLogger( CalendarNodeBuilder.class );
 	
 	public static final String ISO_8601_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 	
@@ -51,7 +51,7 @@ public class DateNodeBuilder extends AbstractLeafNodeBuilder {
 	 * back to {@link Object}s.
 	 * @param engine The {@link PersistenceEngine}
 	 */
-	public DateNodeBuilder( final PersistenceEngine engine, final String dateFormat )
+	public CalendarNodeBuilder( final PersistenceEngine engine, final String dateFormat )
 	{
 		super( engine );
 		this.outputDateFormat = dateFormat;
@@ -62,7 +62,7 @@ public class DateNodeBuilder extends AbstractLeafNodeBuilder {
 	 * back to {@link Object}s.
 	 * @param engine The {@link PersistenceEngine}
 	 */
-	public DateNodeBuilder( final PersistenceEngine engine )
+	public CalendarNodeBuilder( final PersistenceEngine engine )
 	{
 		super( engine );
 	}
@@ -70,16 +70,16 @@ public class DateNodeBuilder extends AbstractLeafNodeBuilder {
 	/**
 	 * Default no-arg constructor
 	 */
-	public DateNodeBuilder()
+	public CalendarNodeBuilder()
 	{
 		super();
 	}
 	
 	/**
 	 * Copy constructor
-	 * @param builder The {@link DateNodeBuilder} to copy
+	 * @param builder The {@link CalendarNodeBuilder} to copy
 	 */
-	public DateNodeBuilder( final DateNodeBuilder builder )
+	public CalendarNodeBuilder( final CalendarNodeBuilder builder )
 	{
 		super( builder );
 		this.outputDateFormat = builder.outputDateFormat;
@@ -261,8 +261,8 @@ public class DateNodeBuilder extends AbstractLeafNodeBuilder {
 
 	/**
 	 * Creates an object of the specified {@link Class} based on the information in the {@link InfoNode}. Note that
-	 * the {@link com.sun.org.apache.xalan.internal.lib.NodeInfo} may also contain type information about the class to generate. The specified {@link Class}
-	 * overrides that value. This is done to avoid modifying the {@link com.sun.org.apache.xalan.internal.lib.NodeInfo} tree when supplemental information becomes
+	 * the {@link org.freezedry.persistence.tree.InfoNode} may also contain type information about the class to generate. The specified {@link Class}
+	 * overrides that value. This is done to avoid modifying the {@link org.freezedry.persistence.tree.InfoNode} tree when supplemental information becomes
 	 * available.
 	 * @param containingClass The {@link Class} containing the clazz, represented by the {@link InfoNode}
 	 * @param clazz The {@link Class} of the object to create
@@ -345,8 +345,8 @@ public class DateNodeBuilder extends AbstractLeafNodeBuilder {
 	 * @return a copy of the object that meets the above criteria
 	 */
 	@Override
-	public DateNodeBuilder getCopy()
+	public CalendarNodeBuilder getCopy()
 	{
-		return new DateNodeBuilder( this );
+		return new CalendarNodeBuilder( this );
 	}
 }
