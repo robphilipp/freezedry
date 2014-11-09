@@ -75,7 +75,7 @@ public class XmlPersistenceTest  extends AbstractPersistenceTest {
 	public void testCube()
 	{
 		final String output = OUTPUT_DIR + "cube.xml";
-		final Cube cube = new Cube(Arrays.asList( 2.0, 2.0, 2.0 ) );
+		final Cube cube = new Cube( 2.0, 2.0, 2.0 );
 		persistence.write( cube, output );
 		final Cube recube = persistence.read( Cube.class, output );
 

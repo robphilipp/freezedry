@@ -849,7 +849,7 @@ public class PersistenceEngine {
 				// create the parameter array (use default values that will get overriden
 				// during the object creation anyway)
 				final Object[] params = createConstructorParameters( minParamTypes );
-				
+
 				// create the new instance using the constructor and its default parameters
 				object = minParamConstructor.newInstance( params );
 			}
@@ -891,7 +891,7 @@ public class PersistenceEngine {
 		return object;
 	}
 	
-	/*
+	/**
 	 * Creates an array of default parameters for the constructor. If the arguments
 	 * are primitives, the creates the object of the correct type, otherwise, simply
 	 * type casts the null.
@@ -917,7 +917,7 @@ public class PersistenceEngine {
 		return params;
 	}
 	
-	/*
+	/**
 	 * Builds the specified {@link Object} by setting the fields it contains, using the information in 
 	 * the specified {@link InfoNode}. The fields in the specified {@link Object} are objects that must be 
 	 * instantiated before being set. This method is part of the recursive algorithm that walks down the

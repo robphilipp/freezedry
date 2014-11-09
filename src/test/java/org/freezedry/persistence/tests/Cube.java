@@ -3,6 +3,7 @@ package org.freezedry.persistence.tests;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Cube whose "lower left-hand side" sits on the origin.
@@ -22,21 +23,20 @@ public class Cube {
 		this.dimensions = new ArrayList<>();
 		if( dimensions != null )
 		{
-			for( double dimension : dimensions )
-			{
-				this.dimensions.add( Math.abs( dimension ) );
-			}
+			this.dimensions.addAll( dimensions.stream().map( Math::abs ).collect( Collectors.toList() ) );
 		}
 	}
 
 	/**
-	 * Constructor for an n-dimensial cube, where n is the size of the specified dimensions list
+	 * Constructor for an n-dimensional cube, where n is the size of the specified dimensions list
 	 * @param dimensions The list of dimensions. For example, a 3-d unit cube would be ( 1, 1, 1 ).
 	 */
-//	public Cube( final Double...dimensions )
-//	{
-//		this( Arrays.asList( dimensions ) );
-//	}
+	public Cube( final Double...dimensions )
+	{
+		// the casting is to handle the case where dimensions is null, so that we can call the
+		// correct constructor
+		this( Arrays.asList( (Double[])dimensions ) );
+	}
 
 	/**
 	 * @return The number of dimensions. For example, a 3-d cube would return 3
