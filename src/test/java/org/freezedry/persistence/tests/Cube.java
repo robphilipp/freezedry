@@ -33,9 +33,8 @@ public class Cube {
 	 */
 	public Cube( final Double...dimensions )
 	{
-		// the casting is to handle the case where dimensions is null, so that we can call the
-		// correct constructor
-		this( Arrays.asList( (Double[])dimensions ) );
+		// Arrays.asList requires a non-null argument
+		this( dimensions == null ? null : Arrays.asList( dimensions ) );
 	}
 
 	/**
