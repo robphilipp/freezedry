@@ -33,10 +33,10 @@ public class Cube {
 	 * Constructor for an n-dimensial cube, where n is the size of the specified dimensions list
 	 * @param dimensions The list of dimensions. For example, a 3-d unit cube would be ( 1, 1, 1 ).
 	 */
-	public Cube( final Double...dimensions )
-	{
-		this( Arrays.asList( dimensions ) );
-	}
+//	public Cube( final Double...dimensions )
+//	{
+//		this( Arrays.asList( dimensions ) );
+//	}
 
 	/**
 	 * @return The number of dimensions. For example, a 3-d cube would return 3
