@@ -79,39 +79,45 @@
         <div class="span9">
             <h2 id="overview" class="no-show"><a href="#overview" class="scroll-offset">Overview</a></h2>
 
-            <p><b>FreezeDry</b> provides an easy mechanism for converting Java objects into a persisted
-                form and then back again. And there is no need for creating binding files. New in version 0.2.8
-                FreezeDry can serialize objects into an output stream and deserialize object from an input stream. And
-                version 0.2.7 added a convenient object difference calculator.</p>
+            <p><b>FreezeDry</b> makes it easy to persist and serialize objects. You don't need binding files. In most
+            cases you don't need to pollute your code with annotations. You don't need no-arg constructors. And you can
+            persist top-level generic classes. FreezeDry supports JSON, XML, and flattened key-value pairs.</p>
+
+            <p>As an added bonus, <b>FreezeDry</b> has an object difference calculator for comparing objects and reporting
+            back field level differences.</p>
+
+            <p>FreezeDry aims to be non-intrusive, flexible, and extensible. You can write and register you own classes
+            for converting objects into a persisted form, and you get the translation to JSON, XML, and flattened key-value
+            pairs for free.</p>
 
             <p class="image">
                 <img src="images/architecture_overview.png" title="FreezeDry Architecture Overview"/>
                 <!--<embed src="images/architecture_overview.svg" type="image/svg+xml" viewBox="0 0 10 10"/>-->
             </p>
 
-            <p>Version 0.2.0 added a set of convenient classes to the <b>FreezeDry</b> framework that makes it much easier to
-                persist objects and reconstitute them from their persisted form. These new classes, derived from the <b class="class">Persistence</b>
+            <p>FreezDry has set of convenient classes that makes it easy to
+                persist objects and reconstitute them from their persisted form. These classes, derived from the <b class="class">Persistence</b>
                 interface, remove the need for you to deal directly with the <b class="class">PersistenceEngine</b>. The <b class="class">Persistence</b>
                 classes allow a fair amount of flexibility, but if they don't meet your needs, you can still use the <b class="class">PersistenceEngine</b>
                 directly as before.</p>
 
             <p>The current <b>FreezeDry</b> version provides the ability to convert between Java objects and XML, Java objects and JSON, and Java
-                objects and lists of key-value pairs. In its most basic form, converting a Java object into a persisted form is as simple as:</p>
+                objects and flattened key-value pairs. In its most basic form, converting a Java object into a persisted form is as simple as:</p>
 
             <!-- You also need to add some content to highlight, but that is covered elsewhere. -->
             <pre><code class="language-java">
-                final XmlPersistence persistence = new XmlPersistence();
-                persistence.write( division, "person.xml" );
+                final JsonPersistence persistence = new JsonPersistence();
+                persistence.write( division, "division.json" );
             </code></pre>
 
-            <p>And to reconstitute the <b>division</b> object from the "person.xml" file, all you need to do is:</p>
+            <p>And to reconstitute the <b>division</b> object from the "division.json" file, all you need to do is:</p>
 
             <pre><code class="language-java">
-                final XmlPersistence persistence = new XmlPersistence();
-                Division redivision = persistence.read( Division.class, "person.xml" );
+                final JsonPersistence persistence = new JsonPersistence();
+                Division redivision = persistence.read( Division.class, "division.json" );
             </code></pre>
 
-            <p>The approach used in version 0.1.0 is still available. In some cases you might find that the older method, although more
+            <p>In some cases you might find that direct use of the <b class="class">PersistenceEngine</b>, although more
                 complicated, provides more control over the transformation of objects and persisted forms into and out of the semantic model.
                 The code below demonstrates how to persist a Java object to an XML file by directly using the <b class="class">PersistenceEngine</b>
                 and an <b class="class">XmlWriter</b>:</p>
@@ -137,7 +143,7 @@
                 }
             </code></pre>
 
-            <p>Both approaches produces an XML file like the one below:</p>
+            <p>This produces an XML file like the one below:</p>
 
             <pre><code class="language-markup">
                 &lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;
@@ -166,7 +172,7 @@
                 &lt;/Division&gt;
             </code></pre>
 
-            <p>Don't like the way the XML is mapped to your object? Well, there are ways to alter the XML mapping--either through annotations,
+            <p>Don't like the way the XML, JSON or key-value pairs are mapped to your object? Well, there are ways to alter the mapping--either through annotations,
                 by implementing a custom node builder, or by implementing a custom reader and writer.</p>
 
             <p>In the next sections we will describe <b>FreezeDry</b>s design.</p>

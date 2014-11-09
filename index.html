@@ -76,11 +76,16 @@
         </div>
         <div class="span9">
             <h2 id="goals" class="no-show"><a href="#goals" class="scroll-offset">FreezeDry</a></h2>
-            <p><b>FreezeDry</b> provides an easy mechanism for converting Java objects into a persisted form such as XML,
-                JSON, or lists of key-value pairs. And then incredibly, from that persisted form, back into a Java object.
-                Version 0.2.8 added serialization and an object difference calculator. Version 0.2.9 added OSGi bundle
-                information to the jar manifest and provides pax:exam integration tests (using felix as a default container).
-            </p>
+            <p><b>FreezeDry</b> makes it easy to persist and serialize objects. You don't need binding files. In most
+                cases you don't need to pollute your code with annotations. You don't need no-arg constructors. And you can
+                persist top-level generic classes. FreezeDry supports JSON, XML, and flattened key-value pairs.</p>
+
+            <p>As an added bonus, <b>FreezeDry</b> has an object difference calculator for comparing objects and reporting
+                back field level differences.</p>
+
+            <p>FreezeDry aims to be non-intrusive, flexible, and extensible. You can write and register you own classes
+                for converting objects into a persisted form, and you get the translation to JSON, XML, and flattened key-value
+                pairs for free.</p>
 
             <p class="image">
                 <img src="images/architecture_overview.png" title="FreezeDry Architecture Overview"/>
